@@ -9,6 +9,17 @@ async function createSupervisor(req, res) {
 
   const { fullname, email, phone, username, password } = req.body;
   try {
+    const supervisorExist = await pool.query(
+      `SELECT email, phone, username FROM supervisors WHERE email = $1 OR phone = $2 OR username = $3`,
+      [email, phone, username]
+    );
+
+    if (supervisorExist.rowCount > 0) {
+      return res
+        .status(400)
+        .json({ message: "Try changing email or password or username!" });
+    }
+
     await pool.query(
       `INSERT INTO supervisors (fullname, email, phone, username, password, dpassword) VALUES($1, $2, $3, $4, $5, $6)`,
       [fullname, email, phone, username, password, password]
