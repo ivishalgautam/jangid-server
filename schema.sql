@@ -55,6 +55,7 @@ CREATE TABLE workers(
     username VARCHAR(20) NOT NULL,
     password VARCHAR(20) NOT NULL,
     dpassword TEXT NOT NULL,
+    supervisor_id INT REFERENCES supervisors(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -65,6 +66,27 @@ UPDATE
 
 CREATE TABLE sites(
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    supervisor_id INT REFERENCES supervisors(id)
+    site_name TEXT NOT NULL,
+    owner_name VARCHAR(100) NOT NULL,
+    address TEXT NOT NULL,
+    image TEXT NOT NULL,
+    supervisor_id INT REFERENCES supervisors(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TRIGGER trigger_update_updated_at BEFORE
+UPDATE
+    ON sites FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+CREATE TABLE wallet(
+    id SERIAL PRIMARY KEY,
+    amount INT NOT NULL,
+    supervisor_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TRIGGER trigger_update_updated_at BEFORE
+UPDATE
+    ON wallet FOR EACH ROW EXECUTE FUNCTION update_updated_at();

@@ -7,11 +7,11 @@ async function createSupervisor(req, res) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { fullname, email, phone } = req.body;
+  const { fullname, email, phone, username, password } = req.body;
   try {
     await pool.query(
-      `INSERT INTO supervisors (fullname, email, phone) VALUES($1, $2, $3)`,
-      [fullname, email, phone]
+      `INSERT INTO supervisors (fullname, email, phone, username, password, dpassword) VALUES($1, $2, $3, $4, $5, $6)`,
+      [fullname, email, phone, username, password, password]
     );
 
     res.json({ message: "Created" });
