@@ -1,3 +1,4 @@
+const router = require("express").Router();
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -25,3 +26,5 @@ router.put("/:siteId", uploads.single("file"), Controller.updateSiteById);
 router.delete("/:siteId", Controller.deleteSiteById);
 router.get("/:siteId", Controller.getSiteById);
 router.get("/", Controller.getAllSites);
+
+module.exports = router;
