@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const { pool } = require("../config/db");
+const bcrypt = require("bcryptjs");
 
 async function createSupervisor(req, res) {
   const errors = validationResult(req);
@@ -20,15 +21,17 @@ async function createSupervisor(req, res) {
         .json({ message: "Try changing email or password or username!" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     await pool.query(
-      `INSERT INTO supervisors (fullname, email, phone, username, password, dpassword) VALUES($1, $2, $3, $4, $5, $6)`,
-      [fullname, email, phone, username, password, password]
+      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword) VALUES($1, $2, $3, $4, $5, $6)`,
+      [fullname, email, phone, username, password, hashedPassword]
     );
 
     res.json({ message: "Created" });
   } catch (error) {
     console.log(error);
-    req.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
 

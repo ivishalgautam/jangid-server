@@ -18,7 +18,7 @@ CREATE TABLE admin(
     role role_type DEFAULT 'admin',
     username VARCHAR(20) NOT NULL UNIQUE,
     password VARCHAR(20) NOT NULL,
-    dpassword TEXT NOT NULL,
+    hpassword TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -36,7 +36,7 @@ CREATE TABLE supervisors(
     role role_type DEFAULT 'supervisor',
     username VARCHAR(20) NOT NULL UNIQUE,
     password VARCHAR(20) NOT NULL,
-    dpassword TEXT NOT NULL,
+    hpassword TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -54,7 +54,7 @@ CREATE TABLE workers(
     role role_type DEFAULT 'worker',
     username VARCHAR(20) NOT NULL UNIQUE,
     password VARCHAR(20) NOT NULL,
-    dpassword TEXT NOT NULL,
+    hpassword TEXT NOT NULL,
     supervisor_id INT REFERENCES supervisors(id),
     is_present BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

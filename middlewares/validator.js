@@ -11,6 +11,15 @@ const validateSupervisor = [
     .withMessage("Phone number must be at least 10 characters long"),
 ];
 
+const validateCredentials = [
+  body("username")
+    .isLength({ min: 3 })
+    .withMessage("Name must be at least 3 characters long"),
+  body("password")
+    .isLength({ min: 3 })
+    .withMessage("Phone number must be at least 10 characters long"),
+];
+
 // Validation middleware for creating a worker
 const validateWorker = [
   body("fullname")
@@ -25,4 +34,5 @@ const validateWorker = [
 module.exports = {
   validateSupervisor,
   validateWorker,
+  validateCredentials,
 };

@@ -10,6 +10,9 @@ app.use("/api/supervisors", require("./router/supervisor"));
 app.use("/api/workers", require("./router/worker"));
 app.use("/api/dashboard", require("./router/dashboard"));
 
+// auth
+app.use("/api/auth", require("./router/auth"));
+
 app.listen(process.env.PORT, () => {
   console.log(`Server up and running on localhost:${process.env.PORT}`);
 });
