@@ -8,6 +8,9 @@ app.use(cors());
 
 app.use("/api/supervisors", require("./router/supervisor"));
 app.use("/api/workers", require("./router/worker"));
+app.use("/api/sites", require("./router/site"));
+app.use("/api/wallets", require("./router/wallet"));
+app.use("/api/expenses", require("./router/expense"));
 app.use("/api/dashboard", require("./router/dashboard"));
 
 // auth

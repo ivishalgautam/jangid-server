@@ -1,11 +1,21 @@
 const router = require("express").Router();
 const Controller = require("../controller/worker.controller");
 const { validateWorker } = require("../middlewares/validator");
+const { verifyTokenAndSupervisor } = require("../middlewares/verifyToken");
 
-router.post("/", validateWorker, Controller.createWorker);
-router.put("/:workerId", Controller.updateWorkerById);
-router.delete("/:workerId", Controller.deleteWorkerById);
-router.get("/:workerId", Controller.getWorkerById);
-router.get("/", Controller.getAllWorkers);
+router.post(
+  "/",
+  validateWorker,
+  verifyTokenAndSupervisor,
+  Controller.createWorker
+);
+router.put("/:workerId", verifyTokenAndSupervisor, Controller.updateWorkerById);
+router.delete(
+  "/:workerId",
+  verifyTokenAndSupervisor,
+  Controller.deleteWorkerById
+);
+router.get("/:workerId", verifyTokenAndSupervisor, Controller.getWorkerById);
+router.get("/", verifyTokenAndSupervisor, Controller.getAllWorkers);
 
 module.exports = router;

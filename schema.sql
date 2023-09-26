@@ -91,3 +91,13 @@ CREATE TABLE wallet(
 CREATE TRIGGER trigger_update_updated_at BEFORE
 UPDATE
     ON wallet FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+CREATE TYPE expense_type as ENUM('site', 'worker');
+
+CREATE TABLE expenses(
+    id SERIAL PRIMARY KEY,
+    amount INT NOT NULL,
+    purpose expense_type NOT NULL,
+    site_id INT NOT NULL,
+    worker_id INT
+);
