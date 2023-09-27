@@ -3,6 +3,10 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const Controller = require("../controller/site.controller");
+const {
+  verifyTokenAndAdmin,
+  verifyToken,
+} = require("../middlewares/verifyToken");
 
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -21,10 +25,23 @@ const storage = multer.diskStorage({
 });
 const uploads = multer({ storage });
 
-router.post("/", uploads.single("file"), Controller.createSite);
-router.put("/:siteId", uploads.single("file"), Controller.updateSiteById);
-router.delete("/:siteId", Controller.deleteSiteById);
-router.get("/:siteId", Controller.getSiteById);
-router.get("/", Controller.getAllSites);
+router.post(
+  "/",
+  verifyTokenAndAdmin,
+  uploads.single("file"),
+  Controller.createSite
+); //admin
+
+router.delete("/:siteId", verifyTokenAndAdmin, Controller.deleteSiteById); // admin
+router.get("/", verifyTokenAndAdmin, Controller.getAllSites); // admin
+
+router.put(
+  "/:siteId",
+  verifyToken,
+  uploads.single("file"),
+  Controller.updateSiteById
+);
+
+router.get("/:siteId", verifyToken, Controller.getSiteById);
 
 module.exports = router;

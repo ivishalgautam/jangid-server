@@ -8,4 +8,6 @@ router.post(
   Controller.supervisorLogin
 );
 
+router.post("/login/admin", validateCredentials, Controller.adminLogin);
+
 module.exports = router;

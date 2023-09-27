@@ -1,5 +1,7 @@
 const { validationResult } = require("express-validator");
 const { pool } = require("../config/db");
+const path = require("path");
+const fs = require("fs");
 
 async function createWorker(req, res) {
   const errors = validationResult(req);
@@ -7,12 +9,16 @@ async function createWorker(req, res) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { fullname, email, phone } = req.body;
+  const { fullname, phone, site_assigned } = req.body;
   try {
+    const docs = req.files.map((file) => `/assets/${file.filename}`);
+    const profile_img = req.file ? `/assets/${req.file.filename}` : null;
+
     await pool.query(
-      `INSERT INTO workers (fullname, email, phone) VALUES ($1, $2, $3)`,
-      [fullname, email, phone]
+      `INSERT INTO workers (fullname, phone, docs, site_assigned, password, profile_img) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [fullname, phone, docs, site_assigned, password, profile_img]
     );
+
     res.json({ message: "CREATED" });
   } catch (error) {
     console.log(error);
@@ -33,6 +39,7 @@ async function updateWorkerById(req, res) {
     if (rowCount === 0) {
       return res.status(404).json({ message: "NOT FOUND!" });
     }
+
     res.json({ message: "UPDATED" });
   } catch (error) {
     console.log(error);

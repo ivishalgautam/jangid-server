@@ -49,9 +49,22 @@ function verifyTokenAndAdmin(req, res, next) {
   });
 }
 
+function verifyAdminAndSupervisor(req, res, next) {
+  verifyToken(req, res, () => {
+    if (req.user.role === "admin" || req.user.role === "supervisor") {
+      next();
+    } else {
+      return res
+        .status(401)
+        .json({ message: "Access denied not admin or supervisor!" });
+    }
+  });
+}
+
 module.exports = {
   verifyToken,
   verifyTokenAndSupervisor,
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
+  verifyAdminAndSupervisor,
 };

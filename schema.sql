@@ -37,6 +37,7 @@ CREATE TABLE supervisors(
     username VARCHAR(20) NOT NULL UNIQUE,
     password VARCHAR(20) NOT NULL,
     hpassword TEXT NOT NULL,
+    is_present BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -48,15 +49,22 @@ UPDATE
 CREATE TABLE workers(
     id SERIAL PRIMARY KEY,
     fullname VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
     phone VARCHAR(20) NOT NULL UNIQUE,
-    is_disabled BOOLEAN DEFAULT false,
     role role_type DEFAULT 'worker',
+    docs TEXT [],
+    profile_img TEXT,
     username VARCHAR(20) NOT NULL UNIQUE,
     password VARCHAR(20) NOT NULL,
     hpassword TEXT NOT NULL,
     supervisor_id INT REFERENCES supervisors(id),
+    site_assigned INT,
+    daily_wage_salary INT NOT NULL,
     is_present BOOLEAN DEFAULT false,
+    is_disabled BOOLEAN DEFAULT false,
+    total_working_hours INT DEFAULT 0,
+    total_payout INT DEFAULT 0,
+    total_paid INT DEFAULT 0,
+    pending_payout INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -100,4 +108,20 @@ CREATE TABLE expenses(
     purpose expense_type NOT NULL,
     site_id INT NOT NULL,
     worker_id INT
+);
+
+CREATE TABLE attendences(
+    id SERIAL PRIMARY KEY,
+    date DATE DEFAULT CURRENT_DATE,
+    hours INT NOT NULL,
+    check_in TIMESTAMP NOT NULL,
+    check_out TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE worker_payouts(
+    id SERIAL PRIMARY KEY,
+    amount INT NOT NULL,
+    worker_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

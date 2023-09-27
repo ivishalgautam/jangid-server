@@ -1,6 +1,6 @@
 <!-- workers endpoints with authorization in headers -->
 
-POST:"/api/workers" <!-- { fullname, email, phone } -->
+POST:"/api/workers" <!-- { fullname, phone, docs, site_assigned, password, profile_img } change -->
 GET:"/api/workers" <!-- fetch all the worker -->
 GET:"/api/workers/:workerId" <!-- fetch all the worker -->
 PUT:"/api/workers/:workerId" <!-- updates a worker -->

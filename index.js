@@ -11,7 +11,10 @@ app.use("/api/workers", require("./router/worker"));
 app.use("/api/sites", require("./router/site"));
 app.use("/api/wallets", require("./router/wallet"));
 app.use("/api/expenses", require("./router/expense"));
+app.use("/api/payouts", require("./router/payout"));
 app.use("/api/dashboard", require("./router/dashboard"));
+
+app.use("/api/admin", require("./router/admin"));
 
 // auth
 app.use("/api/auth", require("./router/auth"));
