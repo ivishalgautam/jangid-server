@@ -5,6 +5,28 @@ async function createAdmin(req, res) {
   const { fullname, email, username, password } = req.body;
 
   try {
+    const emailExist = await pool.query(
+      `SELECT * FROM admin WHERE email = $1`,
+      [email]
+    );
+
+    if (emailExist.rowCount > 0) {
+      return res
+        .status(400)
+        .json({ message: `Admin already exist with this '${email}' email!` });
+    }
+
+    const usernameExist = await pool.query(
+      `SELECT * FROM admin WHERE username = $1`,
+      [username]
+    );
+
+    if (usernameExist.rowCount > 0) {
+      return res.status(400).json({
+        message: `Admin already exist with this '${username}' username!`,
+      });
+    }
+
     const hpassword = await bcrypt.hash(password, 10);
 
     await pool.query(
