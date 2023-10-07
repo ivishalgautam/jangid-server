@@ -19,6 +19,10 @@ app.use("/api/admin", require("./router/admin"));
 // auth
 app.use("/api/auth", require("./router/auth"));
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server up and running on localhost:${process.env.PORT}`);
+app.get("/", (req, res) => {
+  res.json({ message: "hello world" });
+});
+
+app.listen(4001, () => {
+  console.log(`Jangid stone server up and running on localhost:4001`);
 });
