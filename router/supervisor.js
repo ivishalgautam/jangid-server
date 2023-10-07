@@ -5,8 +5,8 @@ const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
 router.post(
   "/",
-  verifyTokenAndAdmin,
-  validateSupervisor,
+  // verifyTokenAndAdmin,
+  // validateSupervisor,
   Controller.createSupervisor
 ); //admin
 
