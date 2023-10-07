@@ -1,14 +1,8 @@
 const router = require("express").Router();
 const Controller = require("../controller/supervisor.controller");
-const { validateSupervisor } = require("../middlewares/validator");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
-router.post(
-  "/",
-  // verifyTokenAndAdmin,
-  // validateSupervisor,
-  Controller.createSupervisor
-); //admin
+router.post("/", verifyTokenAndAdmin, Controller.createSupervisor); //admin
 
 router.put(
   "/:supervisorId",
