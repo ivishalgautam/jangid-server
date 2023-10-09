@@ -31,7 +31,7 @@ router.post(
   "/",
   validateWorker,
   verifyTokenAndSupervisor,
-  uploads.array("docs", 5),
+  uploads.array("file", 5),
   // uploads.single("profile_img"),
   Controller.createWorker
 );
