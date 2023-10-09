@@ -6,6 +6,7 @@ const fs = require("fs");
 async function createWorker(req, res) {
   // const errors = validationResult(req);
   console.log(req.files);
+  console.log(req.headers);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
