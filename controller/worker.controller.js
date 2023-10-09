@@ -28,7 +28,7 @@ async function createWorker(req, res) {
     const profile_img = req.file ? `/assets/${req.file.filename}` : null;
 
     await pool.query(
-      `INSERT INTO workers (fullname, phone, docs, site_assigned, password, daily_wage_salary, username, hpassword, profile_img) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      `INSERT INTO workers (fullname, phone, docs, site_assigned, password, daily_wage_salary, username, hpassword, profile_img) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [
         fullname,
         phone,
