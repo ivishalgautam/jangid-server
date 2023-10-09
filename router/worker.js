@@ -29,7 +29,7 @@ const uploads = multer({ storage });
 
 router.post(
   "/",
-  validateWorker,
+  // validateWorker,
   verifyTokenAndSupervisor,
   uploads.array("file", 5),
   // uploads.single("profile_img"),
