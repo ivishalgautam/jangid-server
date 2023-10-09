@@ -56,7 +56,7 @@ CREATE TABLE workers(
     username VARCHAR(20) NOT NULL UNIQUE,
     password VARCHAR(20) NOT NULL,
     hpassword TEXT NOT NULL,
-    supervisor_id INT REFERENCES supervisors(id),
+    supervisor_id INT,
     site_assigned INT,
     daily_wage_salary INT NOT NULL,
     is_present BOOLEAN DEFAULT false,

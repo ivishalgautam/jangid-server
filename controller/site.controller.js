@@ -6,6 +6,7 @@ async function createSite(req, res) {
     filename: req.file.originalname,
     path: `/assets/images/${req.file.filename}`,
   };
+  console.log(req.file);
   try {
     await pool.query(
       `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image) VALUES ($1, $2, $3, $4, $5)`,
