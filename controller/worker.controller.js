@@ -11,8 +11,14 @@ async function createWorker(req, res) {
   //   return res.status(400).json({ errors: errors.array() });
   // }
 
-  const { fullname, phone, site_assigned, daily_wage_salary, username } =
-    req.body;
+  const {
+    fullname,
+    phone,
+    site_assigned,
+    daily_wage_salary,
+    username,
+    password,
+  } = req.body;
   try {
     const docs = req.files.map((file) => `/assets/${file.filename}`);
     // const profile_img = req.file ? `/assets/${req.file.filename}` : null;
