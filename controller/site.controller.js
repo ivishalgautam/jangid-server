@@ -9,7 +9,7 @@ async function createSite(req, res) {
   try {
     await pool.query(
       `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image) VALUES ($1, $2, $3, $4, $5)`,
-      [site_name, owner_name, address, parseInt(supervisor_id), files.path]
+      [site_name, owner_name, address, supervisor_id, files.path]
     );
     res.json({ message: "Site created" });
   } catch (error) {
