@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const { pool } = require("../config/db");
 const path = require("path");
 const fs = require("fs");
+const bcrypt = require("bcryptjs");
 
 async function createWorker(req, res) {
   // const errors = validationResult(req);
