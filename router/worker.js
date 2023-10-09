@@ -32,7 +32,7 @@ router.post(
   // validateWorker,
   verifyTokenAndSupervisor,
   uploads.array("file", 5),
-  uploads.single("profile_img"),
+  // uploads.single("profile_img"),
   Controller.createWorker
 );
 router.put(
