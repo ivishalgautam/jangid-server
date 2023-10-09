@@ -18,9 +18,13 @@ const storage = multer.diskStorage({
     callback(null, folderPath);
   },
   filename: function (req, file, callback) {
-    callback(null, `${Date.now()}-${file.originalname}`);
+    callback(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
   },
 });
+
 const uploads = multer({ storage });
 
 router.post(
@@ -28,6 +32,7 @@ router.post(
   validateWorker,
   verifyTokenAndSupervisor,
   uploads.array("file", 5),
+  // uploads.single("profile_img"),
   Controller.createWorker
 );
 router.put(

@@ -9,14 +9,23 @@ async function createWorker(req, res) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { fullname, phone, site_assigned } = req.body;
+  const { fullname, phone, site_assigned, daily_wage_salary, username } =
+    req.body;
   try {
     const docs = req.files.map((file) => `/assets/${file.filename}`);
-    const profile_img = req.file ? `/assets/${req.file.filename}` : null;
+    // const profile_img = req.file ? `/assets/${req.file.filename}` : null;
 
     await pool.query(
-      `INSERT INTO workers (fullname, phone, docs, site_assigned, password, profile_img) VALUES ($1, $2, $3, $4, $5, $6)`,
-      [fullname, phone, docs, site_assigned, password, profile_img]
+      `INSERT INTO workers (fullname, phone, docs, site_assigned, password, daily_wage_salary, username) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        fullname,
+        phone,
+        docs,
+        site_assigned,
+        password,
+        daily_wage_salary,
+        username,
+      ]
     );
 
     res.json({ message: "CREATED" });
@@ -28,12 +37,24 @@ async function createWorker(req, res) {
 
 async function updateWorkerById(req, res) {
   const workerId = parseInt(req.params.workerId);
-  const { fullname, email, phone } = req.body;
+  const { fullname, phone, site_assigned, daily_wage_salary, username } =
+    req.body;
+
+  const docs = req.files.map((file) => `/assets/${file.filename}`);
+  const profile_img = req.file ? `/assets/${req.file.filename}` : null;
 
   try {
     const { rowCount } = await pool.query(
-      `UPDATE workers SET fullname = $1, email = $2, phone = $3 WHERE id = $4`,
-      [fullname, email, phone, workerId]
+      `UPDATE workers SET fullname = $1, phone = $2, site_assigned = $4, password = $5, daily_wage_salary = $7, username = $8 WHERE id = $9;`,
+      [
+        fullname,
+        phone,
+        site_assigned,
+        password,
+        daily_wage_salary,
+        username,
+        parseInt(workerId),
+      ]
     );
 
     if (rowCount === 0) {
