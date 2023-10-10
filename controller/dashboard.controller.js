@@ -29,4 +29,22 @@ async function supervisor(req, res) {
   }
 }
 
-module.exports = { supervisor };
+async function admin(req, res) {
+  try {
+    const { rows } = await pool.query(
+      `SELECT 
+            (SELECT COUNT(*) FROM sites AS s WHERE s.is_completed = false) AS ongoing_sites,
+            (SELECT COUNT(*) FROM sites AS s WHERE s.is_completed = true) AS completed_sites,
+            (SELECT COUNT(*) FROM workers) AS total_workers,
+            (SELECT COUNT(*) FROM workers AS w WHERE w.is_present = true) AS present_workers,
+            (SELECT COUNT(*) FROM supervisors) AS total_supervisors,
+            (SELECT COUNT(*) FROM workers AS s WHERE s.is_present = true) AS present_supervisors;`
+    );
+    res.json(rows[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+module.exports = { supervisor, admin };

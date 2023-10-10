@@ -1,11 +1,16 @@
 const router = require("express").Router();
 const Controller = require("../controller/dashboard.controller");
-const { verifyTokenAndSupervisor } = require("../middlewares/verifyToken");
+const {
+  verifyTokenAndSupervisor,
+  verifyTokenAndAdmin,
+} = require("../middlewares/verifyToken");
 
 router.get(
   "/supervisor/:supervisorId",
   verifyTokenAndSupervisor,
   Controller.supervisor
 );
+
+router.get("/admin", verifyTokenAndAdmin, Controller.admin);
 
 module.exports = router;

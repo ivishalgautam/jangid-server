@@ -80,6 +80,7 @@ CREATE TABLE sites(
     address TEXT NOT NULL,
     image TEXT NOT NULL,
     supervisor_id INT REFERENCES supervisors(id),
+    is_completed BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
