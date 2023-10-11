@@ -75,12 +75,12 @@ async function deleteSupervisorById(req, res) {
 }
 
 async function getSupervisorbyId(req, res) {
-  const supervisorId = parseInt(req.params.supervisorId);
+  const { supervisor_id } = req.body;
 
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT * FROM supervisors WHERE id = $1`,
-      [supervisorId]
+      [supervisor_id]
     );
 
     if (rowCount === 0) {

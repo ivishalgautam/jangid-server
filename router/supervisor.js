@@ -16,7 +16,7 @@ router.delete(
   Controller.deleteSupervisorById
 ); //admin
 
-router.get("/", verifyTokenAndAdmin, Controller.getAllSupervisors);
-router.get("/:supervisorId", verifyTokenAndAdmin, Controller.getSupervisorbyId);
+router.get("/get-all", verifyTokenAndAdmin, Controller.getAllSupervisors);
+router.get("/", verifyTokenAndAdmin, Controller.getSupervisorbyId);
 
 module.exports = router;
