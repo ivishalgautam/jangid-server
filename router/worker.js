@@ -46,7 +46,7 @@ router.delete(
   verifyTokenAndSupervisor,
   Controller.deleteWorkerById
 );
-router.get("/:workerId", verifyTokenAndSupervisor, Controller.getWorkerById);
-router.get("/", verifyTokenAndSupervisor, Controller.getAllWorkers);
+router.get("/all", verifyTokenAndSupervisor, Controller.getAllWorkers);
+router.get("/", verifyTokenAndSupervisor, Controller.getWorkerById);
 
 module.exports = router;

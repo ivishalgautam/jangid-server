@@ -60,12 +60,12 @@ async function deleteWalletById(req, res) {
 }
 
 async function getWalletById(req, res) {
-  const walletId = parseInt(req.params.walletId);
+  const wallet_id = req.body;
 
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT * FROM wallet WHERE id = $1`,
-      [walletId]
+      [wallet_id]
     );
 
     if (rowCount === 0) {

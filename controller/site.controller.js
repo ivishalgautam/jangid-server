@@ -67,11 +67,11 @@ async function deleteSiteById(req, res) {
 }
 
 async function getSiteById(req, res) {
-  const siteId = parseInt(req.params.siteId);
+  const { site_id } = req.body;
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT * FROM sites WHERE id = $1`,
-      [siteId]
+      [site_id]
     );
 
     if (rowCount === 0) {

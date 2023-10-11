@@ -60,12 +60,12 @@ async function deleteExpenseById(req, res) {
 }
 
 async function getExpenseById(req, res) {
-  const expenseId = parseInt(req.params.expenseId);
+  const expense_id = req.body;
 
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT * FROM expenses WHERE id = $1`,
-      [expenseId]
+      [expense_id]
     );
 
     if (rowCount === 0) {

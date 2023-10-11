@@ -5,12 +5,8 @@ const fs = require("fs");
 const bcrypt = require("bcryptjs");
 
 async function createWorker(req, res) {
-  // const errors = validationResult(req);
   console.log(req.files);
   console.log(req.headers);
-  // if (!errors.isEmpty()) {
-  //   return res.status(400).json({ errors: errors.array() });
-  // }
 
   const {
     fullname,
@@ -100,11 +96,11 @@ async function deleteWorkerById(req, res) {
 }
 
 async function getWorkerById(req, res) {
-  const workerId = parseInt(req.params.workerId);
+  const worker_id = req.body;
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT * FROM workers WHERE id = $1`,
-      [workerId]
+      [worker_id]
     );
 
     if (rowCount === 0) {

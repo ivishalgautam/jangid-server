@@ -33,7 +33,7 @@ router.post(
 ); //admin
 
 router.delete("/:siteId", verifyTokenAndAdmin, Controller.deleteSiteById); // admin
-router.get("/", verifyTokenAndAdmin, Controller.getAllSites); // admin
+router.get("/all", verifyTokenAndAdmin, Controller.getAllSites); // admin
 
 router.put(
   "/:siteId",
@@ -42,6 +42,6 @@ router.put(
   Controller.updateSiteById
 );
 
-router.get("/:siteId", verifyToken, Controller.getSiteById);
+router.get("/", verifyToken, Controller.getSiteById);
 
 module.exports = router;
