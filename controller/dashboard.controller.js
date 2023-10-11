@@ -55,7 +55,7 @@ async function worker(req, res) {
             (SELECT SUM(hours) AS total_work_hours
             FROM attendences
             WHERE EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM NOW())
-            AND EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM NOW());`
+            AND EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM NOW())`
     );
     res.json(rows[0]);
   } catch (error) {
