@@ -32,21 +32,23 @@ async function supervisor(req, res) {
 async function admin(req, res) {
   try {
     const { rows } = await pool.query(
-      `SELECT 
-            (SELECT COUNT(*) FROM sites AS s WHERE s.is_completed = false) AS ongoing_sites,
-            (SELECT COUNT(*) FROM sites AS s WHERE s.is_completed = true) AS completed_sites,
-            (SELECT COUNT(*) FROM workers) AS total_workers,
-            (SELECT COUNT(*) FROM workers AS w WHERE w.is_present = true) AS present_workers,
-            (SELECT COUNT(*) FROM supervisors) AS total_supervisors,
-            (SELECT COUNT(*) FROM workers AS s WHERE s.is_present = true) AS present_supervisors
-            (SELECT site_name, SUM(total_budget) AS total_budget FROM sites) AS total_income_this_month 
-            FROM sites
-              INNER JOIN (
-                  SELECT site_name, SUM(total_budget) AS total_budget
-                  FROM sites
-                  WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', CURRENT_DATE)
-                  GROUP BY site_name
-              ) AS income ON sites.site_name = income.site_name;;`
+      `
+  SELECT 
+      (SELECT COUNT(*) FROM sites AS s WHERE s.is_completed = false) AS ongoing_sites,
+      (SELECT COUNT(*) FROM sites AS s WHERE s.is_completed = true) AS completed_sites,
+      (SELECT COUNT(*) FROM workers) AS total_workers,
+      (SELECT COUNT(*) FROM workers AS w WHERE w.is_present = true) AS present_workers,
+      (SELECT COUNT(*) FROM supervisors) AS total_supervisors,
+      (SELECT COUNT(*) FROM workers AS s WHERE s.is_present = true) AS present_supervisors,
+      (SELECT site_name, SUM(total_budget) AS total_budget FROM sites) AS total_income_this_month
+  FROM sites
+  INNER JOIN (
+      SELECT site_name, SUM(total_budget) AS total_budget
+      FROM sites
+      WHERE DATE_TRUNC('month', created_at) = DATE_TRUNC('month', CURRENT_DATE)
+      GROUP BY site_name
+  ) AS income ON sites.site_name = income.site_name;
+  `
     );
     res.json(rows[0]);
   } catch (error) {
