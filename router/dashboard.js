@@ -5,11 +5,7 @@ const {
   verifyTokenAndAdmin,
 } = require("../middlewares/verifyToken");
 
-router.get(
-  "/supervisor/:supervisorId",
-  verifyTokenAndSupervisor,
-  Controller.supervisor
-);
+router.get("/supervisor", verifyTokenAndSupervisor, Controller.supervisor);
 
 router.get("/admin", verifyTokenAndAdmin, Controller.admin);
 router.get("/worker", Controller.worker);

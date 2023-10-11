@@ -1,11 +1,11 @@
 const { pool } = require("../config/db");
 
 async function supervisor(req, res) {
-  const supervisorId = parseInt(req.params.supervisorId);
+  const { supervisor_id } = req.body;
   try {
     const supervisor = await pool.query(
       `SELECT * FROM supervisors WHERE id = $1`,
-      [supervisorId]
+      [supervisor_id]
     );
 
     if (supervisor.rowCount === 0) {
@@ -20,7 +20,7 @@ async function supervisor(req, res) {
             (SELECT COUNT(*) FROM wallet AS wlt WHERE wlt.supervisor_id = sv.id) AS wallet_count
         FROM supervisors AS sv
         WHERE sv.id = $1;`,
-      [supervisorId]
+      [supervisor_id]
     );
     res.json(rows[0]);
   } catch (error) {
@@ -49,13 +49,14 @@ async function admin(req, res) {
 }
 
 async function worker(req, res) {
+  const { worker_id } = req.body;
   try {
     const { rows } = await pool.query(
       `SELECT 
-            (SELECT SUM(hours) AS total_work_hours
+            (SELECT SUM(hours)
             FROM attendences
             WHERE EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM NOW())
-            AND EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM NOW())`
+            AND EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM NOW()) AS total_work_hours`
     );
     res.json(rows[0]);
   } catch (error) {
