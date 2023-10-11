@@ -52,11 +52,9 @@ async function worker(req, res) {
   const { worker_id } = req.body;
   try {
     const { rows } = await pool.query(
-      `SELECT 
-            (SELECT SUM(hours)
-            FROM attendences
-            WHERE EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM NOW())
-            AND EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM NOW()) AS total_work_hours`
+      `SELECT (
+        SELECT SUM(hours) FROM attendences WHERE EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM NOW()) AND EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM NOW())
+        ) AS total_work_hours`
     );
     res.json(rows[0]);
   } catch (error) {
