@@ -48,4 +48,20 @@ async function admin(req, res) {
   }
 }
 
-module.exports = { supervisor, admin };
+async function worker(req, res) {
+  try {
+    const { rows } = await pool.query(
+      `SELECT 
+            (SELECT SUM(hours) AS total_work_hours
+            FROM attendences
+            WHERE EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM NOW())
+            AND EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM NOW());`
+    );
+    res.json(rows[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+module.exports = { supervisor, admin, worker };

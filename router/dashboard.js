@@ -12,5 +12,6 @@ router.get(
 );
 
 router.get("/admin", verifyTokenAndAdmin, Controller.admin);
+router.get("/worker", Controller.worker);
 
 module.exports = router;
