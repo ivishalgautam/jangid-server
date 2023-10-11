@@ -4,7 +4,10 @@ const path = require("path");
 const fs = require("fs");
 const Controller = require("../controller/worker.controller");
 const { validateWorker } = require("../middlewares/validator");
-const { verifyTokenAndSupervisor } = require("../middlewares/verifyToken");
+const {
+  verifyTokenAndSupervisor,
+  verifyToken,
+} = require("../middlewares/verifyToken");
 
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -46,7 +49,7 @@ router.delete(
   verifyTokenAndSupervisor,
   Controller.deleteWorkerById
 );
-router.get("/all", verifyTokenAndSupervisor, Controller.getAllWorkers);
+router.get("/all", verifyToken, Controller.getAllWorkers);
 router.get("/", verifyTokenAndSupervisor, Controller.getWorkerById);
 
 module.exports = router;
