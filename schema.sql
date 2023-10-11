@@ -79,6 +79,8 @@ CREATE TABLE sites(
     owner_name VARCHAR(100) NOT NULL,
     address TEXT NOT NULL,
     image TEXT NOT NULL,
+    total_budget INT DEFAULT 0,
+    budget_left INT DEFAULT 0,
     supervisor_id INT REFERENCES supervisors(id),
     is_completed BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
