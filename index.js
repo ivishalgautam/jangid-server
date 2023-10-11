@@ -16,6 +16,7 @@ app.use("/api/wallets", require("./router/wallet"));
 app.use("/api/expenses", require("./router/expense"));
 app.use("/api/payouts", require("./router/payout"));
 app.use("/api/dashboard", require("./router/dashboard"));
+app.use("/api/attendences", require("./router/attendence"));
 
 app.use("/api/admin", require("./router/admin"));
 

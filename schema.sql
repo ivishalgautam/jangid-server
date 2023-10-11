@@ -119,6 +119,7 @@ CREATE TABLE attendences(
     hours INT NOT NULL,
     check_in TIMESTAMP NOT NULL,
     check_out TIMESTAMP NOT NULL,
+    worker_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -127,4 +128,13 @@ CREATE TABLE worker_payouts(
     amount INT NOT NULL,
     worker_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE check_in_out(
+    id SERIAL PRIMARY KEY,
+    date DATE,
+    check_in TIMESTAMP,
+    check_out TIMESTAMP,
+    worker_id INT NOT NULL,
+    created_at DATE DEFAULT CURRENT_DATE
 );
