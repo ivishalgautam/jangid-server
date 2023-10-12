@@ -15,19 +15,19 @@ async function createCheckIn(req, res) {
 }
 
 async function createCheckOut(req, res) {
-  const { session_id } = req.body;
+  const { check_out, session_id } = req.body;
   try {
     const { rows, rowCount } = await pool.query(
-      `UPDATE check_in_out set check_out = $1 WHERE id = $1 returning *`,
-      [session_id]
+      `UPDATE check_in_out set check_out = $1 WHERE id = $2 returning *`,
+      [check_out, session_id]
     );
 
-    const check_in = rows[0].check_in;
-    const check_out = rows[0].check_out;
+    const check_in_time = rows[0].check_in;
+    const check_out_time = rows[0].check_out;
 
     // Calculate the time difference in hours
     const timeDifferenceInMilliseconds =
-      new Date(check_out) - new Date(check_in);
+      new Date(check_out_time) - new Date(check_in_time);
     const timeDifferenceInHours =
       timeDifferenceInMilliseconds / (1000 * 60 * 60); // Convert milliseconds to hours
 
@@ -38,8 +38,8 @@ async function createCheckOut(req, res) {
           rows[0].worker_id,
           new Date().toLocaleDateString(),
           timeDifferenceInHours,
-          check_in,
-          check_out,
+          check_in_time,
+          check_out_time,
         ]
       );
     }
