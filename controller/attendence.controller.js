@@ -21,11 +21,27 @@ async function createCheckOut(req, res) {
       `UPDATE check_in_out set check_out = $1 WHERE id = $1 returning *`,
       [session_id]
     );
+
+    const check_in = rows[0].check_in;
+    const check_out = rows[0].check_out;
+
+    // Calculate the time difference in hours
+    const timeDifferenceInMilliseconds =
+      new Date(check_out) - new Date(check_in);
+    const timeDifferenceInHours =
+      timeDifferenceInMilliseconds / (1000 * 60 * 60); // Convert milliseconds to hours
+
     if (rowCount > 0) {
-      // await pool.query(
-      //   `INSERT INTO attendences (worker_id, date, hours, check_in, check_out) VALUES ($1, $2, $3, $4, $5)`,
-      //   [rows[0].worker_id, new Date().toLocaleDateString(), hours, check_in, check_out]
-      // );
+      await pool.query(
+        `INSERT INTO attendences (worker_id, date, hours, check_in, check_out) VALUES ($1, $2, $3, $4, $5)`,
+        [
+          rows[0].worker_id,
+          new Date().toLocaleDateString(),
+          timeDifferenceInHours,
+          check_in,
+          check_out,
+        ]
+      );
     }
   } catch (error) {
     console.log(error);
@@ -61,4 +77,9 @@ async function getWorkerAttendenceById(req, res) {
   }
 }
 
-module.exports = { createAttendence, getWorkerAttendenceById };
+module.exports = {
+  createAttendence,
+  getWorkerAttendenceById,
+  createCheckIn,
+  createCheckOut,
+};

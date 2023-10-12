@@ -20,6 +20,9 @@ app.use("/api/attendences", require("./router/attendence"));
 
 app.use("/api/admin", require("./router/admin"));
 
+// check in - check out
+app.use("/api/attendence", require("./router/attendence"));
+
 // auth
 app.use("/api/auth", require("./router/auth"));
 
