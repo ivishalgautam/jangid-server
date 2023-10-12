@@ -19,7 +19,7 @@ async function createCheckOut(req, res) {
   const { check_out, session_id } = req.body;
   try {
     const { rows, rowCount } = await pool.query(
-      `UPDATE check_in_out set check_out = $1 WHERE id = $2 returning *`,
+      `UPDATE check_in_out set check_out = $1 WHERE uid = $2 returning *`,
       [check_out, session_id]
     );
     console.log(rows);
