@@ -1,13 +1,14 @@
 const { pool } = require("../config/db");
+import { v4 as uuidv4 } from "uuid";
 
 async function createCheckIn(req, res) {
   const { check_in, worker_id, date } = req.body;
   try {
     const { rows } = await pool.query(
-      `INSERT INTO check_in_out (check_in, worker_id, date) VALUES ($1, $2, $3) returning *`,
-      [check_in, worker_id, date]
+      `INSERT INTO check_in_out (uid, check_in, worker_id, date) VALUES ($1, $2, $3, $4) returning *`,
+      [uuidv4(), check_in, worker_id, date]
     );
-    res.json({ session_id: rows[0].id });
+    res.json({ session_id: rows[0].uid });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });

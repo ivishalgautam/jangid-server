@@ -131,7 +131,7 @@ CREATE TABLE worker_payouts(
 );
 
 CREATE TABLE check_in_out(
-    id SERIAL PRIMARY KEY,
+    uid TEXT,
     date DATE,
     check_in TIMESTAMP,
     check_out TIMESTAMP,
