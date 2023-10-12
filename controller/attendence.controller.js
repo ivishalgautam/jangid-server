@@ -1,5 +1,5 @@
 const { pool } = require("../config/db");
-import { v4 as uuidv4 } from "uuid";
+const { v4: uuidv4 } = require("uuid");
 
 async function createCheckIn(req, res) {
   const { check_in, worker_id, date } = req.body;
