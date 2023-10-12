@@ -21,6 +21,7 @@ async function createCheckOut(req, res) {
       `UPDATE check_in_out set check_out = $1 WHERE id = $2 returning *`,
       [check_out, session_id]
     );
+    console.log(rows);
 
     const check_in_time = rows[0].check_in;
     const check_out_time = rows[0].check_out;
