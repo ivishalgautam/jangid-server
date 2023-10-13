@@ -30,4 +30,27 @@ async function addPayout(req, res) {
   }
 }
 
-module.exports = { addPayout };
+async function getAllPayouts(req, res) {
+  const { query } = req.body;
+  try {
+    switch (query) {
+      case "worker":
+        const workerPayouts = await pool.query(`SELECT * FROM worker_payouts;`);
+        res.json(workerPayouts.rows);
+        break;
+      case "site":
+        const sitePayouts = await pool.query(`SELECT * FROM site_payouts;`);
+        res.json(sitePayouts.rows);
+        break;
+
+      default:
+        res.status(404).json({ message: "No query found!" });
+        break;
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+module.exports = { addPayout, getAllPayouts };

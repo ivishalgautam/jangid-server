@@ -136,6 +136,15 @@ CREATE TABLE worker_payouts(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE site_payouts(
+    id SERIAL PRIMARY KEY,
+    amount INT NOT NULL,
+    site_id INT NOT NULL,
+    supervisor_id INT NOT NULL,
+    comment text NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE check_in_out(
     uid TEXT,
     date DATE,
