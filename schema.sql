@@ -132,6 +132,7 @@ CREATE TABLE worker_payouts(
     id SERIAL PRIMARY KEY,
     amount INT NOT NULL,
     worker_id INT NOT NULL,
+    supervisor_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

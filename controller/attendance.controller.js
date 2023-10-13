@@ -17,6 +17,9 @@ async function createAttendance(req, res) {
 async function getWorkerAttendanceById(req, res) {
   const { worker_id } = req.body;
   try {
+    if (!worker_id) {
+      return res.status(404).json({ message: `'worker_id' not found!` });
+    }
     const { rows } = await pool.query(
       `SELECT * FROM attendances WHERE worker_id = $1`,
       [worker_id]
