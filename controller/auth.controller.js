@@ -133,6 +133,9 @@ async function workerLogout(req, res) {
       [session_id]
     );
     console.log(rows);
+    if (rowCount === 0) {
+      return res.status(400).json({ message: "Session expired!" });
+    }
 
     const check_in_time = rows[0].check_in;
     const check_out_time = rows[0].check_out;
@@ -152,7 +155,17 @@ async function workerLogout(req, res) {
           timeDifferenceInHours,
           check_in_time,
           check_out_time,
-        ]
+        ],
+        async (err, result) => {
+          if (err) {
+            console.error(err);
+            req.status(500).json({ message: err.message });
+          } else {
+            await pool.query(`DELETE FROM check_in_out WHERE uid = $1`, [
+              rows[0].uid,
+            ]);
+          }
+        }
       );
     }
 
