@@ -49,9 +49,14 @@ async function createWorker(req, res) {
 }
 
 async function updateWorkerById(req, res) {
-  const workerId = parseInt(req.params.workerId);
-  const { fullname, phone, site_assigned, daily_wage_salary, username } =
-    req.body;
+  const {
+    worker_id,
+    fullname,
+    phone,
+    site_assigned,
+    daily_wage_salary,
+    username,
+  } = req.body;
 
   const docs = req.files.map((file) => `/assets/${file.filename}`);
   const profile_img = req.file ? `/assets/${req.file.filename}` : null;
@@ -66,7 +71,7 @@ async function updateWorkerById(req, res) {
         password,
         daily_wage_salary,
         username,
-        parseInt(workerId),
+        parseInt(worker_id),
       ]
     );
 
@@ -81,11 +86,42 @@ async function updateWorkerById(req, res) {
   }
 }
 
+async function siteAssign(req, res) {
+  const { site_id, worker_id } = req.body;
+  try {
+    const site = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
+      site_id,
+    ]);
+
+    if (site.rowCount === 0) {
+      return res.status(404).json({ message: "Site not exist!" });
+    }
+
+    const worker = await pool.query(`SELECT * FROM workers WHERE id = $1`, [
+      worker_id,
+    ]);
+
+    if (worker.rowCount === 0) {
+      return res.status(404).json({ message: "Worker not exist!" });
+    }
+
+    await pool.query(`UPDATE workers SET site_assigned = $1 WHERE id = $2;`, [
+      site_id,
+      worker_id,
+    ]);
+
+    res.json({ message: "Site assigned." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function deleteWorkerById(req, res) {
-  const workerId = parseInt(req.params.workerId);
+  const { worker_id } = req.body;
   try {
     const { rowCount } = await pool.query(`DELETE FROM workers WHERE id = $1`, [
-      workerId,
+      worker_id,
     ]);
 
     if (rowCount === 0) {
@@ -100,7 +136,7 @@ async function deleteWorkerById(req, res) {
 }
 
 async function getWorkerById(req, res) {
-  const worker_id = req.body;
+  const { worker_id } = req.body;
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT * FROM workers WHERE id = $1`,
@@ -135,4 +171,5 @@ module.exports = {
   deleteWorkerById,
   getWorkerById,
   getAllWorkers,
+  siteAssign,
 };

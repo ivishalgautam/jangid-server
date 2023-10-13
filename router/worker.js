@@ -39,16 +39,15 @@ router.post(
   Controller.createWorker
 );
 router.put(
-  "/:workerId",
+  "/",
   verifyTokenAndSupervisor,
   uploads.array("file", 5),
   Controller.updateWorkerById
 );
-router.delete(
-  "/:workerId",
-  verifyTokenAndSupervisor,
-  Controller.deleteWorkerById
-);
+
+router.put("/site-assign", verifyTokenAndSupervisor, Controller.siteAssign);
+
+router.delete("/", verifyTokenAndSupervisor, Controller.deleteWorkerById);
 router.get("/all", verifyToken, Controller.getAllWorkers);
 router.get("/", verifyTokenAndSupervisor, Controller.getWorkerById);
 

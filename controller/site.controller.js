@@ -30,9 +30,16 @@ async function createSite(req, res) {
 }
 
 async function updateSiteById(req, res) {
-  const { site_name, owner_name, address, supervisor_id, lat, long, radius } =
-    req.body;
-  const siteId = parseInt(req.params.siteId);
+  const {
+    site_id,
+    site_name,
+    owner_name,
+    address,
+    supervisor_id,
+    lat,
+    long,
+    radius,
+  } = req.body;
   const files = {
     filename: req.file.originalname,
     path: `/assets/images/${req.file.filename}`,
@@ -40,7 +47,7 @@ async function updateSiteById(req, res) {
 
   try {
     const exist = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
-      siteId,
+      site_id,
     ]);
 
     if (exist.rowCount === 0) {
@@ -58,7 +65,7 @@ async function updateSiteById(req, res) {
         lat,
         long,
         radius,
-        siteId,
+        site_id,
       ]
     );
     res.json({ message: "Site updated" });
@@ -69,17 +76,16 @@ async function updateSiteById(req, res) {
 }
 
 async function deleteSiteById(req, res) {
-  const siteId = parseInt(req.params.siteId);
+  const { site_id } = req.body;
   try {
-    const exist = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
-      siteId,
+    const exist = await pool.query(`DELETE FROM sites WHERE id = $1`, [
+      site_id,
     ]);
 
     if (exist.rowCount === 0) {
       return res.status(404).json({ message: "Site not found!" });
     }
 
-    await pool.query(`DELETE FROM sites WHERE id = $1`, [siteId]);
     res.json({ message: "Site deleted" });
   } catch (error) {
     console.log(error);

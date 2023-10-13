@@ -32,16 +32,10 @@ router.post(
   Controller.createSite
 ); //admin
 
-router.delete("/:siteId", verifyTokenAndAdmin, Controller.deleteSiteById); // admin
+router.delete("/", verifyTokenAndAdmin, Controller.deleteSiteById); // admin
 router.get("/all", verifyTokenAndAdmin, Controller.getAllSites); // admin
-
-router.put(
-  "/:siteId",
-  verifyToken,
-  uploads.single("file"),
-  Controller.updateSiteById
-);
-
 router.get("/", verifyToken, Controller.getSiteById);
+
+router.put("/", verifyToken, uploads.single("file"), Controller.updateSiteById);
 
 module.exports = router;
