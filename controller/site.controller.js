@@ -1,7 +1,8 @@
 const { pool } = require("../config/db");
 
 async function createSite(req, res) {
-  const { site_name, owner_name, address, supervisor_id } = req.body;
+  const { site_name, owner_name, address, supervisor_id, lat, long, radius } =
+    req.body;
   const files = {
     filename: req.file.originalname,
     path: `/assets/images/${req.file.filename}`,
@@ -9,8 +10,17 @@ async function createSite(req, res) {
   // console.log(req.file);
   try {
     await pool.query(
-      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image) VALUES ($1, $2, $3, $4, $5)`,
-      [site_name, owner_name, address, supervisor_id, files.path]
+      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [
+        site_name,
+        owner_name,
+        address,
+        supervisor_id,
+        files.path,
+        lat,
+        long,
+        radius,
+      ]
     );
     res.json({ message: "Site created" });
   } catch (error) {
@@ -20,7 +30,8 @@ async function createSite(req, res) {
 }
 
 async function updateSiteById(req, res) {
-  const { site_name, owner_name, address, supervisor_id } = req.body;
+  const { site_name, owner_name, address, supervisor_id, lat, long, radius } =
+    req.body;
   const siteId = parseInt(req.params.siteId);
   const files = {
     filename: req.file.originalname,
@@ -37,8 +48,18 @@ async function updateSiteById(req, res) {
     }
 
     await pool.query(
-      `UPDATE sites SET site_name = $1, owner_name = $2, address = $3, supervisor_id = $4, image = $5) WHERE id = $6`,
-      [site_name, owner_name, address, supervisor_id, files.path, siteId]
+      `UPDATE sites SET site_name = $1, owner_name = $2, address = $3, supervisor_id = $4, image = $5, lat = $6, long = $7, radius = $8) WHERE id = $9`,
+      [
+        site_name,
+        owner_name,
+        address,
+        supervisor_id,
+        files.path,
+        lat,
+        long,
+        radius,
+        siteId,
+      ]
     );
     res.json({ message: "Site updated" });
   } catch (error) {

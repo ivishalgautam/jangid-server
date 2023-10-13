@@ -65,6 +65,8 @@ CREATE TABLE workers(
     total_payout INT DEFAULT 0,
     total_paid INT DEFAULT 0,
     pending_payout INT DEFAULT 0,
+    lat text,
+    long text,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -83,6 +85,9 @@ CREATE TABLE sites(
     budget_left INT DEFAULT 0,
     supervisor_id INT REFERENCES supervisors(id),
     is_completed BOOLEAN DEFAULT false,
+    lat text,
+    long text,
+    radius INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

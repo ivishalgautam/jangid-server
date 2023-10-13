@@ -3,6 +3,7 @@ const { pool } = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwtGenerator = require("../utils/jwtGenerator");
 const { v4: uuidv4 } = require("uuid");
+const { haversine } = require("../helper/haversine");
 
 async function supervisorLogin(req, res) {
   const { username, password } = req.body;
@@ -86,7 +87,7 @@ async function adminLogin(req, res) {
 }
 
 async function workerlogin(req, res) {
-  const { username, password } = req.body;
+  const { username, password, lat, long } = req.body;
   try {
     const worker = await pool.query(
       `SELECT * FROM workers WHERE username = $1;`,
@@ -106,17 +107,53 @@ async function workerlogin(req, res) {
 
     if (!validPassword) {
       return res.status(400).json({ message: "Invalid credentials!" });
-    } else {
-      await pool.query(
-        `UPDATE workers SET is_present = true WHERE username = $1;`,
-        [username]
-      );
     }
 
-    const { rows } = await pool.query(
-      `INSERT INTO check_in_out (uid, check_in, worker_id, date) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE) returning *`,
-      [uuidv4(), worker.rows[0].id]
+    const updateLatLong = await pool.query(
+      `UPDATE workers SET lat = $1, long = $2 WHERE $3`,
+      [lat, long, worker.rows[0].id]
     );
+
+    const siteAssigned = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
+      worker.rows[0].site_assigned,
+    ]);
+
+    if (siteAssigned.rowCount === 0) {
+      return res
+        .status(500)
+        .json({ message: "You are not assigned to any site!" });
+    }
+
+    // Coordinates of the center point (latitude and longitude)
+    const centerLat = siteAssigned.rows[0].lat;
+    const centerLon = siteAssigned.rows[0].long;
+
+    // Coordinates of the point to check (latitude and longitude)
+    const checkLat = updateLatLong.rows[0].lat;
+    const checkLon = updateLatLong.rows[0].long;
+
+    const radius = siteAssigned.rows[0].radius;
+    const distance = haversine(centerLat, centerLon, checkLat, checkLon);
+
+    if (distance <= radius) {
+      await pool.query(
+        `INSERT INTO check_in_out (uid, check_in, worker_id, date) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE) returning *`,
+        [uuidv4(), worker.rows[0].id],
+        async (error, result) => {
+          if (error) {
+            return res.status(500).json({ message: error.message });
+          } else {
+            await pool.query(
+              `UPDATE workers SET is_present = true WHERE id = $1;`,
+              [worker.rows[0].id]
+            );
+          }
+        }
+      );
+    } else {
+      console.log(`The point is outside ${radius} kilometers of the center.`);
+      return res.status(400).json({ message: "You are out of radius!" });
+    }
 
     res.json({ session_id: rows[0].uid });
   } catch (error) {
