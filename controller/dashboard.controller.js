@@ -53,7 +53,7 @@ async function worker(req, res) {
   try {
     const { rows } = await pool.query(
       `SELECT 
-        (SUM(amount)
+        (SELECT SUM(amount)
         FROM 
             worker_payouts
         WHERE 
