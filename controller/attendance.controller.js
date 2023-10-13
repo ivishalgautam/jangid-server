@@ -31,7 +31,18 @@ async function getWorkerAttendanceById(req, res) {
   }
 }
 
+async function getAllAttendances(req, res) {
+  try {
+    const { rows } = await pool.query(`SELECT * FROM attendances;`);
+    res.json(rows);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createAttendance,
   getWorkerAttendanceById,
+  getAllAttendances,
 };
