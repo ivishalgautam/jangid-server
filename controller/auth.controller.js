@@ -108,7 +108,7 @@ async function workerlogin(req, res) {
       return res.status(400).json({ message: "Invalid credentials!" });
     } else {
       await pool.query(
-        `UPDATE worker SET is_present = true WHERE username = $1;`,
+        `UPDATE workers SET is_present = true WHERE username = $1;`,
         [username]
       );
     }
