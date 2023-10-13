@@ -136,20 +136,17 @@ async function workerlogin(req, res) {
     const distance = haversine(centerLat, centerLon, checkLat, checkLon);
 
     if (distance <= radius) {
-      const { rows } = await pool.query(
+      const { rows, rowCount } = await pool.query(
         `INSERT INTO check_in_out (uid, check_in, worker_id, date) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE) returning *`,
-        [uuidv4(), worker.rows[0].id],
-        async (error, result) => {
-          if (error) {
-            return res.status(500).json({ message: error.message });
-          } else {
-            await pool.query(
-              `UPDATE workers SET is_present = true WHERE id = $1;`,
-              [worker.rows[0].id]
-            );
-          }
-        }
+        [uuidv4(), worker.rows[0].id]
       );
+      if (rowCount > 0) {
+        await pool.query(
+          `UPDATE workers SET is_present = true WHERE id = $1;`,
+          [worker.rows[0].id]
+        );
+      }
+
       res.json({ session_id: rows[0].uid });
     } else {
       console.error(`The point is outside ${radius} kilometers of the center.`);
