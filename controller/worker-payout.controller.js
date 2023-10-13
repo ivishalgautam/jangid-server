@@ -1,11 +1,10 @@
 const { pool } = require("../config/db");
 
 async function addPayout(req, res) {
-  const { amount } = req.body;
-  const workerId = parseInt(req.params.workerId);
+  const { amount, worker_id, supervisor_id } = req.body;
   try {
     const worker = await pool.query(`SELECT * FROM workers WHERE id = $1`, [
-      workerId,
+      worker_id,
     ]);
 
     if (worker.rowCount === 0) {
@@ -13,15 +12,15 @@ async function addPayout(req, res) {
     }
 
     await pool.query(
-      `INSERT INTO worker_payouts (amount, worker_id) VALUES ($1, $2)`,
-      [amount, workerId]
+      `INSERT INTO worker_payouts (amount, worker_id, supervisor_id) VALUES ($1, $2, $3)`,
+      [amount, worker_id, supervisor_id]
     );
 
     const { total_payout, total_paid } = worker?.rows[0];
 
     await pool.query(
       `UPDATE workers SET total_paid = $1, pending_payout = $2 WHERE id = $3;`,
-      [total_paid + amount, total_payout - total_paid + amount, workerId]
+      [total_paid + amount, total_payout - total_paid + amount, worker_id]
     );
 
     res.json({ message: "Payout added" });
