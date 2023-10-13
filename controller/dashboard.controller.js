@@ -58,7 +58,7 @@ async function worker(req, res) {
             worker_payouts
         WHERE 
             EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE)
-            AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AS total_payout_this_month;`,
+            AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)) AND worker_id = $1 AS total_payout_this_month;`,
       [worker_id]
     );
     res.json(rows[0]);
