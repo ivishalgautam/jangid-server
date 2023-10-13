@@ -110,7 +110,7 @@ async function workerlogin(req, res) {
     }
 
     const updateLatLong = await pool.query(
-      `UPDATE workers SET lat = $1, long = $2 WHERE $3`,
+      `UPDATE workers SET lat = $1, long = $2 WHERE $3 returning *`,
       [lat, long, worker.rows[0].id]
     );
 
@@ -151,13 +151,13 @@ async function workerlogin(req, res) {
         }
       );
     } else {
-      console.log(`The point is outside ${radius} kilometers of the center.`);
+      console.error(`The point is outside ${radius} kilometers of the center.`);
       return res.status(400).json({ message: "You are out of radius!" });
     }
 
     res.json({ session_id: rows[0].uid });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -208,7 +208,7 @@ async function workerLogout(req, res) {
 
     res.json({ message: "Logged out" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 }
