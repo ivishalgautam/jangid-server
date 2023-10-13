@@ -1,24 +1,24 @@
 const { pool } = require("../config/db");
 
-async function createAttendence(req, res) {
+async function createAttendance(req, res) {
   const { worker_id, date, hours, check_in, check_out } = req.body;
   try {
     await pool.query(
-      `INSERT INTO attendences (worker_id, date, hours, check_in, check_out) VALUES ($1, $2, $3, $4, $5)`,
+      `INSERT INTO attendances (worker_id, date, hours, check_in, check_out) VALUES ($1, $2, $3, $4, $5)`,
       [worker_id, date, hours, check_in, check_out]
     );
-    res.json({ message: "Attendence marked" });
+    res.json({ message: "Attendance marked" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
   }
 }
 
-async function getWorkerAttendenceById(req, res) {
+async function getWorkerAttendanceById(req, res) {
   const { worker_id } = req.body;
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM attendences WHERE worker_id = $1`,
+      `SELECT * FROM attendances WHERE worker_id = $1`,
       [worker_id]
     );
     res.json(rows);
@@ -29,6 +29,6 @@ async function getWorkerAttendenceById(req, res) {
 }
 
 module.exports = {
-  createAttendence,
-  getWorkerAttendenceById,
+  createAttendance,
+  getWorkerAttendanceById,
 };

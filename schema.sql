@@ -113,10 +113,10 @@ CREATE TABLE expenses(
     worker_id INT
 );
 
-CREATE TABLE attendences(
+CREATE TABLE attendances(
     id SERIAL PRIMARY KEY,
     date DATE DEFAULT CURRENT_DATE,
-    hours INT NOT NULL,
+    hours VARCHAR NOT NULL,
     check_in TIMESTAMP NOT NULL,
     check_out TIMESTAMP NOT NULL,
     worker_id INT NOT NULL,
