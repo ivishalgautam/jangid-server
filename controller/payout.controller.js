@@ -1,6 +1,6 @@
 const { pool } = require("../config/db");
 
-async function addPayout(req, res) {
+async function addWorkerPayout(req, res) {
   const { amount, worker_id, supervisor_id } = req.body;
   try {
     const worker = await pool.query(`SELECT * FROM workers WHERE id = $1`, [
@@ -9,6 +9,15 @@ async function addPayout(req, res) {
 
     if (worker.rowCount === 0) {
       return res.status(404).json({ message: "Worker not found!" });
+    }
+
+    const supervisor = await pool.query(
+      `SELECT * FROM supervisors WHERE id = $1`,
+      [supervisor_id]
+    );
+
+    if (supervisor.rowCount === 0) {
+      return res.status(404).json({ message: "Supervisor not found!" });
     }
 
     await pool.query(
@@ -30,9 +39,50 @@ async function addPayout(req, res) {
   }
 }
 
+async function addSitePayout(req, res) {
+  const { amount, site_id, supervisor_id, comment } = req.body;
+  try {
+    const site = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
+      site_id,
+    ]);
+
+    if (site.rowCount === 0) {
+      return res.status(404).json({ message: "Site not found!" });
+    }
+
+    const supervisor = await pool.query(
+      `SELECT * FROM supervisors WHERE id = $1`,
+      [supervisor_id]
+    );
+
+    if (supervisor.rowCount === 0) {
+      return res.status(404).json({ message: "Supervisor not found!" });
+    }
+
+    await pool.query(
+      `INSERT INTO site_payouts (amount, site_id, supervisor_id, comment) VALUES ($1, $2, $3, $4)`,
+      [amount, site_id, supervisor_id, comment],
+      (error, result) => {
+        if (error) {
+          return res.status(500).json({ message: error.message });
+        } else {
+          res.json({ message: "Payout added" });
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function getAllPayouts(req, res) {
   const { query } = req.body;
   try {
+    if (!query) {
+      return res.status(404).json({ message: "Please pass some query!" });
+    }
+
     switch (query) {
       case "worker":
         const workerPayouts = await pool.query(`SELECT * FROM worker_payouts;`);
@@ -42,7 +92,6 @@ async function getAllPayouts(req, res) {
         const sitePayouts = await pool.query(`SELECT * FROM site_payouts;`);
         res.json(sitePayouts.rows);
         break;
-
       default:
         res.status(404).json({ message: "No query found!" });
         break;
@@ -53,4 +102,4 @@ async function getAllPayouts(req, res) {
   }
 }
 
-module.exports = { addPayout, getAllPayouts };
+module.exports = { addWorkerPayout, addSitePayout, getAllPayouts };
