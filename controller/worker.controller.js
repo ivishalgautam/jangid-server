@@ -2,8 +2,8 @@ const { pool } = require("../config/db");
 const bcrypt = require("bcryptjs");
 
 async function createWorker(req, res) {
-  console.log(req.files);
-  console.log(req.headers);
+  // console.log(req.files);
+  // console.log(req.headers);
 
   const {
     fullname,

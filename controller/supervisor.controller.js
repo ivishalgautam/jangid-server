@@ -13,15 +13,34 @@ async function createSupervisor(req, res) {
   console.log(req.body, profile_img);
 
   try {
-    const supervisorExist = await pool.query(
-      `SELECT email, phone, username FROM supervisors WHERE email = $1 OR phone = $2 OR username = $3`,
-      [email, phone, username]
+    const emailExist = await pool.query(
+      `SELECT email, phone, username FROM supervisors WHERE email = $1;`,
+      [email]
     );
-
-    if (supervisorExist.rowCount > 0) {
+    if (emailExist.rowCount > 0) {
       return res
         .status(400)
-        .json({ message: "Try changing email or password or username!" });
+        .json({ message: "supervisor exist with this email!" });
+    }
+
+    const phoneExist = await pool.query(
+      `SELECT email, phone, username FROM supervisors WHERE phone = $1;`,
+      [phone]
+    );
+    if (phoneExist.rowCount > 0) {
+      return res
+        .status(400)
+        .json({ message: "supervisor exist with this phone!" });
+    }
+
+    const usernameExist = await pool.query(
+      `SELECT email, phone, username FROM supervisors WHERE username = $1`,
+      [username]
+    );
+    if (usernameExist.rowCount > 0) {
+      return res
+        .status(400)
+        .json({ message: "supervisor exist with this username!" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

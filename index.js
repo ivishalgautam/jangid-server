@@ -28,6 +28,6 @@ app.get("/", (req, res) => {
   res.json({ message: "hello world" });
 });
 
-app.listen(4001, () => {
+app.listen(4001, "127.0.0.1", () => {
   console.log(`Jangid stone server up and running on localhost:4001`);
 });
