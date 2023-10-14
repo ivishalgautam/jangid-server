@@ -4,6 +4,8 @@ const app = express();
 const cors = require("cors");
 const morgan = require("morgan");
 
+app.use(express.static("assets/images"));
+
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
