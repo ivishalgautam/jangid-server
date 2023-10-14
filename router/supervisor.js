@@ -6,7 +6,7 @@ const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
     const folderPath = path.join(__dirname, "../assets/images");
-    // console.log(folderPath);
+    console.log(folderPath);
 
     // Create the folder if it doesn't exist
     if (!fs.existsSync(folderPath)) {
@@ -15,10 +15,7 @@ const storage = multer.diskStorage({
     callback(null, folderPath);
   },
   filename: function (req, file, callback) {
-    callback(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
+    callback(null, `${Date.now()}-${file.originalname}`);
   },
 });
 const uploads = multer({ storage });
