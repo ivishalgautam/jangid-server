@@ -24,7 +24,7 @@ async function createSupervisor(req, res) {
         .json({ message: "Try changing email or password or username!" });
     }
 
-    const hashedPassword = await bcrypt.hashSync(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
       `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, profile_img) VALUES($1, $2, $3, $4, $5, $6, $7);`,
@@ -33,7 +33,7 @@ async function createSupervisor(req, res) {
 
     res.json({ message: "Created" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -53,7 +53,7 @@ async function updateSupervisorById(req, res) {
 
     res.json({ message: "UPDATED" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     req.status(500).json({ message: error.message });
   }
 }
@@ -72,7 +72,7 @@ async function deleteSupervisorById(req, res) {
 
     res.json({ message: "DELETED" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     req.status(500).json({ message: error.message });
   }
 }
@@ -92,7 +92,7 @@ async function getSupervisorbyId(req, res) {
 
     res.json(rows[0]);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     req.status(500).json({ message: error.message });
   }
 }
@@ -102,7 +102,7 @@ async function getAllSupervisors(req, res) {
     const { rows } = await pool.query(`SELECT * FROM supervisors;`);
     res.json(rows);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     req.status(500).json({ message: error.message });
   }
 }
