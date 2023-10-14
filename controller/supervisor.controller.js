@@ -14,7 +14,7 @@ async function createSupervisor(req, res) {
 
   try {
     const emailExist = await pool.query(
-      `SELECT email, phone, username FROM supervisors WHERE email = $1;`,
+      `SELECT email FROM supervisors WHERE email = $1;`,
       [email]
     );
     if (emailExist.rowCount > 0) {
@@ -24,7 +24,7 @@ async function createSupervisor(req, res) {
     }
 
     const phoneExist = await pool.query(
-      `SELECT email, phone, username FROM supervisors WHERE phone = $1;`,
+      `SELECT phone FROM supervisors WHERE phone = $1;`,
       [phone]
     );
     if (phoneExist.rowCount > 0) {
@@ -34,7 +34,7 @@ async function createSupervisor(req, res) {
     }
 
     const usernameExist = await pool.query(
-      `SELECT email, phone, username FROM supervisors WHERE username = $1`,
+      `SELECT username FROM supervisors WHERE username = $1`,
       [username]
     );
     if (usernameExist.rowCount > 0) {
