@@ -24,7 +24,7 @@ async function createSupervisor(req, res) {
         .json({ message: "Try changing email or password or username!" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hashSync(password, 10);
 
     await pool.query(
       `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, profile_img) VALUES($1, $2, $3, $4, $5, $6, $7);`,
