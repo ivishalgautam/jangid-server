@@ -1,8 +1,17 @@
 const { pool } = require("../config/db");
 
 async function createSite(req, res) {
-  const { site_name, owner_name, address, supervisor_id, lat, long, radius } =
-    req.body;
+  const {
+    site_name,
+    owner_name,
+    address,
+    supervisor_id,
+    lat,
+    long,
+    radius,
+    start_time,
+    end_time,
+  } = req.body;
   const files = {
     filename: req.file.originalname,
     path: `/assets/images/${req.file.filename}`,
@@ -10,7 +19,7 @@ async function createSite(req, res) {
   // console.log(req.file);
   try {
     await pool.query(
-      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius, start_time, end_time) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
       [
         site_name,
         owner_name,
@@ -20,6 +29,8 @@ async function createSite(req, res) {
         lat,
         long,
         radius,
+        start_time,
+        end_time,
       ]
     );
     res.json({ message: "Site created" });

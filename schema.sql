@@ -86,6 +86,9 @@ CREATE TABLE sites(
     budget_left INT DEFAULT 0,
     supervisor_id INT REFERENCES supervisors(id),
     is_completed BOOLEAN DEFAULT false,
+    start_time TIME NOT NULL,
+    --16:00:00
+    end_time TIME NOT NULL,
     lat text,
     long text,
     radius INT,

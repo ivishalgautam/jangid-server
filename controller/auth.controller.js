@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwtGenerator = require("../utils/jwtGenerator");
 const { v4: uuidv4 } = require("uuid");
 const { haversine } = require("../helper/haversine");
+const { getCurrentTimeFormatted } = require("../helper/time");
 
 async function supervisorLogin(req, res) {
   const { username, password } = req.body;
@@ -122,6 +123,15 @@ async function workerlogin(req, res) {
       return res
         .status(500)
         .json({ message: "You are not assigned to any site!" });
+    }
+
+    const currentTime = new Date(`1970-01-01T${getCurrentTimeFormatted()}`);
+    const siteStartTime = new Date(
+      `1970-01-01T${siteAssigned.rows[0].start_time}`
+    );
+
+    if (currentTime < siteStartTime) {
+      return res.status(400).json({ message: "Time is not started yet!" });
     }
 
     // Coordinates of the center point (latitude and longitude)

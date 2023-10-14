@@ -1,18 +1,10 @@
-const { validationResult } = require("express-validator");
 const { pool } = require("../config/db");
 const bcrypt = require("bcryptjs");
 
 async function createSupervisor(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   const { fullname, email, phone, username, password } = req.body;
-  const profile_img = `/assets/images/${req.file.filename
-    .split(" ")
-    .join("-")}`;
-  console.log(req.body, profile_img);
+  const profile_img = `/assets/images/${req.file.filename}`;
+  // console.log(req.body, profile_img);
 
   try {
     const emailExist = await pool.query(

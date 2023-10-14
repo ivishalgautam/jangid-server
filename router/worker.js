@@ -23,7 +23,10 @@ const storage = multer.diskStorage({
   filename: function (req, file, callback) {
     callback(
       null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+      file.fieldname +
+        "-" +
+        Date.now() +
+        path.extname(file.originalname.split(" ").join("-"))
     );
   },
 });
