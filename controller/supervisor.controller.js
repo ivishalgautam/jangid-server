@@ -9,7 +9,9 @@ async function createSupervisor(req, res) {
   }
 
   const { fullname, email, phone, username, password } = req.body;
-  const profile_img = `/assets/images/${req.file.filename}`;
+  const profile_img = `/assets/images/${req.file.filename
+    .split(" ")
+    .join("-")}`;
   console.log(req.body, profile_img);
 
   try {
