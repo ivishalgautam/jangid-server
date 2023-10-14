@@ -94,7 +94,7 @@ async function getWorkerPayouts(req, res) {
 
     const { rows } = await pool.query(
       `SELECT * FROM worker_payouts AS wp WHERE worker_id = $1 
-         RIGHT JOIN supervisors AS s on s.id = wp.supervisor_id 
+         JOIN supervisors AS s on s.id = wp.supervisor_id 
       ;`,
       [worker_id]
     );
