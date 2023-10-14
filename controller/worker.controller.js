@@ -45,6 +45,21 @@ async function createWorker(req, res) {
   }
 }
 
+async function updateProfileImage(req, res) {
+  const { worker_id } = req.body;
+
+  try {
+    await pool.query("UPDATE workers SET profile_img = $1 WHERE id = $2", [
+      `/assets/images/${req.file.filename}`,
+      worker_id,
+    ]);
+    res.json({ message: "Profile image added" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function updateWorkerById(req, res) {
   const {
     worker_id,
@@ -169,4 +184,5 @@ module.exports = {
   getWorkerById,
   getAllWorkers,
   siteAssign,
+  updateProfileImage,
 };

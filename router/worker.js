@@ -48,6 +48,14 @@ router.put(
   Controller.updateWorkerById
 );
 
+// to add profile image
+router.put(
+  "/update-profile",
+  verifyTokenAndSupervisor,
+  uploads.single("file"),
+  Controller.updateProfileImage
+);
+
 router.put("/site-assign", verifyTokenAndSupervisor, Controller.siteAssign);
 
 router.delete("/", verifyTokenAndSupervisor, Controller.deleteWorkerById);
