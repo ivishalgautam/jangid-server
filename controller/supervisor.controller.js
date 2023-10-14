@@ -10,7 +10,7 @@ async function createSupervisor(req, res) {
 
   const { fullname, email, phone, username, password } = req.body;
   const profile_img = `/assets/images/${req.file.filename}`;
-  console.log(...req.body, profile_img);
+  console.log(req.body, profile_img);
 
   try {
     const supervisorExist = await pool.query(
