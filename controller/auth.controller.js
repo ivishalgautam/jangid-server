@@ -157,7 +157,7 @@ async function workerlogin(req, res) {
         );
       }
 
-      res.json({ session_id: rows[0].uid, worker: worker.rows[0] });
+      res.json({ session_id: rows[0].uid });
     } else {
       console.error(`The point is outside ${radius} kilometers of the center.`);
       return res.status(400).json({ message: "You are out of radius!" });
