@@ -1,7 +1,4 @@
-const { validationResult } = require("express-validator");
 const { pool } = require("../config/db");
-const path = require("path");
-const fs = require("fs");
 const bcrypt = require("bcryptjs");
 
 async function createWorker(req, res) {
@@ -22,8 +19,8 @@ async function createWorker(req, res) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const docs = req.files.map((file) => `/assets/${file.filename}`);
-    // const profile_img = req.file ? `/assets/${req.file.filename}` : null;
+    const docs = req.files.map((file) => `/assets/images/${file.filename}`);
+    // `/assets/categories/banners/${req.file.filename}`
 
     await pool.query(
       `INSERT INTO workers (fullname, phone, docs, site_assigned, password, daily_wage_salary, username, hpassword, lat, long) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,

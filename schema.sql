@@ -38,6 +38,7 @@ CREATE TABLE supervisors(
     password VARCHAR(20) NOT NULL,
     hpassword TEXT NOT NULL,
     is_present BOOLEAN DEFAULT false,
+    profile_img TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

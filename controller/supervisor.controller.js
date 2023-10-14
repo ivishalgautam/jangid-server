@@ -9,6 +9,8 @@ async function createSupervisor(req, res) {
   }
 
   const { fullname, email, phone, username, password } = req.body;
+  const profile_img = `/assets/images/${req.file.filename}`;
+
   try {
     const supervisorExist = await pool.query(
       `SELECT email, phone, username FROM supervisors WHERE email = $1 OR phone = $2 OR username = $3`,
@@ -24,8 +26,8 @@ async function createSupervisor(req, res) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
-      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword) VALUES($1, $2, $3, $4, $5, $6)`,
-      [fullname, email, phone, username, password, hashedPassword]
+      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, profile_img) VALUES($1, $2, $3, $4, $5, $6, $7)`,
+      [fullname, email, phone, username, password, hashedPassword, profile_img]
     );
 
     res.json({ message: "Created" });
