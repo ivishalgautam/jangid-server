@@ -129,9 +129,12 @@ async function workerlogin(req, res) {
     const siteStartTime = new Date(
       `1970-01-01T${siteAssigned.rows[0].start_time}`
     );
+    const siteEndTime = new Date(`1970-01-01T${siteAssigned.rows[0].end_time}`);
 
     if (currentTime < siteStartTime) {
-      return res.status(400).json({ message: "Time is not started yet!" });
+      return res.status(400).json({
+        message: `Site will open on ${siteAssigned.rows[0].start_time}`,
+      });
     }
 
     // Coordinates of the center point (latitude and longitude)
@@ -146,7 +149,7 @@ async function workerlogin(req, res) {
     const distance = haversine(centerLat, centerLon, checkLat, checkLon);
 
     if (distance <= radius) {
-      const { rows, rowCount } = await pool.query(
+      const { rowCount } = await pool.query(
         `INSERT INTO check_in_out (uid, check_in, worker_id, date) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE) returning *`,
         [uuidv4(), worker.rows[0].id]
       );
@@ -175,10 +178,14 @@ async function workerLogout(req, res) {
       `UPDATE check_in_out set check_out = CURRENT_TIMESTAMP WHERE uid = $1 returning *`,
       [session_id]
     );
-    console.log(rows);
+    // console.log(rows);
     if (rowCount === 0) {
       return res.status(400).json({ message: "Session expired!" });
     }
+
+    const worker = await pool.query(`SELECT * FROM workers WHERE id = $1;`, [
+      rows[0].worker_id,
+    ]);
 
     const check_in_time = rows[0].check_in;
     const check_out_time = rows[0].check_out;
@@ -189,15 +196,37 @@ async function workerLogout(req, res) {
     const timeDifferenceInHours =
       timeDifferenceInMilliseconds / (1000 * 60 * 60); // Convert milliseconds to hours
 
+    const earned =
+      extraHours < 3
+        ? dailyWage
+        : 3 <= extraHours && extraHours < 6
+        ? 2 * dailyWage
+        : 6 <= extraHours && extraHours < 9
+        ? 3 * dailyWage
+        : 9 <= extraHours && extraHours < 12
+        ? 4 * dailyWage
+        : 12 <= extraHours && extraHours < 15
+        ? 5 * dailyWage
+        : 15 <= extraHours && extraHours < 18
+        ? 6 * dailyWage
+        : 18 <= extraHours && extraHours < 21
+        ? 7 * dailyWage
+        : 21 <= extraHours && extraHours < 24
+        ? 8 * dailyWage
+        : 24 <= extraHours && extraHours < 27
+        ? 9 * dailyWage
+        : 10 * dailyWage;
+
     if (rowCount > 0) {
       await pool.query(
-        `INSERT INTO attendances (worker_id, date, hours, check_in, check_out) VALUES ($1, $2, $3, $4, $5)`,
+        `INSERT INTO attendances (worker_id, date, hours, check_in, check_out, earned) VALUES ($1, $2, $3, $4, $5, $6)`,
         [
           rows[0].worker_id,
           new Date().toLocaleDateString(),
           timeDifferenceInHours,
           check_in_time,
           check_out_time,
+          earned,
         ],
         async (err, result) => {
           if (err) {
@@ -207,6 +236,10 @@ async function workerLogout(req, res) {
             await pool.query(`DELETE FROM check_in_out WHERE uid = $1`, [
               rows[0].uid,
             ]);
+            await pool.query(
+              `UPDATE workers SET is_present = false WHERE id = $1;`,
+              [rows[0].worker_id]
+            );
           }
         }
       );

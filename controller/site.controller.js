@@ -12,6 +12,7 @@ async function createSite(req, res) {
     start_time,
     end_time,
   } = req.body;
+
   const files = {
     filename: req.file.originalname,
     path: `/assets/images/${req.file.filename}`,
