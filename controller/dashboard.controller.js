@@ -38,8 +38,7 @@ async function admin(req, res) {
             (SELECT COUNT(*) FROM workers) AS total_workers,
             (SELECT COUNT(*) FROM workers AS w WHERE w.is_present = true) AS present_workers,
             (SELECT COUNT(*) FROM supervisors) AS total_supervisors,
-            (SELECT COUNT(*) FROM workers AS s WHERE s.is_present = true) AS present_supervisors
-            (SELECT site_name, SUM(total_budget)) AS total_income_this_month;`
+            (SELECT COUNT(*) FROM workers AS s WHERE s.is_present = true) AS present_supervisors;`
     );
     res.json(rows[0]);
   } catch (error) {
