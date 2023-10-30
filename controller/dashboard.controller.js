@@ -39,7 +39,7 @@ async function admin(req, res) {
             (SELECT COUNT(*) FROM workers AS w WHERE w.is_present = true) AS present_workers,
             (SELECT COUNT(*) FROM supervisors) AS total_supervisors,
             (SELECT COUNT(*) FROM workers AS s WHERE s.is_present = true) AS present_supervisors
-            (SELECT site_name, SUM(total_budget) AS total_income_this_month;`
+            (SELECT site_name, SUM(total_budget)) AS total_income_this_month;`
     );
     res.json(rows[0]);
   } catch (error) {
@@ -53,9 +53,9 @@ async function worker(req, res) {
   try {
     const { rows } = await pool.query(
       `SELECT 
-        (SELECT SUM(amount)
+        (SELECT SUM(earned)
         FROM 
-            worker_payouts
+            attendances
         WHERE 
             EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE)
             AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
