@@ -80,6 +80,7 @@ CREATE TABLE sites(
     id SERIAL PRIMARY KEY,
     site_name TEXT NOT NULL,
     owner_name VARCHAR(100) NOT NULL,
+    owner_contact VARCHAR(100) NOT NULL,
     address TEXT NOT NULL,
     image TEXT NOT NULL,
     total_budget INT DEFAULT 0,

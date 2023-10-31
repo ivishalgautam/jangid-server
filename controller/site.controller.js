@@ -11,6 +11,7 @@ async function createSite(req, res) {
     radius,
     start_time,
     end_time,
+    owner_contact,
   } = req.body;
 
   const files = {
@@ -20,7 +21,7 @@ async function createSite(req, res) {
   // console.log(req.file);
   try {
     await pool.query(
-      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius, start_time, end_time) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius, start_time, end_time, owner_contact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
       [
         site_name,
         owner_name,
@@ -32,6 +33,7 @@ async function createSite(req, res) {
         radius,
         start_time,
         end_time,
+        owner_contact,
       ]
     );
     res.json({ message: "Site created" });
