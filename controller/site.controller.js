@@ -65,7 +65,7 @@ async function updateSiteById(req, res) {
     }
 
     await pool.query(
-      `UPDATE sites SET site_name = $1, owner_name = $2, address = $3, supervisor_id = $4, lat = $5, long = $6, radius = $7) WHERE id = $8`,
+      `UPDATE sites SET site_name = $1, owner_name = $2, address = $3, supervisor_id = $4, lat = $5, long = $6, radius = $7 WHERE id = $8`,
       [
         site_name,
         owner_name,
