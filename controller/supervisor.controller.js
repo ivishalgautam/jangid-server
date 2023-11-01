@@ -113,7 +113,7 @@ async function getSupervisorbyId(req, res) {
 async function getAllSupervisors(req, res) {
   try {
     const { rows } = await pool.query(`SELECT * FROM supervisors;`);
-    res.json(rows);
+    res.json({ message: "success", status: 200, data: rows });
   } catch (error) {
     console.error(error);
     req.status(500).json({ message: error.message });
