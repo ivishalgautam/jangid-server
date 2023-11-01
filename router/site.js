@@ -36,6 +36,6 @@ router.delete("/", verifyTokenAndAdmin, Controller.deleteSiteById); // admin
 router.get("/all", verifyTokenAndAdmin, Controller.getAllSites); // admin
 router.get("/", verifyToken, Controller.getSiteById);
 
-router.put("/", verifyToken, uploads.single("file"), Controller.updateSiteById);
+router.put("/", verifyToken, Controller.updateSiteById);
 
 module.exports = router;
