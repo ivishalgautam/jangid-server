@@ -54,10 +54,6 @@ async function updateSiteById(req, res) {
     long,
     radius,
   } = req.body;
-  const files = {
-    filename: req.file.originalname,
-    path: `/assets/images/${req.file.filename}`,
-  };
 
   try {
     const exist = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
@@ -69,13 +65,12 @@ async function updateSiteById(req, res) {
     }
 
     await pool.query(
-      `UPDATE sites SET site_name = $1, owner_name = $2, address = $3, supervisor_id = $4, image = $5, lat = $6, long = $7, radius = $8) WHERE id = $9`,
+      `UPDATE sites SET site_name = $1, owner_name = $2, address = $3, supervisor_id = $4, lat = $5, long = $6, radius = $7) WHERE id = $8`,
       [
         site_name,
         owner_name,
         address,
         supervisor_id,
-        files.path,
         lat,
         long,
         radius,
