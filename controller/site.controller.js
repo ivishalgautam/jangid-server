@@ -66,7 +66,9 @@ async function updateSiteById(req, res) {
 
     const { ...data } = req.body;
     const updateColumns = Object.keys(data)
-      .map((column, key) => `${column} = $${key + 1}`)
+      .map(
+        (column, key) => `${column === "site_id" ? "id" : column} = $${key + 1}`
+      )
       .join(", ");
     const updateValues = Object.values(data);
 
