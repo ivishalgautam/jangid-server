@@ -20,8 +20,8 @@ async function createSite(req, res) {
   };
   // console.log(req.file);
   try {
-    await pool.query(
-      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius, start_time, end_time, owner_contact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+    const { rows } = await pool.query(
+      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius, start_time, end_time, owner_contact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id`,
       [
         site_name,
         owner_name,
@@ -36,7 +36,7 @@ async function createSite(req, res) {
         owner_contact,
       ]
     );
-    res.json({ message: "Site created" });
+    res.json({ message: "Site created", site_id: rows[0].id });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
