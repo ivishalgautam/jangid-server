@@ -49,6 +49,16 @@ function verifyTokenAndAdmin(req, res, next) {
   });
 }
 
+function verifyTokenAdminAndSupervisor(req, res, next) {
+  verifyToken(req, res, () => {
+    if (["admin", "supervisor"].includes(req.user.role)) {
+      next();
+    } else {
+      return res.status(401).json({ message: "Unauthorized!" });
+    }
+  });
+}
+
 function verifyAdminAndSupervisor(req, res, next) {
   verifyToken(req, res, () => {
     if (req.user.role === "admin" || req.user.role === "supervisor") {
@@ -67,4 +77,5 @@ module.exports = {
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
   verifyAdminAndSupervisor,
+  verifyTokenAdminAndSupervisor,
 };

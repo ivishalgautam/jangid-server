@@ -7,6 +7,7 @@ const { validateWorker } = require("../middlewares/validator");
 const {
   verifyTokenAndSupervisor,
   verifyToken,
+  verifyTokenAdminAndSupervisor,
 } = require("../middlewares/verifyToken");
 
 const storage = multer.diskStorage({
@@ -36,7 +37,7 @@ const uploads = multer({ storage });
 router.post(
   "/",
   // validateWorker,
-  verifyTokenAndSupervisor,
+  verifyTokenAdminAndSupervisor,
   uploads.array("file", 5),
   // uploads.single("profile_img"),
   Controller.createWorker
