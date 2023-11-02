@@ -14,6 +14,7 @@ async function createWorker(req, res) {
     password,
     lat,
     long,
+    address,
   } = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -23,7 +24,7 @@ async function createWorker(req, res) {
     // `/assets/categories/banners/${req.file.filename}`
 
     await pool.query(
-      `INSERT INTO workers (fullname, phone, docs, site_assigned, password, daily_wage_salary, username, hpassword, lat, long) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      `INSERT INTO workers (fullname, phone, docs, site_assigned, password, daily_wage_salary, username, hpassword, lat, long, address) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
       [
         fullname,
         phone,
@@ -35,6 +36,7 @@ async function createWorker(req, res) {
         hashedPassword,
         lat,
         long,
+        address,
       ]
     );
 

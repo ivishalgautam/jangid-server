@@ -60,6 +60,7 @@ CREATE TABLE workers(
     supervisor_id INT,
     site_assigned INT,
     daily_wage_salary INT NOT NULL,
+    address TEXT,
     is_present BOOLEAN DEFAULT false,
     is_disabled BOOLEAN DEFAULT false,
     total_working_hours INT DEFAULT 0,
