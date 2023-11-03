@@ -129,7 +129,7 @@ async function getAllSites(req, res) {
     res.json({
       message: "success",
       status: 200,
-      data: rows.map(({ password, ...data }) => ({ ...data })),
+      data: rows,
     });
   } catch (error) {
     console.log(error);

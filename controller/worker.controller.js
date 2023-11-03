@@ -172,7 +172,11 @@ async function getAllWorkers(req, res) {
   try {
     const { rows } = await pool.query(`SELECT * FROM workers;`);
 
-    res.json(rows);
+    res.json({
+      message: "success",
+      status: 200,
+      data: rows.map((password, ...data) => ({ ...data })),
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
