@@ -45,7 +45,7 @@ router.post(
 );
 router.put(
   "/",
-  verifyTokenAndSupervisor,
+  verifyTokenAdminAndSupervisor,
   uploads.array("file", 5),
   Controller.updateWorkerById
 );
