@@ -161,7 +161,7 @@ async function getWorkerById(req, res) {
       return res.status(404).json({ message: "NOT FOUND!" });
     }
 
-    res.json(rows[0]);
+    res.json({ status: 200, message: "success", worker: rows[0] });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
