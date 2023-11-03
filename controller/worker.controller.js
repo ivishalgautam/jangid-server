@@ -77,12 +77,11 @@ async function updateWorkerById(req, res) {
 
   try {
     const { rowCount } = await pool.query(
-      `UPDATE workers SET fullname = $1, phone = $2, site_assigned = $3, password = $4, daily_wage_salary = $5, username = $6 WHERE id = $7;`,
+      `UPDATE workers SET fullname = $1, phone = $2, site_assigned = $3, daily_wage_salary = $4, username = $5 WHERE id = $6;`,
       [
         fullname,
         phone,
         site_assigned,
-        password,
         daily_wage_salary,
         username,
         parseInt(worker_id),
