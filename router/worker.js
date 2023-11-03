@@ -8,6 +8,7 @@ const {
   verifyTokenAndSupervisor,
   verifyToken,
   verifyTokenAdminAndSupervisor,
+  verifyTokenAndAdmin,
 } = require("../middlewares/verifyToken");
 
 const storage = multer.diskStorage({
@@ -59,7 +60,7 @@ router.put(
 
 router.put("/site-assign", verifyTokenAndSupervisor, Controller.siteAssign);
 
-router.delete("/", verifyTokenAndSupervisor, Controller.deleteWorkerById);
+router.delete("/", verifyTokenAndAdmin, Controller.deleteWorkerById);
 router.get("/all", verifyToken, Controller.getAllWorkers);
 router.get("/", verifyTokenAndSupervisor, Controller.getWorkerById);
 
