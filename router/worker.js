@@ -53,7 +53,7 @@ router.put(
 // to add profile image
 router.put(
   "/update-profile",
-  verifyTokenAndSupervisor,
+  verifyTokenAdminAndSupervisor,
   uploads.single("file"),
   Controller.updateProfileImage
 );
@@ -61,7 +61,7 @@ router.put(
 router.put("/site-assign", verifyTokenAndSupervisor, Controller.siteAssign);
 
 router.delete("/", verifyTokenAndAdmin, Controller.deleteWorkerById);
-router.get("/all", verifyToken, Controller.getAllWorkers);
-router.get("/", verifyTokenAndSupervisor, Controller.getWorkerById);
+router.get("/all", verifyTokenAdminAndSupervisor, Controller.getAllWorkers);
+router.get("/", verifyTokenAdminAndSupervisor, Controller.getWorkerById);
 
 module.exports = router;
