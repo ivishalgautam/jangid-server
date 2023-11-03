@@ -72,6 +72,10 @@ async function updateWorkerById(req, res) {
     username,
   } = req.body;
 
+  if (!worker_id) {
+    return res.status(400).json({ message: "worker_id not found!" });
+  }
+
   const docs = req.files.map((file) => `/assets/${file.filename}`);
   const profile_img = req.file ? `/assets/${req.file.filename}` : null;
 
