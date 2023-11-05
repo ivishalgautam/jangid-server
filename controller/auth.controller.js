@@ -111,7 +111,7 @@ async function workerlogin(req, res) {
     }
 
     const updateLatLong = await pool.query(
-      `UPDATE workers SET lat = $1, long = $2 WHERE $3 returning *`,
+      `UPDATE workers SET lat = $1, long = $2 WHERE id = $3 returning *`,
       [lat, long, worker.rows[0].id]
     );
 
