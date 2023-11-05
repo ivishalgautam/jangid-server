@@ -58,7 +58,11 @@ router.put(
   Controller.updateProfileImage
 );
 
-router.put("/site-assign", verifyTokenAndSupervisor, Controller.siteAssign);
+router.put(
+  "/site-assign",
+  verifyTokenAdminAndSupervisor,
+  Controller.siteAssign
+);
 
 router.delete("/", verifyTokenAndAdmin, Controller.deleteWorkerById);
 router.get("/all", verifyTokenAdminAndSupervisor, Controller.getAllWorkers);
