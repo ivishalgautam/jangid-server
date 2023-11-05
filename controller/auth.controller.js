@@ -149,7 +149,7 @@ async function workerlogin(req, res) {
     const distance = haversine(centerLat, centerLon, checkLat, checkLon);
 
     if (distance <= radius) {
-      const { rowCount } = await pool.query(
+      const { rows, rowCount } = await pool.query(
         `INSERT INTO check_in_out (uid, check_in, worker_id, date) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE) returning *`,
         [uuidv4(), worker.rows[0].id]
       );
@@ -173,6 +173,8 @@ async function workerlogin(req, res) {
 
 async function workerLogout(req, res) {
   const { session_id } = req.body;
+  let extraHours;
+  let dailyWage;
   try {
     const { rows, rowCount } = await pool.query(
       `UPDATE check_in_out set check_out = CURRENT_TIMESTAMP WHERE uid = $1 returning *`,
@@ -187,6 +189,8 @@ async function workerLogout(req, res) {
       rows[0].worker_id,
     ]);
 
+    dailyWage = worker.rows[0].daily_wage_salary;
+
     const check_in_time = rows[0].check_in;
     const check_out_time = rows[0].check_out;
 
@@ -195,6 +199,21 @@ async function workerLogout(req, res) {
       new Date(check_out_time) - new Date(check_in_time);
     const timeDifferenceInHours =
       timeDifferenceInMilliseconds / (1000 * 60 * 60); // Convert milliseconds to hours
+    const siteHours = await pool.query(
+      `SELECT 
+            EXTRACT(HOUR FROM end_time - start_time) AS hours
+            FROM sites where id = $1;
+            `,
+      [worker.rows[0].site_assigned]
+    );
+
+    extraHours = timeDifferenceInHours - siteHours.rows[0].hours;
+
+    // console.log({
+    //   timeDifferenceInHours,
+    //   siteHours: siteHours.rows[0].hours,
+    //   extraHours: Math.floor(extraHours),
+    // });
 
     const earned =
       extraHours < 3
