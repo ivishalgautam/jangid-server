@@ -81,7 +81,12 @@ async function getExpenseById(req, res) {
 
 async function getAllExpenses(req, res) {
   try {
-    const { rows } = await pool.query(`SELECT * FROM expenses;`);
+    const { rows } = await pool.query(
+      `SELECT *, s.site_name, w.fullname as worker_name
+          FROM expenses exp 
+          LEFT JOIN sites s ON exp.site_id = s.id
+          LEFT JOIN workers w ON exp.worker_id = w.id;`
+    );
 
     res.json(rows);
   } catch (error) {
