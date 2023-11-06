@@ -35,11 +35,7 @@ router.put(
   Controller.updateSupervisorById
 ); //admin
 
-router.delete(
-  "/:supervisorId",
-  verifyTokenAndAdmin,
-  Controller.deleteSupervisorById
-); //admin
+router.delete("/", verifyTokenAndAdmin, Controller.deleteSupervisorById); //admin
 
 router.get("/all", verifyTokenAndAdmin, Controller.getAllSupervisors);
 router.get("/", verifyTokenAndAdmin, Controller.getSupervisorbyId);
