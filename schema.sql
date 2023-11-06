@@ -121,7 +121,8 @@ CREATE TABLE expenses(
     amount INT NOT NULL,
     purpose expense_type NOT NULL,
     site_id INT NOT NULL,
-    worker_id INT
+    worker_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE attendances(
