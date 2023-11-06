@@ -125,10 +125,11 @@ async function getSiteById(req, res) {
               FROM (
                   SELECT * FROM workers WHERE site_assigned = $4
                   UNION ALL
-                  SELECT * FROM expenses WHERE site_id = $4
+                  SELECT * FROM expenses WHERE site_id = $5
               ) AS combined_data
       ;`,
       [
+        parseInt(site_id),
         parseInt(site_id),
         parseInt(site_id),
         parseInt(site_id),
