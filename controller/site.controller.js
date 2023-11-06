@@ -119,10 +119,11 @@ async function getSiteById(req, res) {
       `
       SELECT 
             (SELECT count(*) FROM workers WHERE site_assigned = $1) as total_workers,
-            (SELECT count(*) FROM workers WHERE site_assigned = $2 AND is_present = true) as present_workers,
-            (SELECT count(*) FROM expenses WHERE site_id = $3) as total_transactions
+            (SELECT count(*) FROM workers WHERE site_assigned = $1 AND is_present = true) as present_workers,
+            (SELECT count(*) FROM expenses WHERE site_id = $1) as total_transactions,
+            (SELECT * FROM expenses WHERE site_id = $1) as workers
       ;`,
-      [parseInt(site_id), parseInt(site_id), parseInt(site_id)]
+      [parseInt(site_id)]
     );
 
     res.json({
