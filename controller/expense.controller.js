@@ -80,20 +80,62 @@ async function getExpenseById(req, res) {
 }
 
 async function getAllExpenses(req, res) {
+  const { type } = req.query;
+  let data = [];
   try {
-    const { rows } = await pool.query(
-      `
-      SELECT 
-          exp.*, 
-          s.site_name, 
-          w.fullname as worker_name
-        FROM expenses exp 
-      LEFT JOIN sites s ON exp.site_id = s.id
-      LEFT JOIN workers w ON exp.worker_id = w.id
-      ;`
-    );
+    switch (type) {
+      case "site":
+        data = await pool.query(
+          `
+          SELECT 
+              exp.*, 
+              s.site_name, 
+            FROM expenses exp 
+          LEFT JOIN sites s ON exp.site_id = s.id
+          ;`
+        );
+        break;
 
-    res.json(rows);
+      case "worker":
+        data = await pool.query(
+          `
+          SELECT 
+              exp.*, 
+              w.fullname as worker_name
+            FROM expenses exp 
+          LEFT JOIN workers w ON exp.worker_id = w.id
+          ;`
+        );
+        break;
+
+      default:
+        data = await pool.query(
+          `
+          SELECT 
+              exp.*, 
+              s.site_name, 
+              w.fullname as worker_name
+            FROM expenses exp 
+          LEFT JOIN sites s ON exp.site_id = s.id
+          LEFT JOIN workers w ON exp.worker_id = w.id
+          ;`
+        );
+        break;
+    }
+
+    const filteredData = data.rows.map((row) => {
+      if (type === "site") {
+        const { worker_id, ...data } = row;
+        return { ...data };
+      } else if (type === "worker") {
+        const { site_id, ...data } = row;
+        return { ...data };
+      } else {
+        return { ...row };
+      }
+    });
+
+    res.json(filteredData);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });

@@ -31,6 +31,7 @@ async function supervisor(req, res) {
 
 async function admin(req, res) {
   let data = {};
+
   try {
     const { rows } = await pool.query(
       `SELECT 
@@ -48,6 +49,7 @@ async function admin(req, res) {
     for (const [key, value] of Object.entries(rows[0])) {
       data[key] = value ?? "";
     }
+
     res.json(data);
   } catch (error) {
     console.log(error);
