@@ -89,7 +89,7 @@ async function getAllExpenses(req, res) {
           `
           SELECT 
               exp.*, 
-              s.site_name, 
+              s.site_name
             FROM expenses exp 
           LEFT JOIN sites s ON exp.site_id = s.id
           ;`
