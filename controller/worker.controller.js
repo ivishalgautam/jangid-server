@@ -172,15 +172,32 @@ async function getWorkerById(req, res) {
 }
 
 async function getAllWorkers(req, res) {
+  const { present } = req.query;
   let data = [];
 
   try {
-    data = await pool.query(`SELECT * FROM workers;`);
+    switch (present) {
+      case "true":
+        data = await pool.query(
+          `SELECT * FROM workers WHERE is_present = true;`
+        );
+        break;
+
+      case "false":
+        data = await pool.query(
+          `SELECT * FROM workers WHERE is_present = false;`
+        );
+        break;
+
+      default:
+        data = await pool.query(`SELECT * FROM workers;`);
+        break;
+    }
 
     res.json({
       message: "success",
       status: 200,
-      data: rows,
+      data: data.rows,
     });
   } catch (error) {
     console.log(error);
