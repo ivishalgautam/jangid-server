@@ -30,6 +30,7 @@ async function supervisor(req, res) {
 }
 
 async function admin(req, res) {
+  let data = {};
   try {
     const { rows } = await pool.query(
       `SELECT 
@@ -43,7 +44,11 @@ async function admin(req, res) {
             (SELECT SUM(total_budget) FROM sites WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW()) AND is_completed = true) AS income_this_month;
             `
     );
-    res.json(rows[0]);
+
+    for (const [key, value] of Object.entries(rows[0])) {
+      data[key] = value ?? "";
+    }
+    res.json(data);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
