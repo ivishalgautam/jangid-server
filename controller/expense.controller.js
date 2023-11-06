@@ -92,7 +92,7 @@ async function getAllExpenses(req, res) {
               s.site_name
             FROM expenses exp 
           LEFT JOIN sites s ON exp.site_id = s.id
-          WHERE exp.site_id IS NOT NULL AND exp.site_id <> ''
+          WHERE exp.site_id IS NOT NULL
           ;`
         );
         break;
@@ -105,7 +105,7 @@ async function getAllExpenses(req, res) {
               w.fullname as worker_name
             FROM expenses exp 
           LEFT JOIN workers w ON exp.worker_id = w.id
-          WHERE exp.worker_id IS NOT NULL AND exp.worker_id <> ''
+          WHERE exp.worker_id IS NOT NULL
           ;`
         );
         break;
