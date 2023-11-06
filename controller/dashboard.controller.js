@@ -40,7 +40,7 @@ async function admin(req, res) {
         COALESCE((SELECT COUNT(*) FROM supervisors), '') AS total_supervisors,
         COALESCE((SELECT COUNT(*) FROM workers AS s WHERE s.is_present = true), '') AS present_supervisors,
         COALESCE((SELECT SUM(amount) FROM expenses WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW()), ''), '') AS expense_this_month,
-        COALESCE((SELECT SUM(total_budget) FROM sites WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW()) AND is_completed = true, ''), '') AS income_this_month;
+        COALESCE((SELECT SUM(total_budget) FROM sites WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW()) AND is_completed = true), '') AS income_this_month;
 `);
     res.json(rows[0]);
   } catch (error) {
