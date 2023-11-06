@@ -115,7 +115,21 @@ async function getSiteById(req, res) {
       return res.status(404).json({ message: "Site not found!" });
     }
 
-    res.json(rows[0]);
+    const todayWorking = await pool.query(
+      `
+      SELECT 
+            (SELECT count(*) FROM workers WHERE site_assigned = $1) as total_workers,
+            (SELECT count(*) FROM workers WHERE site_assigned = $1 AND is_present = true) as total_workers,
+            (SELECT count(*) FROM expenses WHERE site_assigned = $1) as total_transactions
+      ;`,
+      [site_id]
+    );
+
+    res.json({
+      message: "success",
+      status: 200,
+      data: { ...rows[0], ...todayWorking.rows[0] },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
