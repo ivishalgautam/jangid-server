@@ -121,9 +121,12 @@ async function getSiteById(req, res) {
             (SELECT count(*) FROM workers WHERE site_assigned = $1) as total_workers,
             (SELECT count(*) FROM workers WHERE site_assigned = $2 AND is_present = true) as present_workers,
             (SELECT count(*) FROM expenses WHERE site_id = $3) as total_transactions,
-            json_agg(workers.*) as workers
-              FROM workers
-              WHERE site_assigned = $4
+            json_agg(row_to_json(workers)) as data
+              FROM (
+                  SELECT * FROM workers WHERE site_assigned = $4
+                  UNION ALL
+                  SELECT * FROM expenses WHERE site_id = $4
+              ) AS combined_data
       ;`,
       [
         parseInt(site_id),
