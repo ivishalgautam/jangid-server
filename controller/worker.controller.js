@@ -172,8 +172,10 @@ async function getWorkerById(req, res) {
 }
 
 async function getAllWorkers(req, res) {
+  let data = [];
+
   try {
-    const { rows } = await pool.query(`SELECT * FROM workers;`);
+    data = await pool.query(`SELECT * FROM workers;`);
 
     res.json({
       message: "success",

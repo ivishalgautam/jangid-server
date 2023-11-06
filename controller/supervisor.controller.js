@@ -54,6 +54,7 @@ async function createSupervisor(req, res) {
 async function updateSupervisorById(req, res) {
   const supervisorId = parseInt(req.params.supervisorId);
   const { fullname, email, phone } = req.body;
+  console.log(supervisorId, ...req.body);
   try {
     const { rowCount } = await pool.query(
       `UPDATE supervisors SET fullname = $1, email = $2, phone = $3 WHERE id = $4`,
