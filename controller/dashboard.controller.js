@@ -31,17 +31,18 @@ async function supervisor(req, res) {
 
 async function admin(req, res) {
   try {
-    const { rows } = await pool.query(`
-    SELECT 
-        COALESCE((SELECT COUNT(*) FROM sites AS s WHERE s.is_completed = false), '') AS ongoing_sites,
-        COALESCE((SELECT COUNT(*) FROM sites AS s WHERE s.is_completed = true), '') AS completed_sites,
-        COALESCE((SELECT COUNT(*) FROM workers), '') AS total_workers,
-        COALESCE((SELECT COUNT(*) FROM workers AS w WHERE w.is_present = true), '') AS present_workers,
-        COALESCE((SELECT COUNT(*) FROM supervisors), '') AS total_supervisors,
-        COALESCE((SELECT COUNT(*) FROM workers AS s WHERE s.is_present = true), '') AS present_supervisors,
-        COALESCE((SELECT SUM(amount) FROM expenses WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW()), ''), '') AS expense_this_month,
-        COALESCE((SELECT SUM(total_budget) FROM sites WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW()) AND is_completed = true), '') AS income_this_month;
-`);
+    const { rows } = await pool.query(
+      `SELECT 
+            (SELECT COUNT(*) FROM sites AS s WHERE s.is_completed = false) AS ongoing_sites,
+            (SELECT COUNT(*) FROM sites AS s WHERE s.is_completed = true) AS completed_sites,
+            (SELECT COUNT(*) FROM workers) AS total_workers,
+            (SELECT COUNT(*) FROM workers AS w WHERE w.is_present = true) AS present_workers,
+            (SELECT COUNT(*) FROM supervisors) AS total_supervisors,
+            (SELECT COUNT(*) FROM workers AS s WHERE s.is_present = true) AS present_supervisors,
+            (SELECT SUM(amount) FROM expenses WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW())) AS expense_this_month,
+            (SELECT SUM(total_budget) FROM sites WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW()) AND is_completed = true) AS income_this_month;
+            `
+    );
     res.json(rows[0]);
   } catch (error) {
     console.log(error);
