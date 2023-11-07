@@ -59,7 +59,7 @@ router.put(
 );
 
 router.put(
-  "/site-assign",
+  "/site-assign/:siteId",
   verifyTokenAdminAndSupervisor,
   Controller.siteAssign
 );

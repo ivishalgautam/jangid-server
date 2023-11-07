@@ -131,7 +131,8 @@ async function getAllSupervisors(req, res) {
 }
 
 async function siteAssign(req, res) {
-  const { site_id, supervisor_id } = req.body;
+  const { supervisor_id } = req.body;
+  const site_id = req.params.siteId;
   try {
     const site = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
       parseInt(site_id),
