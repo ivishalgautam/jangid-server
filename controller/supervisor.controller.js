@@ -134,7 +134,7 @@ async function siteAssign(req, res) {
   const { site_id, supervisor_id } = req.body;
   try {
     const site = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
-      site_id,
+      parseInt(site_id),
     ]);
 
     if (site.rowCount === 0) {
@@ -143,7 +143,7 @@ async function siteAssign(req, res) {
 
     const supervisor = await pool.query(
       `SELECT * FROM supervisors WHERE id = $1`,
-      [supervisor_id]
+      [parseInt(supervisor_id)]
     );
 
     if (supervisor.rowCount === 0) {
