@@ -44,20 +44,11 @@ async function createSite(req, res) {
 }
 
 async function updateSiteById(req, res) {
-  const {
-    site_id,
-    site_name,
-    owner_name,
-    address,
-    supervisor_id,
-    lat,
-    long,
-    radius,
-  } = req.body;
+  const { site_id } = req.body;
 
   try {
     const exist = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
-      site_id,
+      parseInt(site_id),
     ]);
 
     if (exist.rowCount === 0) {
@@ -78,6 +69,7 @@ async function updateSiteById(req, res) {
       };`,
       [...updateValues, site_id]
     );
+
     res.json({ message: "Site updated" });
   } catch (error) {
     console.log(error);
