@@ -1,7 +1,7 @@
 const { pool } = require("../config/db");
 
 async function createExpense(req, res) {
-  const { amount, purpose, site_id, worker_id } = req.body;
+  const { amount, purpose, site_id, comment, worker_id } = req.body;
 
   try {
     const siteRecord = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
@@ -15,13 +15,14 @@ async function createExpense(req, res) {
       `SELECT * FROM workers WHERE id = $1`,
       [worker_id]
     );
+
     if (workerRecord.rowCount === 0) {
       return res.status(404).json({ message: "worker not found!" });
     }
 
     await pool.query(
-      `INSERT INTO expenses (amount, purpose, site_id, worker_id) VALUES ($1, $2, $3, $4)`,
-      [amount, purpose, site_id, worker_id ?? ""]
+      `INSERT INTO expenses (amount, purpose, site_id, comment, worker_id) VALUES ($1, $2, $3, $4, $5)`,
+      [amount, purpose, site_id, comment, worker_id ?? ""]
     );
 
     const supervisor = await pool.query(
