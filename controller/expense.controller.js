@@ -4,10 +4,54 @@ async function createExpense(req, res) {
   const { amount, purpose, site_id, worker_id } = req.body;
 
   try {
+    const siteRecord = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
+      site_id,
+    ]);
+    if (siteRecord.rowCount === 0) {
+      return res.status(404).json({ message: "site not found!" });
+    }
+
+    const workerRecord = await pool.query(
+      `SELECT * FROM workers WHERE id = $1`,
+      [worker_id]
+    );
+    if (workerRecord.rowCount === 0) {
+      return res.status(404).json({ message: "worker not found!" });
+    }
+
     await pool.query(
       `INSERT INTO expenses (amount, purpose, site_id, worker_id) VALUES ($1, $2, $3, $4)`,
-      [amount, purpose, site_id, worker_id]
+      [amount, purpose, site_id, worker_id ?? ""]
     );
+
+    const supervisor = await pool.query(
+      `SELECT * FROM supervisors WHERE site_assigned = $1;`,
+      [siteRecord.rows[0].id]
+    );
+
+    if (supervisor.rowCount === 0) {
+      return res.status(404).json({
+        message: `supervisor not found!`,
+      });
+    }
+
+    const walletRecord = await pool.query(
+      "SELECT * FROM wallets WHERE supervisor_id = $1;",
+      [supervisor.rows[0].id]
+    );
+
+    if (walletRecord.rowCount === 0) {
+      return res.status(404).json({
+        message: `wallet not found with id: '${supervisor.rows[0].id}'`,
+      });
+    }
+
+    let prevAmt = parseInt(walletRecord.rows[0].amount);
+    await pool.query(`UPDATE wallets SET amount = $1 WHERE id = $2;`, [
+      prevAmt - parseInt(amount),
+      walletRecord.rows[0].id,
+    ]);
+
     res.json({ message: "Expense created" });
   } catch (error) {
     console.log(error);
