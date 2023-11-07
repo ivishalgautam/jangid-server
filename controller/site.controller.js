@@ -62,7 +62,7 @@ async function updateSiteById(req, res) {
         (column, key) => `${column === "site_id" ? "id" : column} = $${key + 1}`
       )
       .join(", ");
-    //
+
     const updateValues = Object.values(data);
 
     const { rows, rowCount } = await pool.query(
@@ -71,6 +71,10 @@ async function updateSiteById(req, res) {
       } returning *;`,
       [...updateValues, site_id]
     );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ message: "site not found!" });
+    }
 
     res.json({ message: "Site updated", site_id: rows[0].id });
   } catch (error) {
