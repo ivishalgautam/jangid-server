@@ -68,7 +68,7 @@ async function updateSiteById(req, res) {
     const { rows, rowCount } = await pool.query(
       `UPDATE sites SET ${updateColumns} WHERE id = $${
         updateValues.length + 1
-      };`,
+      } returning *;`,
       [...updateValues, site_id]
     );
 
