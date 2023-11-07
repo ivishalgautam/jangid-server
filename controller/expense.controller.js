@@ -136,12 +136,12 @@ async function getAllExpenses(req, res) {
         data = await pool.query(
           `
           SELECT 
-              exp.*, 
-              s.site_name
-            FROM expenses exp 
+            exp.*, 
+            s.site_name
+          FROM expenses exp 
           LEFT JOIN sites s ON exp.site_id = s.id
-          WHERE exp.site_id IS NOT NULL
-          ;`
+            WHERE exp.site_id IS NOT NULL;
+          `
         );
         break;
 
@@ -149,11 +149,11 @@ async function getAllExpenses(req, res) {
         data = await pool.query(
           `
           SELECT 
-              exp.*, 
-              w.fullname as worker_name
-            FROM expenses exp 
+            exp.*, 
+            w.fullname as worker_name
+          FROM expenses exp 
           LEFT JOIN workers w ON exp.worker_id = w.id
-          WHERE exp.worker_id IS NOT NULL
+            WHERE exp.worker_id IS NOT NULL
           ;`
         );
         break;
@@ -162,10 +162,10 @@ async function getAllExpenses(req, res) {
         data = await pool.query(
           `
           SELECT 
-              exp.*, 
-              s.site_name, 
-              w.fullname as worker_name
-            FROM expenses exp 
+            exp.*, 
+            s.site_name, 
+            w.fullname as worker_name
+          FROM expenses exp 
           LEFT JOIN sites s ON exp.site_id = s.id
           LEFT JOIN workers w ON exp.worker_id = w.id
           ;`
@@ -173,16 +173,16 @@ async function getAllExpenses(req, res) {
         break;
     }
 
-    const filteredData = data.rows.map((row) => {
+    const filteredData = data?.rows.map((row) => {
       if (type === "site") {
         const { worker_id, ...data } = row;
         return { ...data };
       } else {
-        return { ...row };
+        return row;
       }
     });
 
-    res.json(filteredData);
+    res.json({ message: "success", status: 200, data: filteredData });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
