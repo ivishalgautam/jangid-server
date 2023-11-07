@@ -45,6 +45,7 @@ async function createSite(req, res) {
 
 async function updateSiteById(req, res) {
   const { site_id } = req.body;
+  console.log(req.body);
 
   try {
     const exist = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
