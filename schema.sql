@@ -39,6 +39,7 @@ CREATE TABLE supervisors(
     hpassword TEXT NOT NULL,
     is_present BOOLEAN DEFAULT false,
     profile_img TEXT,
+    site_assigned VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

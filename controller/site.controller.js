@@ -121,7 +121,7 @@ async function getSiteById(req, res) {
             (SELECT count(*) FROM workers WHERE site_assigned = $1) as total_workers,
             (SELECT count(*) FROM workers WHERE site_assigned = $2 AND is_present = true) as present_workers,
             (SELECT count(*) FROM expenses WHERE site_id = $3) as total_transactions,
-            json_agg(workers.*) as workers
+            json_agg(workers.fullname, ) as workers
               FROM workers
               WHERE site_assigned = $4
       ;`,
@@ -133,10 +133,14 @@ async function getSiteById(req, res) {
       ]
     );
 
-    const expenses = await pool.query(
-      `SELECT * FROM expenses WHERE site_id = $1`,
+    const site_payouts = await pool.query(
+      `SELECT * FROM site_payouts WHERE site_id = $1`,
       [site_id]
     );
+
+    const worker_payouts = await pool.query(`SELECT * FROM worker_payouts;`, [
+      site_id,
+    ]);
 
     res.json({
       message: "success",
@@ -144,7 +148,8 @@ async function getSiteById(req, res) {
       data: {
         ...rows[0],
         ...todayWorking.rows[0],
-        transactions: expenses.rows,
+        site_payouts: site_payouts.rows,
+        worker_payouts: worker_payouts.rows,
       },
     });
   } catch (error) {

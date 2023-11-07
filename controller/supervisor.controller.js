@@ -2,7 +2,8 @@ const { pool } = require("../config/db");
 const bcrypt = require("bcryptjs");
 
 async function createSupervisor(req, res) {
-  const { fullname, email, phone, username, password } = req.body;
+  const { fullname, email, phone, username, password, site_assigned } =
+    req.body;
   const profile_img = `/assets/images/${req.file.filename}`;
   // console.log(req.body, profile_img);
 
@@ -40,8 +41,17 @@ async function createSupervisor(req, res) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
-      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, profile_img) VALUES ($1, $2, $3, $4, $5, $6, $7);`,
-      [fullname, email, phone, username, password, hashedPassword, profile_img]
+      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, profile_img, site_assigned) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`,
+      [
+        fullname,
+        email,
+        phone,
+        username,
+        password,
+        hashedPassword,
+        profile_img,
+        site_assigned,
+      ]
     );
 
     res.json({ message: "Created" });
@@ -53,11 +63,11 @@ async function createSupervisor(req, res) {
 
 async function updateSupervisorById(req, res) {
   const supervisorId = parseInt(req.params.supervisorId);
-  const { fullname, email, phone } = req.body;
+  const { fullname, email, phone, site_assigned } = req.body;
   try {
     const { rowCount } = await pool.query(
-      `UPDATE supervisors SET fullname = $1, email = $2, phone = $3 WHERE id = $4`,
-      [fullname, email, phone, supervisorId]
+      `UPDATE supervisors SET fullname = $1, email = $2, phone = $3, site_assigned = $4 WHERE id = $5`,
+      [fullname, email, phone, site_assigned, supervisorId]
     );
 
     if (rowCount === 0) {
