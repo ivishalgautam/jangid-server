@@ -77,7 +77,7 @@ async function updateExpenseById(req, res) {
     }
 
     await pool.query(
-      `UPDATE expenses SET amount = $1, purpose = $2, site_id = $3, worker_id = $4) WHERE id = $5`,
+      `UPDATE expenses SET amount = $1, purpose = $2, site_id = $3, worker_id = $4 WHERE id = $5`,
       [amount, purpose, site_id, worker_id, expenseId]
     );
     res.json({ message: "Expense updated" });
@@ -108,7 +108,7 @@ async function deleteExpenseById(req, res) {
 }
 
 async function getExpenseById(req, res) {
-  const expense_id = req.body;
+  const expense_id = req.body.expense_id;
 
   try {
     const { rows, rowCount } = await pool.query(
@@ -176,9 +176,6 @@ async function getAllExpenses(req, res) {
     const filteredData = data.rows.map((row) => {
       if (type === "site") {
         const { worker_id, ...data } = row;
-        return { ...data };
-      } else if (type === "worker") {
-        const { site_id, ...data } = row;
         return { ...data };
       } else {
         return { ...row };
