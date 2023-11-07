@@ -64,14 +64,14 @@ async function updateSiteById(req, res) {
       .join(", ");
     const updateValues = Object.values(data);
 
-    await pool.query(
+    const { rows, rowCount } = await pool.query(
       `UPDATE sites SET ${updateColumns} WHERE id = $${
         updateValues.length + 1
       };`,
       [...updateValues, site_id]
     );
 
-    res.json({ message: "Site updated" });
+    res.json({ message: "Site updated", site_id: rows[0].id });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
