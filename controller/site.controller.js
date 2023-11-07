@@ -62,6 +62,7 @@ async function updateSiteById(req, res) {
         (column, key) => `${column === "site_id" ? "id" : column} = $${key + 1}`
       )
       .join(", ");
+    //
     const updateValues = Object.values(data);
 
     const { rows, rowCount } = await pool.query(
