@@ -130,10 +130,43 @@ async function getAllSupervisors(req, res) {
   }
 }
 
+async function siteAssign(req, res) {
+  const { site_id, supervisor_id } = req.body;
+  try {
+    const site = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
+      site_id,
+    ]);
+
+    if (site.rowCount === 0) {
+      return res.status(404).json({ message: "Site not exist!" });
+    }
+
+    const supervisor = await pool.query(
+      `SELECT * FROM supervisors WHERE id = $1`,
+      [supervisor_id]
+    );
+
+    if (supervisor.rowCount === 0) {
+      return res.status(404).json({ message: "Supervisor not exist!" });
+    }
+
+    await pool.query(
+      `UPDATE supervisors SET site_assigned = $1 WHERE id = $2;`,
+      [site_id, supervisor_id]
+    );
+
+    res.json({ message: "Site assigned." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createSupervisor,
   updateSupervisorById,
   deleteSupervisorById,
   getSupervisorbyId,
   getAllSupervisors,
+  siteAssign,
 };
