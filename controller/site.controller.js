@@ -152,7 +152,9 @@ async function getSiteById(req, res) {
             const { worker_id, worker_img, ...data } = row;
             return { ...data };
           }),
-        worker_payouts: expenses.rows.filter((row) => row.purpose === "worker"),
+        worker_payouts: expenses.rows.filter(
+          (row) => row.purpose === "worker" && row.worker_id !== null
+        ),
         workers: workers.rows,
       },
     });
