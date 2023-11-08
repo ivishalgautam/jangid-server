@@ -4,6 +4,15 @@ async function createWallet(req, res) {
   const { amount, supervisor_id } = req.body;
 
   try {
+    const record = await pool.query(
+      `SELECT * FROM wallet WHERE supervisor_id = $1;`,
+      [supervisor_id]
+    );
+
+    if (record.rowCount > 0) {
+      return res.status(400).json({ message: "already created" });
+    }
+
     await pool.query(
       `INSERT INTO wallet (amount, supervisor_id) VALUES ($1, $2)`,
       [amount, supervisor_id]
@@ -61,12 +70,12 @@ async function deleteWalletById(req, res) {
 }
 
 async function getWalletById(req, res) {
-  const wallet_id = req.body;
+  const supervisorId = req.body.supervisor_id;
 
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT * FROM wallet WHERE id = $1`,
-      [wallet_id]
+      [supervisorId]
     );
 
     if (rowCount === 0) {
