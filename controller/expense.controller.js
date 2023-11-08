@@ -55,12 +55,10 @@ async function createExpense(req, res) {
       return res.status(400).json({ message: "insufficient wallet balance!" });
     }
 
-    console.log(prevAmt, parseInt(amount));
-
-    await pool.query(`UPDATE wallet SET amount = $1 WHERE id = $2;`, [
-      prevAmt - parseInt(amount),
-      walletRecord.rows[0].id,
-    ]);
+    await pool.query(
+      `UPDATE wallet SET amount = $1 WHERE supervisor_id = $2;`,
+      [prevAmt - parseInt(amount), supervisor_id]
+    );
 
     res.json({ message: "Expense created" });
   } catch (error) {
