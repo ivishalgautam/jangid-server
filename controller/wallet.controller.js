@@ -15,28 +15,24 @@ async function createWallet(req, res) {
   }
 }
 
-async function updateWalletById(req, res) {
+async function updateWalletBySupervisorId(req, res) {
   const { amount, supervisor_id } = req.body;
-  const walletId = parseInt(req.params.walletId);
 
   try {
-    const exist = await pool.query(`SELECT * FROM wallet WHERE id = $1`, [
-      walletId,
-    ]);
-
-    if (exist.rowCount === 0) {
-      return res.status(404).json({ message: "Wallet not found!" });
-    }
-
     const walletRecord = await pool.query(
       "SELECT * FROM wallet WHERE supervisor_id = $1",
       [supervisor_id]
     );
 
+    if (walletRecord.rowCount === 0) {
+      return res.status(404).json({ message: "Wallet not found!" });
+    }
+
     await pool.query(`UPDATE wallet SET amount = $1, supervisor_id = $2;`, [
       walletRecord.rows[0].amount + amount,
       supervisor_id,
     ]);
+
     res.json({ message: "Wallet updated" });
   } catch (error) {
     console.log(error);
@@ -97,7 +93,7 @@ async function getAllWallet(req, res) {
 
 module.exports = {
   createWallet,
-  updateWalletById,
+  updateWalletBySupervisorId,
   deleteWalletById,
   getWalletById,
   getAllWallet,
