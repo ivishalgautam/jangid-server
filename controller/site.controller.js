@@ -123,8 +123,6 @@ async function getSiteById(req, res) {
       [site_id, site_id, parseInt(site_id)]
     );
 
-    console.log({ todayWorking });
-
     const expenses = await pool.query(
       `SELECT exp.*, w.profile_img as worker_img, w.fullname as worker_name, s.image as site_img FROM expenses exp 
           LEFT JOIN workers w on exp.worker_id::integer = w.id 
@@ -133,13 +131,10 @@ async function getSiteById(req, res) {
       [parseInt(site_id)]
     );
 
-    console.log({ expenses });
-
     const workers = await pool.query(
       `SELECT id, fullname, created_at, profile_img FROM workers WHERE site_assigned = $1;`,
       [site_id]
     );
-    console.log({ workers });
     res.json({
       message: "success",
       status: 200,
@@ -149,7 +144,7 @@ async function getSiteById(req, res) {
         site_payouts: expenses.rows
           .filter((row) => row.purpose === "site")
           .map((row) => {
-            const { worker_id, worker_img, ...data } = row;
+            const { worker_id, worker_img, worker_name, ...data } = row;
             return { ...data };
           }),
         worker_payouts: expenses.rows.filter(
