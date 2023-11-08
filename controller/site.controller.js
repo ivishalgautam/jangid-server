@@ -142,11 +142,13 @@ async function getSiteById(req, res) {
       data: {
         ...rows[0],
         ...todayWorking.rows[0],
-        site_payouts: expenses.rows.map((row) => {
-          const { worker_id, ...data } = row;
-          return { ...data };
-        }),
-        worker_payouts: expenses.rows,
+        site_payouts: expenses.rows
+          .filter((row) => row.purpose === "site")
+          .map((row) => {
+            const { worker_id, worker_img, ...data } = row;
+            return { ...data };
+          }),
+        worker_payouts: expenses.rows.filter((row) => row.purpose === "worker"),
         workers: workers.rows,
       },
     });

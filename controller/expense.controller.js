@@ -1,7 +1,8 @@
 const { pool } = require("../config/db");
 
 async function createExpense(req, res) {
-  const { amount, purpose, site_id, comment, worker_id } = req.body;
+  const { amount, purpose, site_id, comment, worker_id, supervisor_id } =
+    req.body;
 
   try {
     const siteRecord = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
@@ -26,8 +27,8 @@ async function createExpense(req, res) {
     );
 
     const supervisor = await pool.query(
-      `SELECT * FROM supervisors WHERE site_assigned = $1;`,
-      [siteRecord.rows[0].id]
+      `SELECT * FROM supervisors WHERE id = $1;`,
+      [supervisor_id]
     );
 
     if (supervisor.rowCount === 0) {
