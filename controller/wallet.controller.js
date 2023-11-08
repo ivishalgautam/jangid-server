@@ -37,11 +37,13 @@ async function updateWalletBySupervisorId(req, res) {
     console.log({ walletRecord: walletRecord.rows });
 
     if (walletRecord.rowCount === 0) {
+      console.log("inside create");
       await pool.query(
         `INSERT INTO wallet (amount, supervisor_id) VALUES ($1, $2)`,
         [amount, supervisor_id]
       );
     } else {
+      console.log("inside update");
       await pool.query(`UPDATE wallet SET amount = $1, supervisor_id = $2;`, [
         parseInt(walletRecord.rows[0].amount) + parseInt(amount),
         supervisor_id,
