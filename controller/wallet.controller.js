@@ -28,8 +28,13 @@ async function updateWalletById(req, res) {
       return res.status(404).json({ message: "Wallet not found!" });
     }
 
+    const walletRecord = await pool.query(
+      "SELECT * FROM wallet WHERE supervisor_id = $1",
+      [supervisor_id]
+    );
+
     await pool.query(`UPDATE wallet SET amount = $1, supervisor_id = $2;`, [
-      amount,
+      walletRecord.rows[0].amount + amount,
       supervisor_id,
     ]);
     res.json({ message: "Wallet updated" });
