@@ -34,15 +34,20 @@ async function updateWalletBySupervisorId(req, res) {
     );
 
     if (walletRecord.rowCount === 0) {
-      return res.status(404).json({ message: "Wallet not found!" });
+      await pool.query(
+        `INSERT INTO wallet (amount, supervisor_id) VALUES ($1, $2)`,
+        [amount, supervisor_id]
+      );
+
+      return res.json({ message: "Wallet created!" });
+    } else {
+      await pool.query(`UPDATE wallet SET amount = $1, supervisor_id = $2;`, [
+        parseInt(walletRecord.rows[0].amount) + parseInt(amount),
+        supervisor_id,
+      ]);
+
+      res.json({ message: "Wallet updated" });
     }
-
-    await pool.query(`UPDATE wallet SET amount = $1, supervisor_id = $2;`, [
-      parseInt(walletRecord.rows[0].amount) + parseInt(amount),
-      supervisor_id,
-    ]);
-
-    res.json({ message: "Wallet updated" });
   } catch (error) {
     console.log(error);
     res.json({ message: error.message });
