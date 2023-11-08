@@ -98,6 +98,10 @@ async function deleteSupervisorById(req, res) {
 
     if (rowCount === 0) {
       return res.status(404).json({ message: "NOT FOUND!" });
+    } else {
+      await pool.query(`DELETE FROM wallet WHERE supervisor_id = $1;`, [
+        supervisorId,
+      ]);
     }
 
     res.json({ message: "DELETED" });
