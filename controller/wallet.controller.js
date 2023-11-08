@@ -43,9 +43,9 @@ async function updateWalletBySupervisorId(req, res) {
         parseInt(walletRecord.rows[0].amount) + parseInt(amount),
         supervisor_id,
       ]);
-
-      res.json({ message: "Amount added" });
     }
+
+    res.json({ message: "Amount added" });
   } catch (error) {
     console.log(error);
     res.json({ message: error.message });
