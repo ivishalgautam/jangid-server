@@ -113,8 +113,6 @@ async function getSiteById(req, res) {
       return res.status(404).json({ message: "Site not found!" });
     }
 
-    console.log({ rows });
-
     const todayWorking = await pool.query(
       `
       SELECT 
@@ -122,37 +120,26 @@ async function getSiteById(req, res) {
             (SELECT count(*) FROM workers WHERE site_assigned = $2 AND is_present = true) as present_workers,
             (SELECT count(*) FROM expenses WHERE site_id = $3) as total_transactions
       ;`,
-      [site_id, site_id, parseInt(site_id)],
-      (err, data) => {
-        if (err) {
-          console.error(err);
-        }
-      }
+      [site_id, site_id, parseInt(site_id)]
     );
+
+    console.log({ todayWorking });
 
     const expenses = await pool.query(
       `SELECT exp.*, w.profile_img as worker_img, s.image as site_img FROM expenses exp 
           LEFT JOIN workers w on exp.worker_id = w.id 
           LEFT JOIN sites s on exp.site_id = s.id 
           WHERE site_id = $1;`,
-      [parseInt(site_id)],
-      (err, data) => {
-        if (err) {
-          console.error(err);
-        }
-      }
+      [parseInt(site_id)]
     );
+
+    console.log({ expenses });
 
     const workers = await pool.query(
       `SELECT id, fullname, created_at, profile_img FROM workers WHERE site_assigned = $1;`,
-      [site_id],
-      (err, data) => {
-        if (err) {
-          console.error(err);
-        }
-      }
+      [site_id]
     );
-
+    console.log({ workers });
     res.json({
       message: "success",
       status: 200,
