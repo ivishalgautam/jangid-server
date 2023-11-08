@@ -36,7 +36,7 @@ async function createExpense(req, res) {
 
     await pool.query(
       `INSERT INTO expenses (amount, purpose, site_id, comment, worker_id, supervisor_id) VALUES ($1, $2, $3, $4, $5, $6)`,
-      [amount, purpose, site_id, comment, worker_id ?? "", supervisor_id]
+      [amount, purpose, site_id, comment, worker_id, supervisor_id]
     );
 
     const walletRecord = await pool.query(
