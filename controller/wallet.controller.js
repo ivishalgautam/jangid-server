@@ -38,7 +38,7 @@ async function updateWalletBySupervisorId(req, res) {
     }
 
     await pool.query(`UPDATE wallet SET amount = $1, supervisor_id = $2;`, [
-      walletRecord.rows[0].amount + amount,
+      parseInt(walletRecord.rows[0].amount) + parseInt(amount),
       supervisor_id,
     ]);
 
