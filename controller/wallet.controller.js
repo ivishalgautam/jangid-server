@@ -69,12 +69,12 @@ async function deleteWalletById(req, res) {
   }
 }
 
-async function getWalletById(req, res) {
+async function getWalletBySupervisorId(req, res) {
   const supervisorId = req.body.supervisor_id;
 
   try {
     const { rows, rowCount } = await pool.query(
-      `SELECT * FROM wallet WHERE id = $1`,
+      `SELECT * FROM wallet WHERE supervisor_id = $1`,
       [supervisorId]
     );
 
@@ -104,6 +104,6 @@ module.exports = {
   createWallet,
   updateWalletBySupervisorId,
   deleteWalletById,
-  getWalletById,
+  getWalletBySupervisorId,
   getAllWallet,
 };
