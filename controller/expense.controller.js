@@ -21,11 +21,6 @@ async function createExpense(req, res) {
       return res.status(404).json({ message: "worker not found!" });
     }
 
-    await pool.query(
-      `INSERT INTO expenses (amount, purpose, site_id, comment, worker_id) VALUES ($1, $2, $3, $4, $5)`,
-      [amount, purpose, site_id, comment, worker_id ?? ""]
-    );
-
     const supervisor = await pool.query(
       `SELECT * FROM supervisors WHERE id = $1;`,
       [supervisor_id]
@@ -37,14 +32,19 @@ async function createExpense(req, res) {
       });
     }
 
+    await pool.query(
+      `INSERT INTO expenses (amount, purpose, site_id, comment, worker_id, supervisor_id) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [amount, purpose, site_id, comment, worker_id ?? "", supervisor_id]
+    );
+
     const walletRecord = await pool.query(
       "SELECT * FROM wallets WHERE supervisor_id = $1;",
-      [supervisor.rows[0].id]
+      [supervisor_id]
     );
 
     if (walletRecord.rowCount === 0) {
       return res.status(404).json({
-        message: `wallet not found with id: '${supervisor.rows[0].id}'`,
+        message: `wallet not found with id: '${supervisor_id}'`,
       });
     }
 

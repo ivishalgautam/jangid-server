@@ -123,7 +123,7 @@ CREATE TABLE expenses(
     comment text,
     site_id INT NOT NULL,
     worker_id INT,
-    supervisor_id INT NOT NULL,
+    supervisor_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
