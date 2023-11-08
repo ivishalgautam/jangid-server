@@ -122,7 +122,7 @@ CREATE TABLE expenses(
     purpose expense_type NOT NULL,
     comment text,
     site_id INT NOT NULL,
-    worker_id INT,
+    worker_id VARCHAR(100),
     supervisor_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
