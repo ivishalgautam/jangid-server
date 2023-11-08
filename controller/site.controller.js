@@ -106,12 +106,7 @@ async function getSiteById(req, res) {
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT * FROM sites WHERE id = $1`,
-      [parseInt(site_id)],
-      (err, data) => {
-        if (err) {
-          console.error(err);
-        }
-      }
+      [parseInt(site_id)]
     );
 
     if (rowCount === 0) {
