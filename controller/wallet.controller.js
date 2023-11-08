@@ -26,6 +26,7 @@ async function createWallet(req, res) {
 
 async function updateWalletBySupervisorId(req, res) {
   const { amount, supervisor_id } = req.body;
+  console.log(req.body);
 
   try {
     const walletRecord = await pool.query(
