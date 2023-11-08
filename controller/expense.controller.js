@@ -38,7 +38,7 @@ async function createExpense(req, res) {
     );
 
     const walletRecord = await pool.query(
-      "SELECT * FROM wallets WHERE supervisor_id = $1;",
+      "SELECT * FROM wallet WHERE supervisor_id = $1;",
       [supervisor_id]
     );
 
