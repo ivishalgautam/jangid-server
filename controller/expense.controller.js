@@ -12,13 +12,15 @@ async function createExpense(req, res) {
       return res.status(404).json({ message: "site not found!" });
     }
 
-    const workerRecord = await pool.query(
-      `SELECT * FROM workers WHERE id = $1`,
-      [worker_id]
-    );
+    if (worker_id) {
+      const workerRecord = await pool.query(
+        `SELECT * FROM workers WHERE id = $1`,
+        [worker_id]
+      );
 
-    if (workerRecord.rowCount === 0) {
-      return res.status(404).json({ message: "worker not found!" });
+      if (workerRecord.rowCount === 0) {
+        return res.status(404).json({ message: "worker not found!" });
+      }
     }
 
     const supervisor = await pool.query(
