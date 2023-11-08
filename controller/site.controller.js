@@ -106,7 +106,12 @@ async function getSiteById(req, res) {
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT * FROM sites WHERE id = $1`,
-      [parseInt(site_id)]
+      [parseInt(site_id)],
+      (err, data) => {
+        if (err) {
+          console.error(err);
+        }
+      }
     );
 
     if (rowCount === 0) {
@@ -120,7 +125,12 @@ async function getSiteById(req, res) {
             (SELECT count(*) FROM workers WHERE site_assigned = $2 AND is_present = true) as present_workers,
             (SELECT count(*) FROM expenses WHERE site_id = $3) as total_transactions
       ;`,
-      [site_id, site_id, parseInt(site_id)]
+      [site_id, site_id, parseInt(site_id)],
+      (err, data) => {
+        if (err) {
+          console.error(err);
+        }
+      }
     );
 
     const expenses = await pool.query(
@@ -128,12 +138,22 @@ async function getSiteById(req, res) {
           LEFT JOIN workers w on exp.worker_id = w.id 
           LEFT JOIN sites s on exp.site_id = s.id 
           WHERE site_id = $1;`,
-      [parseInt(site_id)]
+      [parseInt(site_id)],
+      (err, data) => {
+        if (err) {
+          console.error(err);
+        }
+      }
     );
 
     const workers = await pool.query(
       `SELECT id, fullname, created_at, profile_img FROM workers WHERE site_assigned = $1;`,
-      [site_id]
+      [site_id],
+      (err, data) => {
+        if (err) {
+          console.error(err);
+        }
+      }
     );
 
     res.json({
