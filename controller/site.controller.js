@@ -120,7 +120,7 @@ async function getSiteById(req, res) {
             (SELECT count(*) FROM workers WHERE site_assigned = $2 AND is_present = true) as present_workers,
             (SELECT count(*) FROM expenses WHERE site_id = $3) as total_transactions
       ;`,
-      [site_id, site_id, site_id]
+      [parseInt(site_id), parseInt(site_id), parseInt(site_id)]
     );
 
     const expenses = await pool.query(
@@ -128,7 +128,7 @@ async function getSiteById(req, res) {
           LEFT JOIN workers w on exp.worker_id = w.id 
           LEFT JOIN sites s on exp.site_id = s.id 
           WHERE site_id = $1;`,
-      [site_id]
+      [parseInt(site_id)]
     );
 
     const workers = await pool.query(
