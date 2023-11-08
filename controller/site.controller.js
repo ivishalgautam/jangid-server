@@ -126,7 +126,7 @@ async function getSiteById(req, res) {
     console.log({ todayWorking });
 
     const expenses = await pool.query(
-      `SELECT exp.*, w.profile_img as worker_img, s.image as site_img FROM expenses exp 
+      `SELECT exp.*, w.profile_img as worker_img, w.fullname as worker_name, s.image as site_img FROM expenses exp 
           LEFT JOIN workers w on exp.worker_id::integer = w.id 
           LEFT JOIN sites s on exp.site_id = s.id 
           WHERE site_id = $1;`,
