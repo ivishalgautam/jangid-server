@@ -34,7 +34,7 @@ async function updateWalletBySupervisorId(req, res) {
       [supervisor_id]
     );
 
-    console.log({ walletRecord });
+    console.log({ walletRecord: walletRecord.rows });
 
     if (walletRecord.rowCount === 0) {
       await pool.query(
