@@ -56,7 +56,7 @@ async function createSupervisor(req, res) {
 
     if (supervisor.rowCount > 0) {
       await pool.query(
-        "INSERT INTO supervisors (supervisor_id, amount) VALUES ($1, 0)",
+        "INSERT INTO wallet (supervisor_id, amount) VALUES ($1, 0)",
         [supervisor.rows[0].id]
       );
     }
