@@ -112,7 +112,11 @@ async function getSupervisorbyId(req, res) {
 
   try {
     const { rows, rowCount } = await pool.query(
-      `SELECT * FROM supervisors WHERE id = $1`,
+      `
+      SELECT s.*, 
+          w.amount as wallet_balance FROM supervisors s
+          LEFT JOIN wallet w on s.id = w.supervisor_id 
+          WHERE s.id = $1`,
       [supervisor_id]
     );
 
@@ -129,7 +133,10 @@ async function getSupervisorbyId(req, res) {
 
 async function getAllSupervisors(req, res) {
   try {
-    const { rows } = await pool.query(`SELECT * FROM supervisors;`);
+    const { rows } = await pool.query(`
+        SELECT s.*, w.amount as wallet_balance FROM supervisors s;
+            LEFT JOIN wallet w on s.id = w.supervisor_id
+        `);
     res.json({ message: "success", status: 200, data: rows });
   } catch (error) {
     console.error(error);

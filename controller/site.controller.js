@@ -126,10 +126,10 @@ async function getSiteById(req, res) {
     const expenses = await pool.query(
       `SELECT 
           exp.*, 
-          w.profile_img as worker_img, 
-          w.fullname as worker_name, 
-          s.image as site_img, 
-          s.site_name 
+          w.profile_img as worker_img,
+          w.fullname as worker_name,
+          s.image as site_img,
+          s.site_name
         FROM expenses exp 
           LEFT JOIN workers w on exp.worker_id::integer = w.id 
           LEFT JOIN sites s on exp.site_id = s.id 
@@ -141,6 +141,7 @@ async function getSiteById(req, res) {
       `SELECT id, fullname, created_at, profile_img FROM workers WHERE site_assigned = $1;`,
       [site_id]
     );
+
     res.json({
       message: "success",
       status: 200,
