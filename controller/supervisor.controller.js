@@ -40,8 +40,8 @@ async function createSupervisor(req, res) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await pool.query(
-      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, profile_img, site_assigned) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`,
+    const supervisor = await pool.query(
+      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, profile_img, site_assigned) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) returning *;`,
       [
         fullname,
         email,
@@ -53,6 +53,13 @@ async function createSupervisor(req, res) {
         site_assigned,
       ]
     );
+
+    if (supervisor.rowCount > 0) {
+      await pool.query(
+        "INSERT INTO supervisors (supervisor_id, amount) VALUES ($1, 0)",
+        [supervisor.rows[0].id]
+      );
+    }
 
     res.json({ message: "Created" });
   } catch (error) {
