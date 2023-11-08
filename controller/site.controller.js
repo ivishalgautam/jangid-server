@@ -113,6 +113,8 @@ async function getSiteById(req, res) {
       return res.status(404).json({ message: "Site not found!" });
     }
 
+    console.log({ rows });
+
     const todayWorking = await pool.query(
       `
       SELECT 
