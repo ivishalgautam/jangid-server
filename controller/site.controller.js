@@ -168,8 +168,11 @@ async function getSiteById(req, res) {
 
 async function getAllSites(req, res) {
   console.log(req.user);
+  let data;
   try {
-    const { rows } = await pool.query(`SELECT * FROM sites;`);
+    if (req.user.role === "admin") {
+      data = await pool.query(`SELECT * FROM sites;`);
+    }
 
     res.json({
       message: "success",

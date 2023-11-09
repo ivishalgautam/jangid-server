@@ -36,9 +36,7 @@ async function supervisorLogin(req, res) {
 
     const { hpassword, ...data } = supervisor.rows[0];
     console.log(data);
-    const jwtToken = jwtGenerator({
-      ...data,
-    });
+    const jwtToken = jwtGenerator(supervisor.rows[0]);
 
     res.json({ supervisor: data, token: jwtToken });
   } catch (error) {
@@ -54,12 +52,12 @@ async function adminLogin(req, res) {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    const supervisor = await pool.query(
+    const admin = await pool.query(
       `SELECT id, fullname, email, role, hpassword FROM admin WHERE username = $1`,
       [username]
     );
 
-    if (supervisor.rowCount === 0) {
+    if (admin.rowCount === 0) {
       return res.status(404).json({
         message: `Admin with this username: '${username}' not exist!`,
       });
@@ -67,18 +65,16 @@ async function adminLogin(req, res) {
 
     const validPassword = await bcrypt.compare(
       password,
-      supervisor.rows[0].hpassword
+      admin.rows[0].hpassword
     );
 
     if (!validPassword) {
       return res.status(401).json({ message: "INVALID CREDENTIALS!" });
     }
 
-    const { hpassword, ...data } = supervisor.rows[0];
-    console.log(data);
-    const jwtToken = jwtGenerator({
-      ...data,
-    });
+    const { hpassword, ...data } = admin.rows[0];
+
+    const jwtToken = jwtGenerator(admin.rows[0]);
 
     res.json({ admin: data, token: jwtToken });
   } catch (error) {

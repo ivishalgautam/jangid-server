@@ -6,6 +6,7 @@ const Controller = require("../controller/site.controller");
 const {
   verifyTokenAndAdmin,
   verifyToken,
+  verifyAdminAndSupervisor,
 } = require("../middlewares/verifyToken");
 
 const storage = multer.diskStorage({
@@ -33,7 +34,7 @@ router.post(
 ); //admin
 
 router.delete("/", verifyTokenAndAdmin, Controller.deleteSiteById); // admin
-router.get("/all", verifyTokenAndAdmin, Controller.getAllSites); // admin
+router.get("/all", verifyAdminAndSupervisor, Controller.getAllSites); // admin
 router.get("/", verifyToken, Controller.getSiteById);
 
 router.put("/", verifyToken, Controller.updateSiteById);
