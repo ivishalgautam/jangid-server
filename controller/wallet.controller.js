@@ -36,7 +36,7 @@ async function updateWalletBySupervisorId(req, res) {
 
     if (walletRecord.rowCount === 0) {
       await pool.query(
-        `INSERT INTO wallet (amount, supervisor_id) VALUES ($1, $2)`,
+        `INSERT INTO wallet (amount, supervisor_id) VALUES ($1, $2);`,
         [amount, supervisor_id]
       );
     } else {

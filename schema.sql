@@ -105,7 +105,7 @@ UPDATE
 CREATE TABLE wallet(
     id SERIAL PRIMARY KEY,
     amount INT NOT NULL,
-    supervisor_id INT NOT NULL,
+    supervisor_id INT NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

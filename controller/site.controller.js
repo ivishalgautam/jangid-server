@@ -167,6 +167,7 @@ async function getSiteById(req, res) {
 }
 
 async function getAllSites(req, res) {
+  console.log(req.user);
   try {
     const { rows } = await pool.query(`SELECT * FROM sites;`);
 
