@@ -8,11 +8,13 @@ const { getCurrentTimeFormatted } = require("../helper/time");
 
 async function supervisorLogin(req, res) {
   const { username, password } = req.body;
-  console.log(req.body);
+
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+
   try {
     const supervisor = await pool.query(
       `SELECT id, fullname, email, phone, role, hpassword, site_assigned FROM supervisors WHERE username = $1`,
@@ -31,7 +33,7 @@ async function supervisorLogin(req, res) {
     );
 
     if (!validPassword) {
-      return res.status(401).json({ message: "INVALID CREDENTIALS!" });
+      return res.status(401).json({ message: "invalid credentials!" });
     }
 
     const { hpassword, ...data } = supervisor.rows[0];
@@ -47,10 +49,13 @@ async function supervisorLogin(req, res) {
 
 async function adminLogin(req, res) {
   const { username, password } = req.body;
+
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+
   try {
     const admin = await pool.query(
       `SELECT id, fullname, email, role, hpassword FROM admin WHERE username = $1`,
@@ -85,6 +90,7 @@ async function adminLogin(req, res) {
 
 async function workerlogin(req, res) {
   const { username, password, lat, long } = req.body;
+
   try {
     const worker = await pool.query(
       `SELECT * FROM workers WHERE username = $1;`,
@@ -172,6 +178,7 @@ async function workerLogout(req, res) {
   const { session_id } = req.body;
   let extraHours;
   let dailyWage;
+
   try {
     const { rows, rowCount } = await pool.query(
       `UPDATE check_in_out set check_out = CURRENT_TIMESTAMP WHERE uid = $1 returning *`,
@@ -212,26 +219,36 @@ async function workerLogout(req, res) {
     //   extraHours: Math.floor(extraHours),
     // });
 
-    const earned =
-      extraHours < 3
-        ? dailyWage
-        : 3 <= extraHours && extraHours < 6
-        ? 2 * dailyWage
-        : 6 <= extraHours && extraHours < 9
-        ? 3 * dailyWage
-        : 9 <= extraHours && extraHours < 12
-        ? 4 * dailyWage
-        : 12 <= extraHours && extraHours < 15
-        ? 5 * dailyWage
-        : 15 <= extraHours && extraHours < 18
-        ? 6 * dailyWage
-        : 18 <= extraHours && extraHours < 21
-        ? 7 * dailyWage
-        : 21 <= extraHours && extraHours < 24
-        ? 8 * dailyWage
-        : 24 <= extraHours && extraHours < 27
-        ? 9 * dailyWage
-        : 10 * dailyWage;
+    let earned = dailyWage;
+
+    for (let i = 3; i <= 60; i += 3) {
+      if (extraHours >= i) {
+        earned = (i / 3) * dailyWage;
+      } else {
+        break;
+      }
+    }
+
+    // const earned =
+    //   extraHours < 3
+    //     ? dailyWage
+    //     : 3 <= extraHours && extraHours < 6
+    //     ? 2 * dailyWage
+    //     : 6 <= extraHours && extraHours < 9
+    //     ? 3 * dailyWage
+    //     : 9 <= extraHours && extraHours < 12
+    //     ? 4 * dailyWage
+    //     : 12 <= extraHours && extraHours < 15
+    //     ? 5 * dailyWage
+    //     : 15 <= extraHours && extraHours < 18
+    //     ? 6 * dailyWage
+    //     : 18 <= extraHours && extraHours < 21
+    //     ? 7 * dailyWage
+    //     : 21 <= extraHours && extraHours < 24
+    //     ? 8 * dailyWage
+    //     : 24 <= extraHours && extraHours < 27
+    //     ? 9 * dailyWage
+    //     : 10 * dailyWage;
 
     if (rowCount > 0) {
       await pool.query(

@@ -38,7 +38,7 @@ async function createSite(req, res) {
     );
     res.json({ message: "Site created", site_id: rows[0].id });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -78,7 +78,7 @@ async function updateSiteById(req, res) {
 
     res.json({ message: "Site updated", site_id: rows[0].id });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -96,7 +96,7 @@ async function deleteSiteById(req, res) {
 
     res.json({ message: "Site deleted" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -161,13 +161,12 @@ async function getSiteById(req, res) {
       },
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 }
 
 async function getAllSites(req, res) {
-  console.log(req.user);
   let data;
   try {
     if (req.user.role === "admin") {
@@ -183,10 +182,10 @@ async function getAllSites(req, res) {
     res.json({
       message: "success",
       status: 200,
-      data: data.rows,
+      data: data?.rows,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 }
