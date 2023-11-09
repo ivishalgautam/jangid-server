@@ -15,7 +15,7 @@ async function supervisorLogin(req, res) {
   }
   try {
     const supervisor = await pool.query(
-      `SELECT * FROM supervisors WHERE username = $1`,
+      `SELECT id, fullname, email, phone, role, hpassword, site_assigned FROM supervisors WHERE username = $1`,
       [username]
     );
 
