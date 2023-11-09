@@ -35,8 +35,8 @@ async function supervisorLogin(req, res) {
     }
 
     const { hpassword, ...data } = supervisor.rows[0];
-    console.log(data);
-    const jwtToken = jwtGenerator(supervisor.rows[0]);
+
+    const jwtToken = jwtGenerator({ ...data });
 
     res.json({ supervisor: data, token: jwtToken });
   } catch (error) {
@@ -69,12 +69,12 @@ async function adminLogin(req, res) {
     );
 
     if (!validPassword) {
-      return res.status(401).json({ message: "INVALID CREDENTIALS!" });
+      return res.status(401).json({ message: "invalid credentials!" });
     }
 
     const { hpassword, ...data } = admin.rows[0];
 
-    const jwtToken = jwtGenerator(admin.rows[0]);
+    const jwtToken = jwtGenerator({ ...data });
 
     res.json({ admin: data, token: jwtToken });
   } catch (error) {
@@ -149,6 +149,7 @@ async function workerlogin(req, res) {
         `INSERT INTO check_in_out (uid, check_in, worker_id, date) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE) returning *`,
         [uuidv4(), worker.rows[0].id]
       );
+
       if (rowCount > 0) {
         await pool.query(
           `UPDATE workers SET is_present = true WHERE id = $1;`,
@@ -156,7 +157,7 @@ async function workerlogin(req, res) {
         );
       }
 
-      res.json({ session_id: rows[0].uid });
+      return res.json({ session_id: rows[0].uid });
     } else {
       console.error(`The point is outside ${radius} kilometers of the center.`);
       return res.status(400).json({ message: "You are out of radius!" });
