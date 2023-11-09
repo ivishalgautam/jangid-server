@@ -171,6 +171,11 @@ async function siteAssign(req, res) {
     }
 
     await pool.query(
+      `UPDATE supervisors SET site_assigned = null WHERE site_assigned = $1;`,
+      [site_id]
+    );
+
+    await pool.query(
       `UPDATE supervisors SET site_assigned = $1 WHERE id = $2;`,
       [site_id, supervisor_id]
     );
