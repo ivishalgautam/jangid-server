@@ -174,10 +174,16 @@ async function getAllSites(req, res) {
       data = await pool.query(`SELECT * FROM sites;`);
     }
 
+    if (req.user.role === "supervisor") {
+      data = await pool.query(`SELECT * FROM sites WHERE id = $1;`, [
+        req.user.site_assigned,
+      ]);
+    }
+
     res.json({
       message: "success",
       status: 200,
-      data: rows,
+      data: data.rows,
     });
   } catch (error) {
     console.log(error);
