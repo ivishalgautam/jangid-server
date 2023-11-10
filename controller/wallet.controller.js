@@ -82,7 +82,7 @@ async function getWalletBySupervisorId(req, res) {
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT amount FROM wallet WHERE supervisor_id = $1`,
-      [supervisorId]
+      [req.user.id]
     );
 
     if (rowCount === 0) {
