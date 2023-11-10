@@ -198,18 +198,20 @@ async function getAllWorkers(req, res) {
     switch (present) {
       case "true":
         data = await pool.query(
-          `SELECT * FROM workers WHERE is_present = true;`
+          `SELECT * FROM workers WHERE is_present = true ORDER BY created_at DESC;`
         );
         break;
 
       case "false":
         data = await pool.query(
-          `SELECT * FROM workers WHERE is_present = false;`
+          `SELECT * FROM workers WHERE is_present = false ORDER BY created_at DESC;`
         );
         break;
 
       default:
-        data = await pool.query(`SELECT * FROM workers;`);
+        data = await pool.query(
+          `SELECT * FROM workers ORDER BY created_at DESC;`
+        );
         break;
     }
 

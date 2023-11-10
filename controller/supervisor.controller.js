@@ -141,6 +141,7 @@ async function getAllSupervisors(req, res) {
     const { rows } = await pool.query(`
         SELECT s.*, w.amount as wallet_balance FROM supervisors s
             LEFT JOIN wallet w on s.id = w.supervisor_id
+            ORDER BY created_at DESC
         `);
     res.json({ message: "success", status: 200, data: rows });
   } catch (error) {

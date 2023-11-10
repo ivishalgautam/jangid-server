@@ -146,7 +146,8 @@ async function getAllExpenses(req, res) {
             s.image as site_image
           FROM expenses exp 
           LEFT JOIN sites s ON exp.site_id = s.id
-            WHERE exp.site_id IS NOT NULL;
+            WHERE exp.site_id IS NOT NULL
+            ORDER BY created_at DESC;
           `
         );
         break;

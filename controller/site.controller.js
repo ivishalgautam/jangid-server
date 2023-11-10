@@ -133,12 +133,13 @@ async function getSiteById(req, res) {
         FROM expenses exp 
           LEFT JOIN workers w on exp.worker_id::integer = w.id 
           LEFT JOIN sites s on exp.site_id = s.id 
-        WHERE site_id = $1;`,
+        WHERE site_id = $1 
+        ORDER BY created_at DESC;`,
       [parseInt(site_id)]
     );
 
     const workers = await pool.query(
-      `SELECT id, fullname, created_at, profile_img FROM workers WHERE site_assigned = $1;`,
+      `SELECT id, fullname, created_at, profile_img FROM workers WHERE site_assigned = $1 ORDER BY created_at DESC;`,
       [site_id]
     );
 

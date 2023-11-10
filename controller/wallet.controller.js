@@ -98,7 +98,9 @@ async function getWalletBySupervisorId(req, res) {
 
 async function getAllWallet(req, res) {
   try {
-    const { rows } = await pool.query(`SELECT * FROM wallet;`);
+    const { rows } = await pool.query(
+      `SELECT * FROM wallet ORDER BY created_at DESC;`
+    );
 
     res.json(rows);
   } catch (error) {
