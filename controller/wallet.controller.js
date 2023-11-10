@@ -78,11 +78,11 @@ async function deleteWalletById(req, res) {
 
 async function getWalletBySupervisorId(req, res) {
   const supervisorId = req.body.supervisor_id;
-  console.log(req.user);
+
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT amount FROM wallet WHERE supervisor_id = $1`,
-      [req.user.id]
+      [req.user.id || supervisorId]
     );
 
     if (rowCount === 0) {

@@ -1,11 +1,18 @@
 const router = require("express").Router();
 const Controller = require("../controller/wallet.controller");
-const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
+const {
+  verifyTokenAndAdmin,
+  verifyTokenAdminAndSupervisor,
+} = require("../middlewares/verifyToken");
 
 // router.post("/", verifyTokenAndAdmin, Controller.createWallet);
 router.put("/", verifyTokenAndAdmin, Controller.updateWalletBySupervisorId);
 router.delete("/:walletId", verifyTokenAndAdmin, Controller.deleteWalletById);
 router.get("/all", verifyTokenAndAdmin, Controller.getAllWallet);
-router.get("/", verifyTokenAndAdmin, Controller.getWalletBySupervisorId);
+router.get(
+  "/",
+  verifyTokenAdminAndSupervisor,
+  Controller.getWalletBySupervisorId
+);
 
 module.exports = router;
