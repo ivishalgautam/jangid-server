@@ -17,7 +17,7 @@ async function supervisor(req, res) {
             (SELECT COUNT(*) FROM sites AS s WHERE s.supervisor_id::integer = sv.id) AS site_count,
             (SELECT COUNT(*) FROM workers AS w WHERE w.supervisor_id::integer = sv.id) AS worker_count,
             (SELECT COUNT(*) FROM workers AS w WHERE w.supervisor_id::integer = sv.id AND w.is_present = true) AS present_worker_count,
-            (SELECT COUNT(*) FROM wallet AS wlt WHERE wlt.supervisor_id::integer = sv.id) AS wallet_count
+            (SELECT amount FROM wallet AS wlt WHERE wlt.supervisor_id::integer = sv.id) AS wallet_count
         FROM supervisors AS sv
         WHERE sv.id = $1;`,
       [supervisor_id]
