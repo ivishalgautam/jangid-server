@@ -22,6 +22,7 @@ async function supervisor(req, res) {
         WHERE sv.id = $1;`,
       [supervisor_id]
     );
+
     res.json(rows[0]);
   } catch (error) {
     console.log(error);
