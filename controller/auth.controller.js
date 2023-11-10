@@ -213,22 +213,18 @@ async function workerLogout(req, res) {
 
     extraHours = timeDifferenceInHours - siteHours.rows[0].hours;
 
-    // console.log({
-    //   timeDifferenceInHours,
-    //   siteHours: siteHours.rows[0].hours,
-    //   extraHours: Math.floor(extraHours),
-    // });
+    // console.log({ timeDifferenceInHours, siteHours: siteHours.rows[0].hours, extraHours: Math.floor(extraHours) });
 
     let earned = dailyWage;
 
     for (let i = 3; i <= 60; i += 3) {
       if (extraHours < 0) {
-        earned = (dailyWage / siteHours) * timeDifferenceInHours;
+        earned = Math.round((dailyWage / siteHours) * timeDifferenceInHours);
         break;
       }
 
       if (extraHours >= i) {
-        earned = (i / 3) * dailyWage;
+        earned = Math.round((i / 3) * dailyWage);
         break;
       }
     }

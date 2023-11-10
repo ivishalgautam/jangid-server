@@ -12,6 +12,7 @@ async function createSupervisor(req, res) {
       `SELECT email FROM supervisors WHERE email = $1;`,
       [email]
     );
+
     if (emailExist.rowCount > 0) {
       return res
         .status(400)

@@ -17,11 +17,30 @@ async function createWorker(req, res) {
     address,
   } = req.body;
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
+  let record;
   try {
+    record = await pool.query(`SELECT * FROM workers WHERE phone = $1;`, [
+      phone,
+    ]);
+
+    if (record.rowCount > 0) {
+      return res.status(409).json({
+        message: `worker already exist with this '${phone}' phone number!`,
+      });
+    }
+
+    record = await pool.query(`SELECT * FROM workers WHERE username = $1;`, [
+      username,
+    ]);
+
+    if (record.rowCount > 0) {
+      return res.status(409).json({
+        message: `worker already exist with this '${username}' username!`,
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
     const docs = req.files.map((file) => `/assets/images/${file.filename}`);
-    // `/assets/categories/banners/${req.file.filename}`
 
     await pool.query(
       `INSERT INTO workers (fullname, phone, docs, site_assigned, password, daily_wage_salary, username, hpassword, lat, long, address) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
