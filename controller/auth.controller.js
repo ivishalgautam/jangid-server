@@ -222,6 +222,11 @@ async function workerLogout(req, res) {
     let earned = dailyWage;
 
     for (let i = 3; i <= 60; i += 3) {
+      if (extraHours < 0) {
+        earned = (dailyWage / siteHours) * timeDifferenceInHours;
+        break;
+      }
+
       if (extraHours >= i) {
         earned = (i / 3) * dailyWage;
         break;

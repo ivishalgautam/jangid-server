@@ -1,7 +1,6 @@
 const { pool } = require("../config/db");
 
 async function supervisor(req, res) {
-  const { supervisor_id } = req.body;
   try {
     const supervisor = await pool.query(
       `SELECT * FROM supervisors WHERE id = $1`,
