@@ -13,7 +13,8 @@ router.post(
 );
 
 // worker
-router.post("/login/worker", validateCredentials, Controller.workerlogin);
-router.post("/logout/worker", validateCredentials, Controller.workerLogout);
+router.post("/login/worker", Controller.workerLogin);
+router.post("/worker/check-in", Controller.workerCheckIn);
+router.post("/worker/check-out", Controller.workerCheckOut);
 
 module.exports = router;

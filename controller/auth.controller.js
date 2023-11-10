@@ -23,7 +23,7 @@ async function supervisorLogin(req, res) {
 
     if (supervisor.rowCount === 0) {
       return res.status(404).json({
-        message: `Supervisor with this username: '${username}' not exist!`,
+        message: `supervisor not found!`,
       });
     }
 
@@ -38,7 +38,7 @@ async function supervisorLogin(req, res) {
 
     const { hpassword, ...data } = supervisor.rows[0];
 
-    const jwtToken = jwtGenerator({ ...data });
+    const jwtToken = jwtGenerator({ ...data }, "2d");
 
     res.json({ supervisor: data, token: jwtToken });
   } catch (error) {
@@ -79,7 +79,7 @@ async function adminLogin(req, res) {
 
     const { hpassword, ...data } = admin.rows[0];
 
-    const jwtToken = jwtGenerator({ ...data });
+    const jwtToken = jwtGenerator({ ...data }, "2d");
 
     res.json({ admin: data, token: jwtToken });
   } catch (error) {
@@ -88,33 +88,61 @@ async function adminLogin(req, res) {
   }
 }
 
-async function workerlogin(req, res) {
-  const { username, password, lat, long } = req.body;
+async function workerLogin(req, res) {
+  const { username, password } = req.body;
 
   try {
-    const worker = await pool.query(
+    const record = await pool.query(
       `SELECT * FROM workers WHERE username = $1;`,
       [username]
     );
 
-    if (worker.rowCount === 0) {
+    if (record.rowCount === 0) {
       return res.status(500).json({
-        message: `Worker not exist with this '${username}' username!`,
+        message: `Worker not found!`,
       });
     }
 
     const validPassword = await bcrypt.compare(
       password,
-      worker.rows[0].hpassword
+      record.rows[0].hpassword
     );
 
     if (!validPassword) {
       return res.status(400).json({ message: "Invalid credentials!" });
     }
 
+    const { password: p, hpassword, ...data } = record?.rows[0];
+    const jwtToken = jwtGenerator({ ...data });
+
+    res.json({
+      message: "success",
+      status: 200,
+      data: { worker: { ...data }, token: jwtToken },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async function workerCheckIn(req, res) {
+  const { worker_id, lat, long } = req.body;
+
+  try {
+    const worker = await pool.query(`SELECT * FROM workers WHERE id = $1;`, [
+      worker_id,
+    ]);
+
+    if (worker.rowCount === 0) {
+      return res.status(500).json({
+        message: `Worker not found!`,
+      });
+    }
+
     const updateLatLong = await pool.query(
       `UPDATE workers SET lat = $1, long = $2 WHERE id = $3 returning *`,
-      [lat, long, worker.rows[0].id]
+      [lat, long, worker_id]
     );
 
     const siteAssigned = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
@@ -128,9 +156,11 @@ async function workerlogin(req, res) {
     }
 
     const currentTime = new Date(`1970-01-01T${getCurrentTimeFormatted()}`);
+
     const siteStartTime = new Date(
       `1970-01-01T${siteAssigned.rows[0].start_time}`
     );
+
     const siteEndTime = new Date(`1970-01-01T${siteAssigned.rows[0].end_time}`);
 
     if (currentTime < siteStartTime) {
@@ -174,7 +204,7 @@ async function workerlogin(req, res) {
   }
 }
 
-async function workerLogout(req, res) {
+async function workerCheckOut(req, res) {
   const { session_id } = req.body;
   let extraHours;
   let dailyWage;
@@ -285,4 +315,10 @@ async function workerLogout(req, res) {
   }
 }
 
-module.exports = { supervisorLogin, adminLogin, workerlogin, workerLogout };
+module.exports = {
+  supervisorLogin,
+  adminLogin,
+  workerCheckIn,
+  workerCheckOut,
+  workerLogin,
+};

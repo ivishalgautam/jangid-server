@@ -25,7 +25,7 @@ async function createWorker(req, res) {
 
     if (record.rowCount > 0) {
       return res.status(409).json({
-        message: `worker already exist with this '${phone}' phone number!`,
+        message: `phone already exist!`,
       });
     }
 
@@ -35,7 +35,7 @@ async function createWorker(req, res) {
 
     if (record.rowCount > 0) {
       return res.status(409).json({
-        message: `worker already exist with this '${username}' username!`,
+        message: `username already exist!`,
       });
     }
 

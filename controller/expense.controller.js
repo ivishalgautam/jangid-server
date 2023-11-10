@@ -3,11 +3,12 @@ const { pool } = require("../config/db");
 async function createExpense(req, res) {
   const { amount, purpose, site_id, comment, worker_id, supervisor_id } =
     req.body;
-
+  console.log(req.body);
   try {
     const siteRecord = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
       site_id,
     ]);
+
     if (siteRecord.rowCount === 0) {
       return res.status(404).json({ message: "site not found!" });
     }
