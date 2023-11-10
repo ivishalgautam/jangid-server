@@ -5,7 +5,7 @@ async function supervisor(req, res) {
   try {
     const supervisor = await pool.query(
       `SELECT * FROM supervisors WHERE id = $1`,
-      [supervisor_id]
+      [req.user.id]
     );
 
     if (supervisor.rowCount === 0) {
@@ -20,7 +20,7 @@ async function supervisor(req, res) {
             (SELECT amount FROM wallet AS wlt WHERE wlt.supervisor_id::integer = sv.id) AS wallet_count
         FROM supervisors AS sv
         WHERE sv.id = $1;`,
-      [supervisor_id]
+      [req.user.id]
     );
 
     res.json(rows[0]);
