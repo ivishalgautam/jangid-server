@@ -81,7 +81,8 @@ async function adminLogin(req, res) {
 
     const jwtToken = jwtGenerator({ ...data });
 
-    res.json({ admin: data, token: jwtToken });
+    res.json("hell");
+    // res.json({ admin: { ...data }, token: jwtToken });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
