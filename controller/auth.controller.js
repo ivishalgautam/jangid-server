@@ -78,10 +78,10 @@ async function adminLogin(req, res) {
     }
 
     const { hpassword, ...data } = admin.rows[0];
-    console.log(data);
-    const jwtToken = jwtGenerator(admin.rows[0]);
 
-    res.json({ admin: { ...data }, token: jwtToken });
+    const jwtToken = jwtGenerator({ ...data }, "2d");
+
+    res.json({ admin: data, token: jwtToken });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
@@ -113,7 +113,7 @@ async function workerLogin(req, res) {
     }
 
     const { password: p, hpassword, ...data } = record?.rows[0];
-    const jwtToken = jwtGenerator({ ...data });
+    const jwtToken = jwtGenerator({ ...data }, null);
 
     res.json({
       message: "success",
