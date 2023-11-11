@@ -5,6 +5,7 @@ const jwtGenerator = require("../utils/jwtGenerator");
 const { v4: uuidv4 } = require("uuid");
 const { haversine } = require("../helper/haversine");
 const { getCurrentTimeFormatted } = require("../helper/time");
+const jwt = require("jsonwebtoken");
 
 async function supervisorLogin(req, res) {
   const { username, password } = req.body;
