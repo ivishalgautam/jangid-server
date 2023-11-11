@@ -79,7 +79,7 @@ async function adminLogin(req, res) {
 
     const { hpassword, ...data } = admin.rows[0];
 
-    const jwtToken = jwtGenerator({ ...data }, "2d");
+    const jwtToken = jwtGenerator({ ...data });
 
     res.json({ admin: data, token: jwtToken });
   } catch (error) {
