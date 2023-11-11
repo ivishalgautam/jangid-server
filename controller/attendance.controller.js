@@ -20,10 +20,24 @@ async function getWorkerAttendanceById(req, res) {
     if (!worker_id) {
       return res.status(404).json({ message: `'worker_id' not found!` });
     }
-    const { rows } = await pool.query(
-      `SELECT * FROM attendances WHERE worker_id = $1 ORDER BY created_at DESC`,
+
+    const workerRecord = await pool.query(
+      `SELECT * FROM workers WHERE id = $1;`,
       [worker_id]
     );
+
+    if (workerRecord.rowCount === 0) {
+      return res.status(404).json({ message: `worker not found!` });
+    }
+
+    const { rows } = await pool.query(
+      `SELECT a.*, s.site_name FROM attendances a 
+       LEFT JOIN sites s ON s.id = a.site_id
+       WHERE worker_id = $1 
+       ORDER BY created_at DESC`,
+      [worker_id]
+    );
+
     res.json(rows);
   } catch (error) {
     console.log(error);
