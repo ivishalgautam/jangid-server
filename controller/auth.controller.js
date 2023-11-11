@@ -113,12 +113,12 @@ async function workerLogin(req, res) {
     }
 
     const { password: p, hpassword, ...data } = record?.rows[0];
-    const jwtToken = jwtGenerator({ ...data }, null);
+    const token = jwt.sign(data, process.env.JWT_SEC, null);
 
     res.json({
       message: "success",
       status: 200,
-      data: { worker: { ...data }, token: jwtToken },
+      data: { worker: { ...data }, token },
     });
   } catch (error) {
     console.log(error);
