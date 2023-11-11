@@ -12,8 +12,8 @@ async function supervisor(req, res) {
     }
 
     const { rows } = await pool.query(
+      // (SELECT COUNT(*) FROM sites AS s WHERE s.supervisor_id::integer = sv.id) AS site_count,
       `SELECT 
-            (SELECT COUNT(*) FROM sites AS s WHERE s.supervisor_id::integer = sv.id) AS site_count,
             (SELECT COUNT(*) FROM workers AS w WHERE w.supervisor_id::integer = sv.id) AS worker_count,
             (SELECT COUNT(*) FROM workers AS w WHERE w.supervisor_id::integer = sv.id AND w.is_present = true) AS present_worker_count,
             (SELECT amount FROM wallet AS wlt WHERE wlt.supervisor_id::integer = sv.id) AS wallet_count
@@ -22,7 +22,13 @@ async function supervisor(req, res) {
       [req.user.id]
     );
 
-    res.json(rows[0]);
+    const { worker_count, present_worker_count, wallet_count } = rows[0];
+
+    res.json({
+      worker_count: String(worker_count),
+      present_worker_count: String(present_worker_count),
+      wallet_count: parseInt(wallet_count),
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
