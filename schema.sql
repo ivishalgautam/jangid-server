@@ -134,7 +134,7 @@ CREATE TABLE attendances(
     check_in TIMESTAMP NOT NULL,
     check_out TIMESTAMP NOT NULL,
     worker_id INT NOT NULL,
-    site_id INT NOT NULL,
+    site_id INT,
     earned INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

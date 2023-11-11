@@ -286,7 +286,7 @@ async function workerCheckOut(req, res) {
         [
           rows[0].worker_id,
           new Date().toLocaleDateString(),
-          timeDifferenceInHours,
+          Math.round(timeDifferenceInHours),
           check_in_time,
           check_out_time,
           earned,
