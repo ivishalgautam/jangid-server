@@ -129,7 +129,8 @@ async function workerLogin(req, res) {
 }
 
 async function workerCheckIn(req, res) {
-  const { worker_id, lat, long } = req.body;
+  const { lat, long } = req.body;
+  const worker_id = req.user.id;
 
   try {
     const worker = await pool.query(`SELECT * FROM workers WHERE id = $1;`, [
@@ -299,6 +300,7 @@ async function workerCheckOut(req, res) {
             console.error(err);
             req.status(500).json({ message: err.message });
           } else {
+            console.log("hello");
             await pool.query(`DELETE FROM check_in_out WHERE uid = $1`, [
               rows[0].uid,
             ]);
@@ -306,6 +308,7 @@ async function workerCheckOut(req, res) {
               `UPDATE workers SET is_present = false WHERE id = $1;`,
               [rows[0].worker_id]
             );
+            console.log("hello");
           }
         }
       );
