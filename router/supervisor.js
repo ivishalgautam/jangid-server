@@ -36,7 +36,7 @@ router.put(
 ); //admin
 
 router.put(
-  "/:supervisorId/update-docs",
+  "/:supervisorId/upload-docs",
   verifyTokenAndAdmin,
   uploads.array("file", 5),
   Controller.uploadDocs
