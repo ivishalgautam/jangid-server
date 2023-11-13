@@ -259,6 +259,11 @@ async function workerCheckOut(req, res) {
     const check_in_time = rows[0].check_in;
     const check_out_time = rows[0].check_out;
 
+    console.log({
+      check_in: moment(check_in_time).tz("Asia/Kolkata"),
+      check_in: moment(check_out_time).tz("Asia/Kolkata"),
+    });
+
     // Calculate the time difference in hours
     const timeDifferenceInMilliseconds =
       new Date(check_out_time) - new Date(check_in_time);
