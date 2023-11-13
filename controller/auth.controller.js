@@ -210,8 +210,7 @@ async function workerCheckIn(req, res) {
 }
 
 async function workerCheckOut(req, res) {
-  const { session_id } = req.body;
-  console.log(req.body);
+  const { session_id, lat, long } = req.body;
   let extraHours;
   let dailyWage;
 
@@ -225,39 +224,43 @@ async function workerCheckOut(req, res) {
       return res.status(400).json({ message: "Session expired!" });
     }
 
+    const worker = await pool.query(`SELECT * FROM workers WHERE id = $1;`, [
+      rows[0].worker_id,
+    ]);
+
+    const siteAssigned = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
+      worker.rows[0].site_assigned,
+    ]);
+
+    if (siteAssigned.rowCount === 0) {
+      return res
+        .status(500)
+        .json({ message: "You are not assigned to any site!" });
+    }
+
     // Coordinates of the center point (latitude and longitude)
     const centerLat = siteAssigned.rows[0].lat;
     const centerLon = siteAssigned.rows[0].long;
 
     // Coordinates of the point to check (latitude and longitude)
-    const checkLat = updateLatLong.rows[0].lat;
-    const checkLon = updateLatLong.rows[0].long;
+    const checkLat = lat;
+    const checkLon = long;
 
     const radius = siteAssigned.rows[0].radius;
     const distance = haversine(centerLat, centerLon, checkLat, checkLon);
 
-    if (distance <= radius) {
-      const { rows, rowCount } = await pool.query(
-        `INSERT INTO check_in_out (uid, check_in, worker_id, date) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE) returning *`,
-        [uuidv4(), worker.rows[0].id]
-      );
+    if (distance > radius) {
+      await pool.query(`DELETE FROM check_in_out WHERE uid = $1`, [
+        rows[0].uid,
+      ]);
 
-      if (rowCount > 0) {
-        await pool.query(
-          `UPDATE workers SET is_present = true WHERE id = $1;`,
-          [worker.rows[0].id]
-        );
-      }
+      await pool.query(`UPDATE workers SET is_present = false WHERE id = $1;`, [
+        rows[0].worker_id,
+      ]);
 
-      return res.json({ session_id: rows[0].uid });
-    } else {
       console.error(`The point is outside ${radius} meters of the center.`);
       return res.status(400).json({ message: "You are out of radius!" });
     }
-
-    const worker = await pool.query(`SELECT * FROM workers WHERE id = $1;`, [
-      rows[0].worker_id,
-    ]);
 
     dailyWage = worker.rows[0].daily_wage_salary;
 
