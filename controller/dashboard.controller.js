@@ -66,16 +66,16 @@ async function admin(req, res) {
 async function worker(req, res) {
   const { worker_id } = req.body;
   try {
+    // (SELECT SUM(hours) FROM attendances WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE) AND worker_id = $2) AS total_work_this_month
     const { rows } = await pool.query(
       `SELECT 
-        (SELECT SUM(earned)
-        FROM 
-            attendances
-        WHERE 
-            EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE)
-            AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
-            AND worker_id = $1) AS total_payout_this_month;`,
-      [worker_id]
+        (SELECT daily_wage_salary FROM workers WHERE worker_id = $1) AS daily_wage
+        (SELECT SUM(earned) FROM attendances WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE) AND worker_id = $2) AS total_payout_this_month
+        (SELECT SUM(amount) FROM expenses WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE) AND worker_id = $3) AS paid_this_month
+        (SELECT SUM(earned) FROM attendances worker_id = $4) AS total_earned
+        (SELECT SUM(amount) FROM expenses worker_id = $5) AS total_paid
+        ;`,
+      [worker_id, worker_id, worker_id, worker_id, worker_id]
     );
     res.json(rows[0]);
   } catch (error) {
