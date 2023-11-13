@@ -203,6 +203,7 @@ async function getWorkerExpenses(req, res) {
           SELECT 
             exp.*, 
             s.fullname as supervisor_name
+            s.profile_img as profile_img
           FROM expenses exp 
           LEFT JOIN supervisors s ON exp.supervisor_id = s.id
             WHERE exp.worker_id = $1
