@@ -23,6 +23,7 @@ async function createSupervisor(req, res) {
       `SELECT phone FROM supervisors WHERE phone = $1;`,
       [phone]
     );
+
     if (phoneExist.rowCount > 0) {
       return res
         .status(400)
@@ -33,6 +34,7 @@ async function createSupervisor(req, res) {
       `SELECT username FROM supervisors WHERE username = $1`,
       [username]
     );
+
     if (usernameExist.rowCount > 0) {
       return res
         .status(400)
@@ -76,6 +78,27 @@ async function updateSupervisorById(req, res) {
     const { rowCount } = await pool.query(
       `UPDATE supervisors SET fullname = $1, email = $2, phone = $3, site_assigned = $4 WHERE id = $5`,
       [fullname, email, phone, site_assigned, supervisorId]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ message: "NOT FOUND!" });
+    }
+
+    res.json({ message: "UPDATED" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async function uploadDocs(req, res) {
+  const supervisorId = parseInt(req.params.supervisorId);
+  const docs = req.files.map((file) => `/assets/images/${file.filename}`);
+
+  try {
+    const { rowCount } = await pool.query(
+      `UPDATE supervisors SET docs = $1 WHERE id = $2`,
+      [docs, supervisorId]
     );
 
     if (rowCount === 0) {
@@ -196,4 +219,5 @@ module.exports = {
   getSupervisorbyId,
   getAllSupervisors,
   siteAssign,
+  uploadDocs,
 };

@@ -2,9 +2,6 @@ const { pool } = require("../config/db");
 const bcrypt = require("bcryptjs");
 
 async function createWorker(req, res) {
-  // console.log(req.files);
-  // console.log(req.headers);
-
   const {
     fullname,
     phone,
@@ -74,7 +71,7 @@ async function updateProfileImage(req, res) {
       `/assets/images/${req.file.filename}`,
       worker_id,
     ]);
-    res.json({ message: "Profile image added" });
+    res.json({ message: "Profile updated" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });

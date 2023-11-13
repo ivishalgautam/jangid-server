@@ -35,6 +35,13 @@ router.put(
   Controller.updateSupervisorById
 ); //admin
 
+router.put(
+  "/:supervisorId/update-docs",
+  verifyTokenAndAdmin,
+  uploads.array("file", 5),
+  Controller.uploadDocs
+); //admin
+
 router.put("/site-assign/:siteId", verifyTokenAndAdmin, Controller.siteAssign);
 
 router.delete("/", verifyTokenAndAdmin, Controller.deleteSupervisorById); //admin

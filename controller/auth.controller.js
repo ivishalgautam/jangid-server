@@ -250,15 +250,6 @@ async function workerCheckOut(req, res) {
     const distance = haversine(centerLat, centerLon, checkLat, checkLon);
 
     if (distance > radius) {
-      await pool.query(`DELETE FROM check_in_out WHERE uid = $1`, [
-        rows[0].uid,
-      ]);
-
-      await pool.query(`UPDATE workers SET is_present = false WHERE id = $1;`, [
-        rows[0].worker_id,
-      ]);
-
-      console.error(`The point is outside ${radius} meters of the center.`);
       return res.status(400).json({ message: "You are out of radius!" });
     }
 

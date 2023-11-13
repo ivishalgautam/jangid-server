@@ -3,7 +3,6 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const Controller = require("../controller/worker.controller");
-const { validateWorker } = require("../middlewares/validator");
 const {
   verifyTokenAndSupervisor,
   verifyToken,
