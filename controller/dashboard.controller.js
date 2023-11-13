@@ -69,7 +69,7 @@ async function worker(req, res) {
     // (SELECT SUM(hours) FROM attendances WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE) AND worker_id = $2) AS total_work_this_month
     const { rows } = await pool.query(
       `SELECT 
-        (SELECT daily_wage_salary FROM workers WHERE id = $1) AS daily_wage,
+        (SELECT daily_wage_salary, is_present FROM workers WHERE id = $1) AS daily_wage,
         (SELECT SUM(earned) FROM attendances WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE) AND worker_id = $2) AS total_payout_this_month,
         (SELECT SUM(amount) FROM expenses WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE) AND worker_id = $3) AS paid_this_month,
         (SELECT SUM(earned) FROM attendances WHERE worker_id = $4) AS total_earned,
@@ -77,7 +77,12 @@ async function worker(req, res) {
         ;`,
       [worker_id, worker_id, worker_id, worker_id, worker_id]
     );
-    res.json(rows[0]);
+
+    const { total_paid, total_earned, ...data } = rows[0];
+    res.json({
+      ...data,
+      pending_payout: parseInt(total_earned) - parseInt(total_paid),
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
