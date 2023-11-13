@@ -91,7 +91,6 @@ async function adminLogin(req, res) {
 
 async function workerLogin(req, res) {
   const { username, password } = req.body;
-  console.log(req.body);
 
   try {
     const record = await pool.query(
@@ -252,15 +251,9 @@ async function workerCheckOut(req, res) {
 
     for (let i = 3; i <= 60; i += 3) {
       if (extraHours <= 0) {
-        console.log({
-          dailyWage,
-          hourse: siteHours.rows[0].hours,
-          timeDifferenceInHours,
-        });
         earned = Math.round(
           (dailyWage / siteHours.rows[0].hours) * timeDifferenceInHours
         );
-        console.log(earned, typeof earned);
         break;
       }
 
@@ -292,15 +285,6 @@ async function workerCheckOut(req, res) {
     //     : 10 * dailyWage;
 
     if (rowCount > 0) {
-      console.log(
-        rows[0].worker_id,
-        new Date().toLocaleDateString(),
-        timeDifferenceInHours,
-        check_in_time,
-        check_out_time,
-        earned,
-        worker.rows[0].site_assigned
-      );
       await pool.query(
         `INSERT INTO attendances (worker_id, date, hours, check_in, check_out, earned, site_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
@@ -317,7 +301,6 @@ async function workerCheckOut(req, res) {
             console.error(err);
             return res.status(500).json({ message: err.message });
           } else {
-            console.log("hello");
             await pool.query(`DELETE FROM check_in_out WHERE uid = $1`, [
               rows[0].uid,
             ]);
@@ -325,7 +308,6 @@ async function workerCheckOut(req, res) {
               `UPDATE workers SET is_present = false WHERE id = $1;`,
               [rows[0].worker_id]
             );
-            console.log("hello");
           }
         }
       );

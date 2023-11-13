@@ -74,9 +74,18 @@ async function worker(req, res) {
         (SELECT SUM(amount) FROM expenses WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE) AND worker_id = $3) AS paid_this_month,
         (SELECT SUM(earned) FROM attendances WHERE worker_id = $4) AS total_earned,
         (SELECT SUM(amount) FROM expenses WHERE worker_id = $5) AS total_paid,
-        (SELECT is_present FROM workers WHERE id = $6)
+        (SELECT is_present FROM workers WHERE id = $6),
+        (SELECT fullname FROM workers WHERE id = $7) as worker_name
         ;`,
-      [worker_id, worker_id, worker_id, worker_id, worker_id, worker_id]
+      [
+        worker_id,
+        worker_id,
+        worker_id,
+        worker_id,
+        worker_id,
+        worker_id,
+        worker_id,
+      ]
     );
 
     const { total_paid, total_earned, ...data } = rows[0];
