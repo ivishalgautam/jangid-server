@@ -259,11 +259,6 @@ async function workerCheckOut(req, res) {
     const check_in_time = rows[0].check_in;
     const check_out_time = rows[0].check_out;
 
-    console.log({
-      check_in: moment(check_in_time).tz("Asia/Kolkata").format(),
-      check_out: moment(check_out_time).tz("Asia/Kolkata").format(),
-    });
-
     // Calculate the time difference in hours
     const timeDifferenceInMilliseconds =
       new Date(check_out_time) - new Date(check_in_time);
@@ -300,6 +295,16 @@ async function workerCheckOut(req, res) {
 
     const time_diff = convertMillisecondsToTime(timeDifferenceInMilliseconds);
 
+    console.log({
+      check_in: moment(check_in_time).tz("Asia/Kolkata").format(),
+      check_out: moment(check_out_time).tz("Asia/Kolkata").format(),
+    });
+
+    const checkInFormatted = moment(check_in_time).tz("Asia/Kolkata").format();
+    const checkOutFormatted = moment(check_out_time)
+      .tz("Asia/Kolkata")
+      .format();
+
     if (rowCount > 0) {
       await pool.query(
         `INSERT INTO attendances (worker_id, date, hours, check_in, check_out, earned, site_id, time_diff) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
@@ -307,8 +312,8 @@ async function workerCheckOut(req, res) {
           rows[0].worker_id,
           new Date().toLocaleDateString(),
           timeDifferenceInHours,
-          moment(check_in_time).tz("Asia/Kolkata").format(),
-          moment(check_out_time).tz("Asia/Kolkata").format(),
+          checkInFormatted,
+          checkOutFormatted,
           earned,
           worker.rows[0].site_assigned,
           time_diff,
