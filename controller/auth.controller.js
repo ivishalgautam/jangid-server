@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const {
   convertMillisecondsToTime,
 } = require("../utils/convertMillisecondsToTime");
+const moment = require("moment-timezone");
 
 async function supervisorLogin(req, res) {
   const { username, password } = req.body;
@@ -301,8 +302,8 @@ async function workerCheckOut(req, res) {
           rows[0].worker_id,
           new Date().toLocaleDateString(),
           timeDifferenceInHours,
-          check_in_time,
-          check_out_time,
+          moment(check_in_time).tz("Asia/Kolkata"),
+          moment(check_out_time).tz("Asia/Kolkata"),
           earned,
           worker.rows[0].site_assigned,
           time_diff,

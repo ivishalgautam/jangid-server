@@ -102,7 +102,7 @@ async function uploadDocs(req, res) {
     );
 
     if (rowCount === 0) {
-      return res.status(404).json({ message: "NOT FOUND!" });
+      return res.status(404).json({ message: "supervisor not found!" });
     }
 
     res.json({ message: "UPDATED" });
