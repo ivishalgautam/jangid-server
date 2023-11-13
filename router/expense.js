@@ -10,5 +10,10 @@ router.put("/:expenseId", verifyTokenAndAdmin, Controller.updateExpenseById);
 router.delete("/:expenseId", verifyTokenAndAdmin, Controller.deleteExpenseById);
 router.get("/all", verifyTokenAndAdmin, Controller.getAllExpenses);
 router.get("/", verifyTokenAndAdmin, Controller.getExpenseById);
+router.get(
+  "/worker/:workerId",
+  verifyTokenAndAdmin,
+  Controller.getWorkerExpenses
+);
 
 module.exports = router;

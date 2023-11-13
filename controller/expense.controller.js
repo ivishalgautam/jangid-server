@@ -196,10 +196,32 @@ async function getAllExpenses(req, res) {
   }
 }
 
+async function getWorkerExpenses(req, res) {
+  try {
+    const expenses = await pool.query(
+      `
+          SELECT 
+            exp.*, 
+            s.fullname as supervisor_name
+          FROM expenses exp 
+          LEFT JOIN supervisors s ON exp.supervisor_id = s.id
+            WHERE exp.worker_id = $1
+          ;`,
+      [req.params.workerId]
+    );
+
+    res.json({ message: "success", status: 200, data: expenses.rows });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createExpense,
   updateExpenseById,
   deleteExpenseById,
   getExpenseById,
   getAllExpenses,
+  getWorkerExpenses,
 };

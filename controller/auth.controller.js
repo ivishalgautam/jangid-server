@@ -6,6 +6,9 @@ const { v4: uuidv4 } = require("uuid");
 const { haversine } = require("../helper/haversine");
 const { getCurrentTimeFormatted } = require("../helper/time");
 const jwt = require("jsonwebtoken");
+const {
+  convertMillisecondsToTime,
+} = require("../utils/convertMillisecondsToTime");
 
 async function supervisorLogin(req, res) {
   const { username, password } = req.body;
@@ -286,9 +289,11 @@ async function workerCheckOut(req, res) {
     //     ? 9 * dailyWage
     //     : 10 * dailyWage;
 
+    const time_diff = convertMillisecondsToTime(timeDifferenceInMilliseconds);
+
     if (rowCount > 0) {
       await pool.query(
-        `INSERT INTO attendances (worker_id, date, hours, check_in, check_out, earned, site_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        `INSERT INTO attendances (worker_id, date, hours, check_in, check_out, earned, site_id, time_diff) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
           rows[0].worker_id,
           new Date().toLocaleDateString(),
@@ -297,6 +302,7 @@ async function workerCheckOut(req, res) {
           check_out_time,
           earned,
           worker.rows[0].site_assigned,
+          time_diff,
         ],
         async (err, result) => {
           if (err) {
