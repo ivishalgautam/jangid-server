@@ -91,6 +91,7 @@ async function adminLogin(req, res) {
 
 async function workerLogin(req, res) {
   const { username, password } = req.body;
+  console.log(req.body);
 
   try {
     const record = await pool.query(
