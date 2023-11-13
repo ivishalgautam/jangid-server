@@ -89,6 +89,7 @@ async function worker(req, res) {
     );
 
     const { total_paid, total_earned, ...data } = rows[0];
+
     res.json({
       message: "success",
       status: 200,
