@@ -100,7 +100,7 @@ async function workerLogin(req, res) {
     );
 
     if (record.rowCount === 0) {
-      return res.status(500).json({
+      return res.status(404).json({
         message: `Worker not found!`,
       });
     }
