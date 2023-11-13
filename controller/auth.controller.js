@@ -298,7 +298,7 @@ async function workerCheckOut(req, res) {
         async (err, result) => {
           if (err) {
             console.error(err);
-            req.status(500).json({ message: err.message });
+            res.status(500).json({ message: err.message });
           } else {
             console.log("hello");
             await pool.query(`DELETE FROM check_in_out WHERE uid = $1`, [
