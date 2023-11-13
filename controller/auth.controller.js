@@ -260,8 +260,8 @@ async function workerCheckOut(req, res) {
     const check_out_time = rows[0].check_out;
 
     console.log({
-      check_in: moment(check_in_time).tz("Asia/Kolkata"),
-      check_out: moment(check_out_time).tz("Asia/Kolkata"),
+      check_in: moment(check_in_time).tz("Asia/Kolkata").format(),
+      check_out: moment(check_out_time).tz("Asia/Kolkata").format(),
     });
 
     // Calculate the time difference in hours
