@@ -136,6 +136,7 @@ CREATE TABLE attendances(
     worker_id INT NOT NULL,
     site_id INT,
     earned INT NOT NULL,
+    time_diff VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
