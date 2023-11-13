@@ -252,7 +252,7 @@ async function workerCheckOut(req, res) {
 
     for (let i = 3; i <= 60; i += 3) {
       if (extraHours <= 0) {
-        console.log(dailyWage, siteHours, timeDifferenceInHours);
+        console.log({ dailyWage, siteHours, timeDifferenceInHours });
         earned = Math.round((dailyWage / siteHours) * timeDifferenceInHours);
         console.log(earned, typeof earned);
         break;
