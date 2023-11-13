@@ -64,7 +64,7 @@ async function admin(req, res) {
 }
 
 async function worker(req, res) {
-  const { worker_id } = req.body;
+  const worker_id = req.user.id;
   try {
     // (SELECT SUM(hours) FROM attendances WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE) AND worker_id = $2) AS total_work_this_month
     const { rows } = await pool.query(
@@ -81,8 +81,12 @@ async function worker(req, res) {
 
     const { total_paid, total_earned, ...data } = rows[0];
     res.json({
-      ...data,
-      pending_payout: parseInt(total_earned) - parseInt(total_paid),
+      message: "success",
+      status: 200,
+      data: {
+        ...data,
+        pending_payout: parseInt(total_earned) - parseInt(total_paid),
+      },
     });
   } catch (error) {
     console.log(error);
