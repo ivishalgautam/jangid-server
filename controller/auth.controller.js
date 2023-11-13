@@ -254,6 +254,7 @@ async function workerCheckOut(req, res) {
       if (extraHours <= 0) {
         console.log("less than 0");
         earned = Math.round((dailyWage / siteHours) * timeDifferenceInHours);
+        console.log(earned, typeof earned);
         break;
       }
 
