@@ -7,7 +7,7 @@ router.post("/worker", verifyAdminAndSupervisor, Payout.addWorkerPayout);
 router.post("/site", verifyAdminAndSupervisor, Payout.addSitePayout);
 
 // get
-router.get("/worker", verifyAdminAndSupervisor, Payout.getWorkerPayouts);
+router.get("/worker", Payout.getWorkerPayouts);
 router.get("/site", verifyAdminAndSupervisor, Payout.getSitePayouts);
 router.get("/all", verifyAdminAndSupervisor, Payout.getAllPayouts);
 
