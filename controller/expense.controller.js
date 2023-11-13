@@ -207,7 +207,7 @@ async function getWorkerExpenses(req, res) {
           LEFT JOIN supervisors s ON exp.supervisor_id = s.id
             WHERE exp.worker_id = $1
           ;`,
-      [req.params.workerId]
+      [req.user.id]
     );
 
     res.json({ message: "success", status: 200, data: expenses.rows });
