@@ -62,19 +62,32 @@ async function getAllAttendances(req, res) {
 async function checkWorkerLoggedOut(req, res) {
   try {
     const loggedInWorkers = await pool.query("SELECT * FROM check_in_out;");
+    const d = new Date();
+    const hours = d.getHours();
+    const minutes = d.getMinutes();
+    const seconds = d.getSeconds();
 
-    for (const { worker_id, site_id } of loggedInWorkers.rows) {
-      // console.log({ worker_id, site_id });
+    for (const {
+      worker_id,
+      site_id,
+      uid: session_id,
+    } of loggedInWorkers.rows) {
+      console.log(session_id);
       const workerRecord = await pool.query(
         "SELECT site_assigned FROM workers WHERE id = $1;",
         [worker_id]
       );
 
-      // console.log(workerRecord.rows);
       const siteAssigned = await pool.query(
         "SELECT start_time, end_time FROM sites WHERE id = $1;",
         [site_id]
       );
+
+      const timeToCheck = moment(
+        `1970-01-01T${String(hours).padStart(2, "0")}:${String(
+          minutes
+        ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+      ).format();
 
       const startTime = moment(
         new Date(`1970-01-01T${siteAssigned.rows[0].start_time}`)
@@ -85,9 +98,25 @@ async function checkWorkerLoggedOut(req, res) {
       )
         .subtract(1, "hours")
         .format();
-
-      if (startTime > moment(new Date()).format() > startTimeOneHourBefore) {
-        console.log("log out");
+      // console.log({ startTimeOneHourBefore, startTime, timeToCheck });
+      console.log(moment(timeToCheck).isBefore(startTime));
+      if (
+        moment(timeToCheck).isAfter(startTimeOneHourBefore) &&
+        moment(timeToCheck).isBefore(startTime)
+      ) {
+        await pool.query(
+          `UPDATE workers SET is_present = false WHERE id = $1;`,
+          [worker_id],
+          async (err, result) => {
+            if (!err) {
+              await pool.query(`DELETE FROM check_in_out WHERE uid = $1;`, [
+                session_id,
+              ]);
+              console.log("logged out");
+              console.log({ result });
+            }
+          }
+        );
       }
     }
 
@@ -98,7 +127,7 @@ async function checkWorkerLoggedOut(req, res) {
   }
 }
 
-// cron.schedule("*/2 * * * * *", checkWorkerLoggedOut);
+cron.schedule("*/2 * * * * *", checkWorkerLoggedOut);
 
 module.exports = {
   createAttendance,
