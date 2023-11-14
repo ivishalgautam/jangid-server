@@ -70,6 +70,8 @@ async function checkWorkerLoggedOut(req, res) {
     const minutes = d.getMinutes();
     const seconds = d.getSeconds();
 
+    // console.log(loggedInWorkers.rows);
+
     for (const {
       worker_id,
       site_id,
@@ -122,7 +124,7 @@ async function checkWorkerLoggedOut(req, res) {
   }
 }
 
-cron.schedule("*/2 * * * * *", checkWorkerLoggedOut);
+cron.schedule("* * * * *", checkWorkerLoggedOut);
 
 module.exports = {
   createAttendance,
