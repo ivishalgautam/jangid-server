@@ -61,14 +61,24 @@ async function getAllAttendances(req, res) {
 async function checkWorkerLoggedOut(req, res) {
   try {
     const loggedInWorkers = await pool.query("SELECT * FROM check_in_out;");
-    console.log(loggedInWorkers.rows);
+
+    for (const { worker_id } of loggedInWorkers.rows) {
+      // console.log(worker_id);
+      const workerRecord = await pool.query(
+        "SELECT site_assigned FROM workers WHERE id = $1;",
+        [worker_id]
+      );
+      console.log(workerRecord.rows);
+    }
+
+    // console.log(loggedInWorkers.rows);
   } catch (error) {
     console.log(error);
     res.status(500).message({ message: error.message });
   }
 }
 
-// cron.schedule("*/10 * * * * *", checkWorkerLoggedOut);
+cron.schedule("*/10 * * * * *", checkWorkerLoggedOut);
 
 module.exports = {
   createAttendance,

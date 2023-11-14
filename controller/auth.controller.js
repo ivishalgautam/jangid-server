@@ -194,8 +194,8 @@ async function workerCheckIn(req, res) {
 
     if (distance <= radius) {
       const { rows, rowCount } = await pool.query(
-        `INSERT INTO check_in_out (uid, check_in, worker_id, date) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE) returning *`,
-        [uuidv4(), worker.rows[0].id]
+        `INSERT INTO check_in_out (uid, check_in, worker_id, date, site_id) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE, $3) returning *`,
+        [uuidv4(), worker.rows[0].id, worker.rows[0].site_assinged]
       );
 
       if (rowCount > 0) {
@@ -285,7 +285,6 @@ async function workerCheckOut(req, res) {
     // console.log({ timeDifferenceInHours, siteHours: siteHours.rows[0].hours, extraHours: Math.floor(extraHours) });
 
     let earned = dailyWage;
-    console.log({ salaryperhour: dailyWage / siteHours.rows[0].hours });
 
     for (let i = 3; i <= 60; i += 3) {
       if (extraHours <= 0) {

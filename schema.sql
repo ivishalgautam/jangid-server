@@ -164,5 +164,6 @@ CREATE TABLE check_in_out(
     check_in TIMESTAMP,
     check_out TIMESTAMP,
     worker_id INT NOT NULL,
+    site_id INT NOT NULL,
     created_at DATE DEFAULT CURRENT_DATE
 );
