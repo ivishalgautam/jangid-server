@@ -48,7 +48,7 @@ async function createWorker(req, res) {
         site_assigned,
         password,
         daily_wage_salary,
-        username,
+        username.trim(),
         hashedPassword,
         lat,
         long,

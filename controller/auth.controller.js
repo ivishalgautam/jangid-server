@@ -146,6 +146,12 @@ async function workerCheckIn(req, res) {
       });
     }
 
+    if (!worker.rows[0].site_assigned) {
+      return res
+        .status(400)
+        .json({ message: "You are not assigned to any site!" });
+    }
+
     const updateLatLong = await pool.query(
       `UPDATE workers SET lat = $1, long = $2 WHERE id = $3 returning *`,
       [lat, long, worker_id]
@@ -157,7 +163,7 @@ async function workerCheckIn(req, res) {
 
     if (siteAssigned.rowCount === 0) {
       return res
-        .status(500)
+        .status(400)
         .json({ message: "You are not assigned to any site!" });
     }
 
@@ -300,6 +306,9 @@ async function workerCheckOut(req, res) {
       check_out: moment(check_out_time).tz("Asia/Kolkata").format(),
     });
 
+    const check_in = moment(check_in_time).tz("Asia/Kolkata");
+    const check_out = moment(check_out_time).tz("Asia/Kolkata");
+
     if (rowCount > 0) {
       await pool.query(
         `INSERT INTO attendances (worker_id, date, hours, check_in, check_out, earned, site_id, time_diff) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
@@ -307,8 +316,8 @@ async function workerCheckOut(req, res) {
           rows[0].worker_id,
           new Date().toLocaleDateString(),
           timeDifferenceInHours,
-          moment(check_in_time).tz("Asia/Kolkata"),
-          moment(check_out_time).tz("Asia/Kolkata"),
+          check_in.format(),
+          check_out.format(),
           earned,
           worker.rows[0].site_assigned,
           time_diff,

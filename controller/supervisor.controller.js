@@ -49,7 +49,7 @@ async function createSupervisor(req, res) {
         fullname,
         email,
         phone,
-        username,
+        username.trim(),
         password,
         hashedPassword,
         profile_img,

@@ -1,4 +1,5 @@
 const { pool } = require("../config/db");
+const cron = require("node-cron");
 
 async function createAttendance(req, res) {
   const { worker_id, date, hours, check_in, check_out } = req.body;
@@ -56,6 +57,18 @@ async function getAllAttendances(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+
+async function checkWorkerLoggedOut(req, res) {
+  try {
+    const loggedInWorkers = await pool.query("SELECT * FROM check_in_out;");
+    console.log(loggedInWorkers.rows);
+  } catch (error) {
+    console.log(error);
+    res.status(500).message({ message: error.message });
+  }
+}
+
+// cron.schedule("*/10 * * * * *", checkWorkerLoggedOut);
 
 module.exports = {
   createAttendance,
