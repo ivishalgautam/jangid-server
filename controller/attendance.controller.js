@@ -104,7 +104,9 @@ async function checkWorkerLoggedOut(req, res) {
           `UPDATE workers SET is_present = false WHERE id = $1;`,
           [worker_id],
           async (err, result) => {
-            if (!err) {
+            if (err) {
+              console.error(err);
+            } else {
               await pool.query(`DELETE FROM check_in_out WHERE uid = $1;`, [
                 session_id,
               ]);
