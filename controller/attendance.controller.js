@@ -72,7 +72,6 @@ async function checkWorkerLoggedOut(req, res) {
       site_id,
       uid: session_id,
     } of loggedInWorkers.rows) {
-      console.log(session_id);
       const workerRecord = await pool.query(
         "SELECT site_assigned FROM workers WHERE id = $1;",
         [worker_id]
@@ -99,7 +98,6 @@ async function checkWorkerLoggedOut(req, res) {
         .subtract(1, "hours")
         .format();
       // console.log({ startTimeOneHourBefore, startTime, timeToCheck });
-      console.log(moment(timeToCheck).isBefore(startTime));
       if (
         moment(timeToCheck).isAfter(startTimeOneHourBefore) &&
         moment(timeToCheck).isBefore(startTime)
@@ -113,7 +111,7 @@ async function checkWorkerLoggedOut(req, res) {
                 session_id,
               ]);
               console.log("logged out");
-              console.log({ result });
+              // console.log({ result });
             }
           }
         );
