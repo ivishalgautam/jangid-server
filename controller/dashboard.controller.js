@@ -73,7 +73,7 @@ async function worker(req, res) {
         COALESCE((SELECT SUM(earned) FROM attendances WHERE worker_id = $2 AND date_trunc('month', created_at) = date_trunc('month', CURRENT_DATE)), 0) AS total_payout_this_month,
         COALESCE((SELECT SUM(amount) FROM expenses WHERE worker_id = $3 AND date_trunc('month', created_at) = date_trunc('month', CURRENT_DATE)), 0) AS paid_this_month,
         (SELECT SUM(earned) FROM attendances WHERE worker_id = $4) AS total_earned,
-        (SELECT SUM(amount) FROM expenses WHERE worker_id = $5) AS total_paid,
+        COALESCE((SELECT SUM(amount) FROM expenses WHERE worker_id = $5), 0) AS total_paid,
         (SELECT is_present FROM workers WHERE id = $6),
         (SELECT fullname FROM workers WHERE id = $7) as worker_name
         ;`,
