@@ -62,6 +62,9 @@ async function getAllAttendances(req, res) {
 async function checkWorkerLoggedOut(req, res) {
   try {
     const loggedInWorkers = await pool.query("SELECT * FROM check_in_out;");
+
+    if (loggedInWorkers.rowCount === 0) return;
+
     const d = new Date();
     const hours = d.getHours();
     const minutes = d.getMinutes();
@@ -72,11 +75,6 @@ async function checkWorkerLoggedOut(req, res) {
       site_id,
       uid: session_id,
     } of loggedInWorkers.rows) {
-      const workerRecord = await pool.query(
-        "SELECT site_assigned FROM workers WHERE id = $1;",
-        [worker_id]
-      );
-
       const siteAssigned = await pool.query(
         "SELECT start_time, end_time FROM sites WHERE id = $1;",
         [site_id]
@@ -111,14 +109,11 @@ async function checkWorkerLoggedOut(req, res) {
                 session_id,
               ]);
               console.log("logged out");
-              // console.log({ result });
             }
           }
         );
       }
     }
-
-    // console.log(loggedInWorkers.rows);
   } catch (error) {
     console.log(error);
     res.status(500).message({ message: error.message });
