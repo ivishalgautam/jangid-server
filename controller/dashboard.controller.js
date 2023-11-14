@@ -90,6 +90,8 @@ async function worker(req, res) {
 
     const { total_paid, total_earned, ...data } = rows[0];
 
+    console.log(total_paid, total_earned);
+
     res.json({
       message: "success",
       status: 200,

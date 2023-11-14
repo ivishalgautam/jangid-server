@@ -1,5 +1,6 @@
 const { pool } = require("../config/db");
 const cron = require("node-cron");
+const moment = require("moment-timezone");
 
 async function createAttendance(req, res) {
   const { worker_id, date, hours, check_in, check_out } = req.body;
@@ -62,13 +63,32 @@ async function checkWorkerLoggedOut(req, res) {
   try {
     const loggedInWorkers = await pool.query("SELECT * FROM check_in_out;");
 
-    for (const { worker_id } of loggedInWorkers.rows) {
-      // console.log(worker_id);
+    for (const { worker_id, site_id } of loggedInWorkers.rows) {
+      // console.log({ worker_id, site_id });
       const workerRecord = await pool.query(
         "SELECT site_assigned FROM workers WHERE id = $1;",
         [worker_id]
       );
-      console.log(workerRecord.rows);
+
+      // console.log(workerRecord.rows);
+      const siteAssigned = await pool.query(
+        "SELECT start_time, end_time FROM sites WHERE id = $1;",
+        [site_id]
+      );
+
+      const startTime = moment(
+        new Date(`1970-01-01T${siteAssigned.rows[0].start_time}`)
+      ).format();
+
+      const startTimeOneHourBefore = moment(
+        new Date(`1970-01-01T${siteAssigned.rows[0].start_time}`)
+      )
+        .subtract(1, "hours")
+        .format();
+
+      if (startTime > moment(new Date()).format() > startTimeOneHourBefore) {
+        console.log("log out");
+      }
     }
 
     // console.log(loggedInWorkers.rows);
@@ -78,7 +98,7 @@ async function checkWorkerLoggedOut(req, res) {
   }
 }
 
-cron.schedule("*/10 * * * * *", checkWorkerLoggedOut);
+// cron.schedule("*/2 * * * * *", checkWorkerLoggedOut);
 
 module.exports = {
   createAttendance,
