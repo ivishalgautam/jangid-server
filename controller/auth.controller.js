@@ -271,6 +271,7 @@ async function workerCheckOut(req, res) {
 
     const timeDifferenceInHours =
       timeDifferenceInMilliseconds / (1000 * 60 * 60); // Convert milliseconds to hours
+
     const siteHours = await pool.query(
       `SELECT 
             EXTRACT(HOUR FROM end_time - start_time) AS hours
@@ -284,6 +285,7 @@ async function workerCheckOut(req, res) {
     // console.log({ timeDifferenceInHours, siteHours: siteHours.rows[0].hours, extraHours: Math.floor(extraHours) });
 
     let earned = dailyWage;
+    console.log({ salaryperhour: dailyWage / siteHours.rows[0].hours });
 
     for (let i = 3; i <= 60; i += 3) {
       if (extraHours <= 0) {
