@@ -42,11 +42,11 @@ async function getWorkerAttendanceById(req, res) {
 
     const data = rows.map((row) => ({
       ...row,
-      check_in: new Date(row.check_in).toUTCString(),
-      check_out: new Date(row.check_out).toUTCString(),
+      check_in: new Date(row.check_in).toLocaleString(),
+      check_out: new Date(row.check_out).toLocaleString(),
     }));
 
-    res.json(data);
+    res.json(rows);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
