@@ -222,6 +222,7 @@ async function workerCheckIn(req, res) {
 
 async function workerCheckOut(req, res) {
   const { session_id, lat, long } = req.body;
+  console.log(req.body);
   let extraHours;
   let dailyWage;
 
