@@ -65,6 +65,7 @@ async function createWorker(req, res) {
 
 async function updateProfileImage(req, res) {
   const { worker_id } = req.body;
+  console.log(req.body);
 
   try {
     const worker = await pool.query(
