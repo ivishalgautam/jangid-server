@@ -1,5 +1,7 @@
 const { pool } = require("../config/db");
 const bcrypt = require("bcryptjs");
+const fs = require("fs");
+const path = require("path");
 
 async function createSupervisor(req, res) {
   const { fullname, email, phone, username, password, site_assigned } =
@@ -138,7 +140,8 @@ async function deleteSupervisorById(req, res) {
       `DELETE FROM supervisors WHERE id = $1 returning *`,
       [supervisorId]
     );
-    console.log("deleted", rows);
+
+    console.log(req.get("host"));
 
     if (rowCount === 0) {
       return res.status(404).json({ message: "NOT FOUND!" });
