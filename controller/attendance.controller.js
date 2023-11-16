@@ -40,7 +40,13 @@ async function getWorkerAttendanceById(req, res) {
       [worker_id]
     );
 
-    res.json(rows);
+    const data = rows.map((row) => ({
+      ...row,
+      check_in: new Date(row.check_in).toUTCString(),
+      check_out: new Date(row.check_out).toUTCString(),
+    }));
+
+    res.json(data);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
