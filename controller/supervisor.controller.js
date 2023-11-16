@@ -134,10 +134,11 @@ async function uploadDocs(req, res) {
 async function deleteSupervisorById(req, res) {
   const supervisorId = parseInt(req.body.supervisor_id);
   try {
-    const { rowCount } = await pool.query(
-      `DELETE FROM supervisors WHERE id = $1`,
+    const { rows, rowCount } = await pool.query(
+      `DELETE FROM supervisors WHERE id = $1 returning *`,
       [supervisorId]
     );
+    console.log("deleted", rows);
 
     if (rowCount === 0) {
       return res.status(404).json({ message: "NOT FOUND!" });
