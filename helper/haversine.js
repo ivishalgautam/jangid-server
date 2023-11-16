@@ -25,7 +25,12 @@ function haversine(lat1, lon1, lat2, lon2) {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = radius * c;
 
-  return distance;
+  // distance in meters
+  const distanceMeters = distance * 1000;
+
+  return distanceMeters;
+
+  // return distance;
 }
 
 module.exports = { haversine };
