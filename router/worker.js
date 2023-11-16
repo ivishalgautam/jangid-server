@@ -56,6 +56,13 @@ router.put(
 );
 
 router.put(
+  "/:workerId/upload-docs",
+  verifyTokenAdminAndSupervisor,
+  uploads.array("file", 5),
+  Controller.uploadDocs
+);
+
+router.put(
   "/site-assign",
   verifyTokenAdminAndSupervisor,
   Controller.siteAssign

@@ -88,6 +88,27 @@ async function updateProfileImage(req, res) {
   }
 }
 
+async function uploadDocs(req, res) {
+  const workerId = parseInt(req.params.workerId);
+  const docs = req.files.map((file) => `/assets/images/${file.filename}`);
+
+  try {
+    const { rowCount } = await pool.query(
+      `UPDATE workers SET docs = $1 WHERE id = $2`,
+      [docs, workerId]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ message: "worker not found!" });
+    }
+
+    res.json({ message: "UPDATED" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function updateWorkerById(req, res) {
   const {
     worker_id,
@@ -241,4 +262,5 @@ module.exports = {
   getAllWorkers,
   siteAssign,
   updateProfileImage,
+  uploadDocs,
 };

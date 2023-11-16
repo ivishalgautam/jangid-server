@@ -23,6 +23,7 @@ const storage = multer.diskStorage({
     callback(null, `${Date.now()}-${file.originalname.split(" ").join("-")}`);
   },
 });
+
 const uploads = multer({ storage });
 
 router.post(
