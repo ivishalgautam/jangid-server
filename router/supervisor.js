@@ -3,7 +3,10 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const Controller = require("../controller/supervisor.controller");
-const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
+const {
+  verifyTokenAndAdmin,
+  verifyTokenAdminAndSupervisor,
+} = require("../middlewares/verifyToken");
 
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
