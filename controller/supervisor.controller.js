@@ -98,12 +98,12 @@ async function updateSupervisorById(req, res) {
 }
 
 async function updateProfileImage(req, res) {
-  const { supervisor_id } = req.body;
+  const { supervisorId } = req.params;
 
   try {
     const { rowCount } = await pool.query(
       "SELECT * FROM supervisors WHERE id = $1",
-      [parseInt(supervisor_id)]
+      [parseInt(supervisorId)]
     );
 
     if (rowCount === 0) {
@@ -112,8 +112,9 @@ async function updateProfileImage(req, res) {
 
     await pool.query("UPDATE supervisors SET profile_img = $1 WHERE id = $2", [
       `/assets/images/${req.file.filename}`,
-      parseInt(supervisor_id),
+      parseInt(supervisorId),
     ]);
+
     res.json({ message: "Profile updated" });
   } catch (error) {
     console.error(error);
@@ -122,13 +123,13 @@ async function updateProfileImage(req, res) {
 }
 
 async function uploadDocs(req, res) {
-  const supervisor_id = parseInt(req.body.supervisor_id);
+  const supervisorId = parseInt(req.body.supervisorId);
   const docs = req.files.map((file) => `/assets/images/${file.filename}`);
 
   try {
     const { rowCount } = await pool.query(
       `UPDATE supervisors SET docs = $1 WHERE id = $2`,
-      [docs, supervisor_id]
+      [docs, supervisorId]
     );
 
     if (rowCount === 0) {
