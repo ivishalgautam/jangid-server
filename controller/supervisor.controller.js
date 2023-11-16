@@ -99,12 +99,11 @@ async function updateSupervisorById(req, res) {
 
 async function updateProfileImage(req, res) {
   const { supervisorId } = req.params;
-  console.log(supervisorId);
 
   try {
     const { rowCount } = await pool.query(
       "SELECT * FROM supervisors WHERE id = $1",
-      [parseInt(supervisorId)]
+      [supervisorId]
     );
 
     if (rowCount === 0) {
@@ -113,7 +112,7 @@ async function updateProfileImage(req, res) {
 
     await pool.query("UPDATE supervisors SET profile_img = $1 WHERE id = $2", [
       `/assets/images/${req.file.filename}`,
-      parseInt(supervisorId),
+      supervisorId,
     ]);
 
     res.json({ message: "Profile updated" });
@@ -146,7 +145,7 @@ async function uploadDocs(req, res) {
 
 async function deleteSupervisorById(req, res) {
   const supervisorId = parseInt(req.body.supervisor_id);
-  const basePath = `https://${req.get("host")}`;
+  const basePath = process.env.images_path;
   try {
     // return console.log(req.get("host"));
 
