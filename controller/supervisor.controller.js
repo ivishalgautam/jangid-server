@@ -161,11 +161,9 @@ async function deleteSupervisorById(req, res) {
     filesToDelete.forEach((file) => {
       fs.unlink(file, (err) => {
         if (err) {
-          return console.error(
-            `error deleting files ${file}:${JSON.stringify(err)}`
-          );
+          console.error(`error deleting files ${file}:${JSON.stringify(err)}`);
         } else {
-          return console.log("files deleted");
+          console.log("files deleted");
         }
       });
     });
