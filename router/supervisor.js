@@ -40,14 +40,14 @@ router.put(
 ); //admin
 
 router.put(
-  "/:supervisorId/update-profile",
+  "/update-profile",
   verifyTokenAdminAndSupervisor,
   uploads.single("file"),
   Controller.updateProfileImage
 );
 
 router.put(
-  "/:supervisorId/upload-docs",
+  "/upload-docs",
   verifyTokenAndAdmin,
   uploads.array("file", 5),
   Controller.uploadDocs
