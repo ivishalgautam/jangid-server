@@ -287,7 +287,11 @@ async function workerCheckOut(req, res) {
 
     extraHours = timeDifferenceInHours - siteHours.rows[0].hours;
 
-    // console.log({ timeDifferenceInHours, siteHours: siteHours.rows[0].hours, extraHours: Math.floor(extraHours) });
+    console.log({
+      timeDifferenceInHours,
+      siteHours: siteHours.rows[0].hours,
+      extraHours: Math.floor(extraHours),
+    });
 
     let earned = dailyWage;
 
@@ -307,10 +311,10 @@ async function workerCheckOut(req, res) {
 
     const time_diff = convertMillisecondsToTime(timeDifferenceInMilliseconds);
 
-    console.log({
-      check_in: moment(check_in_time).tz("Asia/Kolkata").format(),
-      check_out: moment(check_out_time).tz("Asia/Kolkata").format(),
-    });
+    // console.log({
+    //   check_in: moment(check_in_time).tz("Asia/Kolkata").format(),
+    //   check_out: moment(check_out_time).tz("Asia/Kolkata").format(),
+    // });
 
     const check_in = moment(check_in_time).tz("Asia/Kolkata");
     const check_out = moment(check_out_time).tz("Asia/Kolkata");
