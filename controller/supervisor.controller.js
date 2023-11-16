@@ -101,9 +101,18 @@ async function updateProfileImage(req, res) {
   const { supervisor_id } = req.body;
 
   try {
+    const { rowCount } = await pool.query(
+      "SELECT * FROM supervisors WHERE id = $1",
+      [parseInt(supervisor_id)]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ message: "supervisor not found!" });
+    }
+
     await pool.query("UPDATE supervisors SET profile_img = $1 WHERE id = $2", [
       `/assets/images/${req.file.filename}`,
-      supervisor_id,
+      parseInt(supervisor_id),
     ]);
     res.json({ message: "Profile updated" });
   } catch (error) {
