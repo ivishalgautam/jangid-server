@@ -67,10 +67,13 @@ async function updateProfileImage(req, res) {
   const { worker_id } = req.body;
 
   try {
-    await pool.query("UPDATE workers SET profile_img = $1 WHERE id = $2", [
-      `/assets/images/${req.file.filename}`,
-      worker_id,
-    ]);
+    const worker = await pool.query(
+      "UPDATE workers SET profile_img = $1 WHERE id = $2 returning *;",
+      [`/assets/images/${req.file.filename}`, worker_id]
+    );
+
+    console.log(worker.rows);
+
     res.json({ message: "Profile updated" });
   } catch (error) {
     console.error(error);

@@ -96,12 +96,12 @@ async function updateSupervisorById(req, res) {
 }
 
 async function updateProfileImage(req, res) {
-  const { supervisor_id } = req.params;
+  const { supervisorId } = req.params;
 
   try {
     await pool.query("UPDATE supervisors SET profile_img = $1 WHERE id = $2", [
       `/assets/images/${req.file.filename}`,
-      supervisor_id,
+      supervisorId,
     ]);
     res.json({ message: "Profile updated" });
   } catch (error) {

@@ -4,8 +4,6 @@ const path = require("path");
 const fs = require("fs");
 const Controller = require("../controller/worker.controller");
 const {
-  verifyTokenAndSupervisor,
-  verifyToken,
   verifyTokenAdminAndSupervisor,
   verifyTokenAndAdmin,
 } = require("../middlewares/verifyToken");
