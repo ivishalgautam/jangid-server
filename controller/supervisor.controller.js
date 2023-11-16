@@ -99,6 +99,7 @@ async function updateSupervisorById(req, res) {
 
 async function updateProfileImage(req, res) {
   const { supervisorId } = req.params;
+  console.log(supervisorId);
 
   try {
     const { rowCount } = await pool.query(
