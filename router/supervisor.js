@@ -36,6 +36,13 @@ router.put(
 ); //admin
 
 router.put(
+  "/:supervisorId/update-profile",
+  verifyTokenAdminAndSupervisor,
+  uploads.single("file"),
+  Controller.updateProfileImage
+);
+
+router.put(
   "/:supervisorId/upload-docs",
   verifyTokenAndAdmin,
   uploads.array("file", 5),

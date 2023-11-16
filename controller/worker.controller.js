@@ -39,8 +39,8 @@ async function createWorker(req, res) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const docs = req.files.map((file) => `/assets/images/${file.filename}`);
 
-    await pool.query(
-      `INSERT INTO workers (fullname, phone, docs, site_assigned, password, daily_wage_salary, username, hpassword, lat, long, address) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+    const { rows } = await pool.query(
+      `INSERT INTO workers (fullname, phone, docs, site_assigned, password, daily_wage_salary, username, hpassword, lat, long, address) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning *`,
       [
         fullname,
         phone,
@@ -56,7 +56,7 @@ async function createWorker(req, res) {
       ]
     );
 
-    res.json({ message: "CREATED" });
+    res.json({ message: "CREATED", status: 200, worker_id: rows[0].id });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });

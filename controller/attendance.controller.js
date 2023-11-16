@@ -42,7 +42,7 @@ async function getWorkerAttendanceById(req, res) {
 
     const data = rows.map((row) => ({
       ...row,
-      check_in: new Date(moment(row.check_in).tz("Asia/Kolkata").format()),
+      check_in: moment(row.check_in).tz("Asia/Kolkata").format(),
       check_out: moment(row.check_out).tz("Asia/Kolkata").format(),
     }));
 

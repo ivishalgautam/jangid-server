@@ -64,7 +64,11 @@ async function createSupervisor(req, res) {
       );
     }
 
-    res.json({ message: "Created" });
+    res.json({
+      message: "Created",
+      status: 200,
+      supervisor_id: supervisor.rows[0].id,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
@@ -85,6 +89,21 @@ async function updateSupervisorById(req, res) {
     }
 
     res.json({ message: "UPDATED" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async function updateProfileImage(req, res) {
+  const { supervisor_id } = req.params;
+
+  try {
+    await pool.query("UPDATE supervisors SET profile_img = $1 WHERE id = $2", [
+      `/assets/images/${req.file.filename}`,
+      supervisor_id,
+    ]);
+    res.json({ message: "Profile updated" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
@@ -220,4 +239,5 @@ module.exports = {
   getAllSupervisors,
   siteAssign,
   uploadDocs,
+  updateProfileImage,
 };
