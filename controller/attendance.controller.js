@@ -58,7 +58,14 @@ async function getAllAttendances(req, res) {
     const { rows } = await pool.query(
       `SELECT * FROM attendances ORDER BY created_at DESC;`
     );
-    res.json(rows);
+
+    const data = rows.map((row) => ({
+      ...row,
+      check_in: moment(row.check_in).tz("Asia/Kolkata").format(),
+      check_out: moment(row.check_out).tz("Asia/Kolkata").format(),
+    }));
+
+    res.json(data);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
