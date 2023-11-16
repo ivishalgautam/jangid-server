@@ -68,6 +68,15 @@ async function updateProfileImage(req, res) {
   console.log(req.body);
 
   try {
+    const { rowCount } = await pool.query(
+      "SELECT * FROM workers WHERE id = $1;",
+      [worker_id]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ message: "worker not exist!" });
+    }
+
     const worker = await pool.query(
       "UPDATE workers SET profile_img = $1 WHERE id = $2 returning *;",
       [`/assets/images/${req.file.filename}`, worker_id]
