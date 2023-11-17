@@ -78,11 +78,11 @@ async function createSupervisor(req, res) {
 
 async function updateSupervisorById(req, res) {
   const supervisorId = parseInt(req.params.supervisorId);
-  const { fullname, email, phone, site_assigned } = req.body;
+  const { fullname, email, phone, site_assigned, password } = req.body;
   try {
     const { rowCount } = await pool.query(
-      `UPDATE supervisors SET fullname = $1, email = $2, phone = $3, site_assigned = $4 WHERE id = $5`,
-      [fullname, email, phone, site_assigned, supervisorId]
+      `UPDATE supervisors SET fullname = $1, email = $2, phone = $3, site_assigned = $4, password = $5 WHERE id = $6`,
+      [fullname, email, phone, site_assigned, password, supervisorId]
     );
 
     if (rowCount === 0) {
@@ -113,8 +113,6 @@ async function updateProfileImage(req, res) {
       rows[0]?.profile_img !== null && rows[0]?.profile_img !== ""
         ? path.join(__dirname, "../", rows[0]?.profile_img)
         : "";
-
-    console.log({ file });
 
     if (fs.existsSync(file)) {
       fs.unlink(file, (err) => {
