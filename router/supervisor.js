@@ -11,7 +11,6 @@ const {
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
     const folderPath = path.join(__dirname, "../assets/images");
-    console.log(folderPath);
 
     // Create the folder if it doesn't exist
     if (!fs.existsSync(folderPath)) {

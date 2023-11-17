@@ -115,6 +115,8 @@ async function updateProfileImage(req, res) {
       path.basename(rows[0]?.profile_img)
     );
 
+    console.log({ file });
+
     if (fs.existsSync(file)) {
       fs.unlink(file, (err) => {
         if (err) {
