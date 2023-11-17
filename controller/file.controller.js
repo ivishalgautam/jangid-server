@@ -14,6 +14,8 @@ async function deleteFile(req, res) {
         console.log("file deleted");
       }
     });
+
+    res.json({ message: "file deleted" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
