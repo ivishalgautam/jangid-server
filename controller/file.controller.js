@@ -30,7 +30,9 @@ async function deleteFile(req, res) {
         return res.json({ message: `query type not found!` });
     }
 
-    console.log({ rows: data.rows[0].docs });
+    console.log({
+      images: data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
+    });
 
     const file = path.join(__dirname, "../assets/images", filename);
 
@@ -41,7 +43,6 @@ async function deleteFile(req, res) {
             `error deleting file: ${file} message:${JSON.stringify(err)}`
           );
         } else {
-          console.log({ file });
           switch (type) {
             case "worker":
               await pool.query(`UPDATE workers SET docs = $1 WHERE id = $2;`, [
@@ -54,7 +55,7 @@ async function deleteFile(req, res) {
               await pool.query(
                 `UPDATE supervisors SET docs = $1 WHERE id = $2;`,
                 [
-                  data.rows[0]?.docs?.filter((doc) => !doc.includes(file)),
+                  data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
                   supervisor_id,
                 ]
               );
