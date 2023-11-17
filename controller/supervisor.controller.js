@@ -123,18 +123,23 @@ async function updateProfileImage(req, res) {
 }
 
 async function uploadDocs(req, res) {
-  const supervisorId = parseInt(req.body.supervisorId);
+  const supervisorId = parseInt(req.params.supervisorId);
   const docs = req.files.map((file) => `/assets/images/${file.filename}`);
 
   try {
-    const { rowCount } = await pool.query(
-      `UPDATE supervisors SET docs = $1 WHERE id = $2`,
-      [docs, supervisorId]
+    const record = await pool.query(
+      `SELECT * FROM supervisors where id = $1;`,
+      [supervisorId]
     );
 
-    if (rowCount === 0) {
+    if (record.rowCount === 0) {
       return res.status(404).json({ message: "supervisor not found!" });
     }
+
+    const { rowCount } = await pool.query(
+      `UPDATE supervisors SET docs = $1 WHERE id = $2`,
+      [[...record.rows?.[0]?.docs, ...docs], supervisorId]
+    );
 
     res.json({ message: "UPDATED" });
   } catch (error) {
