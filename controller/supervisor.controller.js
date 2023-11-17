@@ -131,7 +131,7 @@ async function uploadDocs(req, res) {
       `SELECT * FROM supervisors where id = $1;`,
       [supervisorId]
     );
-
+    console.log({ record: record.rows });
     if (record.rowCount === 0) {
       return res.status(404).json({ message: "supervisor not found!" });
     }
