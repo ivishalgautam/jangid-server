@@ -45,7 +45,7 @@ async function deleteFile(req, res) {
           switch (type) {
             case "worker":
               await pool.query(`UPDATE workers SET docs = $1 WHERE id = $2;`, [
-                data.rows[0]?.docs?.filter((doc) => !doc.includes(file)),
+                data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
                 worker_id,
               ]);
               break;
