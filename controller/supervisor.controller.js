@@ -154,7 +154,7 @@ async function deleteSupervisorById(req, res) {
       [supervisorId]
     );
 
-    const filesToDelete = rows[0].docs?.map((file) =>
+    const filesToDelete = rows?.[0]?.docs?.map((file) =>
       path.join(basePath, file)
     );
 
