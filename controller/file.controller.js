@@ -37,38 +37,26 @@ async function deleteFile(req, res) {
     const file = path.join(__dirname, "../assets/images", filename);
 
     if (fs.existsSync(file)) {
-      fs.unlinkSync(file, async (err) => {
-        if (err) {
-          console.log(
-            `error deleting file: ${file} message:${JSON.stringify(err)}`
-          );
-        } else {
-          switch (type) {
-            case "worker":
-              return console.log("worker");
-              await pool.query(`UPDATE workers SET docs = $1 WHERE id = $2;`, [
-                data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
-                worker_id,
-              ]);
-              break;
+      fs.unlinkSync(file);
+      switch (type) {
+        case "worker":
+          await pool.query(`UPDATE workers SET docs = $1 WHERE id = $2;`, [
+            data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
+            worker_id,
+          ]);
+          break;
 
-            case "supervisor":
-              return console.log("supervisor");
-              await pool.query(
-                `UPDATE supervisors SET docs = $1 WHERE id = $2;`,
-                [
-                  data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
-                  supervisor_id,
-                ]
-              );
-              break;
+        case "supervisor":
+          await pool.query(`UPDATE supervisors SET docs = $1 WHERE id = $2;`, [
+            data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
+            supervisor_id,
+          ]);
+          break;
 
-            default:
-              break;
-          }
-          console.log("file deleted");
-        }
-      });
+        default:
+          break;
+      }
+      console.log("file deleted");
     } else {
       return res.status(404).json({ message: "file not found!" });
     }
