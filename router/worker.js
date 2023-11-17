@@ -56,7 +56,7 @@ router.put(
 );
 
 router.put(
-  "/:workerId/upload-docs",
+  "/upload-docs/:workerId",
   verifyTokenAdminAndSupervisor,
   uploads.array("file", 5),
   Controller.uploadDocs
