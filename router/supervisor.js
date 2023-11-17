@@ -29,7 +29,7 @@ const uploads = multer({ storage });
 router.post(
   "/",
   verifyTokenAndAdmin,
-  uploads.single("file"),
+  uploads.array("file", 5),
   Controller.createSupervisor
 ); //admin
 

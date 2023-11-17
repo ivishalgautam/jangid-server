@@ -6,8 +6,7 @@ const path = require("path");
 async function createSupervisor(req, res) {
   const { fullname, email, phone, username, password, site_assigned } =
     req.body;
-  const profile_img = `/assets/images/${req.file.filename}`;
-  // console.log(req.body, profile_img);
+  const docs = req.files.map((file) => `/assets/images/${file.filename}`);
 
   try {
     const emailExist = await pool.query(
@@ -46,7 +45,7 @@ async function createSupervisor(req, res) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const supervisor = await pool.query(
-      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, profile_img, site_assigned) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) returning *;`,
+      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, docs, site_assigned) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) returning *;`,
       [
         fullname,
         email,
@@ -54,7 +53,7 @@ async function createSupervisor(req, res) {
         username.trim(),
         password,
         hashedPassword,
-        profile_img,
+        docs,
         site_assigned,
       ]
     );
