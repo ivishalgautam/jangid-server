@@ -109,7 +109,10 @@ async function updateProfileImage(req, res) {
       return res.status(404).json({ message: "supervisor not found!" });
     }
 
-    const file = path.join(__dirname, "../", rows[0]?.profile_img);
+    const file =
+      rows[0]?.profile_img !== null && rows[0]?.profile_img !== ""
+        ? path.join(__dirname, "../", rows[0]?.profile_img)
+        : "";
 
     console.log({ file });
 
