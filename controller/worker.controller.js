@@ -108,7 +108,6 @@ async function uploadDocs(req, res) {
         record.rows[0]?.docs !== null
           ? [...record.rows[0]?.docs, ...docs]
           : [...docs],
-        ,
         workerId,
       ]
     );
