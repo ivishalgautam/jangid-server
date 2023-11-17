@@ -100,7 +100,7 @@ async function updateProfileImage(req, res) {
   const { supervisorId } = req.params;
 
   try {
-    const { rowCount } = await pool.query(
+    const { rows, rowCount } = await pool.query(
       "SELECT * FROM supervisors WHERE id = $1",
       [supervisorId]
     );
