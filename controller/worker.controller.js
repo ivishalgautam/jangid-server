@@ -69,7 +69,7 @@ async function updateProfileImage(req, res) {
   const { worker_id } = req.body;
 
   try {
-    const { rowCount } = await pool.query(
+    const { rows, rowCount } = await pool.query(
       "SELECT * FROM workers WHERE id = $1;",
       [worker_id]
     );
@@ -78,7 +78,23 @@ async function updateProfileImage(req, res) {
       return res.status(404).json({ message: "worker not exist!" });
     }
 
-    const worker = await pool.query(
+    const file = path.join(
+      __dirname,
+      "../",
+      path.basename(rows[0]?.profile_img)
+    );
+
+    if (fs.existsSync(file)) {
+      fs.unlink(file, (err) => {
+        if (err) {
+          console.log(`error deleting file:${file}`);
+        } else {
+          console.log("prev profile removed");
+        }
+      });
+    }
+
+    await pool.query(
       "UPDATE workers SET profile_img = $1 WHERE id = $2 returning *;",
       [`/assets/images/${req.file.filename}`, worker_id]
     );

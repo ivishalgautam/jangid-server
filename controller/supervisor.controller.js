@@ -109,6 +109,22 @@ async function updateProfileImage(req, res) {
       return res.status(404).json({ message: "supervisor not found!" });
     }
 
+    const file = path.join(
+      __dirname,
+      "../",
+      path.basename(rows[0]?.profile_img)
+    );
+
+    if (fs.existsSync(file)) {
+      fs.unlink(file, (err) => {
+        if (err) {
+          console.log(`error deleting file:${file}`);
+        } else {
+          console.log("prev profile removed");
+        }
+      });
+    }
+
     await pool.query("UPDATE supervisors SET profile_img = $1 WHERE id = $2", [
       `/assets/images/${req.file.filename}`,
       supervisorId,
@@ -162,8 +178,6 @@ async function deleteSupervisorById(req, res) {
     const filesToDelete = rows?.[0]?.docs?.map((file) =>
       path.join(__dirname, "../", file)
     );
-
-    console.log({ filesToDelete });
 
     filesToDelete?.forEach((file) => {
       if (fs.existsSync(file)) {
