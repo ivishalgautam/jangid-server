@@ -138,7 +138,7 @@ async function uploadDocs(req, res) {
 
     const { rowCount } = await pool.query(
       `UPDATE supervisors SET docs = $1 WHERE id = $2`,
-      [[...record.rows?.[0]?.docs, ...docs], supervisorId]
+      [[...record.rows[0]?.docs, ...docs], supervisorId]
     );
 
     res.json({ message: "UPDATED" });
