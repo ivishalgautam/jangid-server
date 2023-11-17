@@ -1,5 +1,7 @@
 const { pool } = require("../config/db");
 const bcrypt = require("bcryptjs");
+const path = require("path");
+const fs = require("fs");
 
 async function createWorker(req, res) {
   const {
@@ -196,9 +198,10 @@ async function siteAssign(req, res) {
 async function deleteWorkerById(req, res) {
   const { worker_id } = req.body;
   try {
-    const { rowCount } = await pool.query(`DELETE FROM workers WHERE id = $1`, [
-      worker_id,
-    ]);
+    const { rows, rowCount } = await pool.query(
+      `DELETE FROM workers WHERE id = $1`,
+      [worker_id]
+    );
 
     if (rowCount === 0) {
       return res.status(404).json({ message: "NOT FOUND!" });
@@ -212,6 +215,19 @@ async function deleteWorkerById(req, res) {
           }
         }
       );
+
+      const filesToDelete = rows[0]?.docs.map((file) =>
+        path.join(__dirname, "../", file)
+      );
+
+      filesToDelete?.forEach((file) => {
+        if (fs.existsSync(file)) {
+          fs.unlink(file);
+          console.log(`file:${file} deleted`);
+        } else {
+          console.error(`file:${file} not found!`);
+        }
+      });
 
       await pool.query(
         `DELETE FROM attendances WHERE worker_id = $1;`,

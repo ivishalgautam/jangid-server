@@ -153,27 +153,23 @@ async function uploadDocs(req, res) {
 
 async function deleteSupervisorById(req, res) {
   const supervisorId = parseInt(req.body.supervisor_id);
-  // const basePath = process.env.images_path;
   try {
-    // return console.log(req.get("host"));
-
     const { rows, rowCount } = await pool.query(
       `DELETE FROM supervisors WHERE id = $1 returning *`,
       [supervisorId]
     );
 
     const filesToDelete = rows?.[0]?.docs?.map((file) =>
-      path.join(__dirname, file)
+      path.join(__dirname, "../", file)
     );
 
     filesToDelete?.forEach((file) => {
-      fs.unlink(file, (err) => {
-        if (err) {
-          console.error(`error deleting files ${file}:${JSON.stringify(err)}`);
-        } else {
-          console.log("files deleted");
-        }
-      });
+      if (fs.existsSync(file)) {
+        fs.unlink(file);
+        console.log(`file:${file} deleted`);
+      } else {
+        console.error(`file:${file} not found!`);
+      }
     });
 
     if (rowCount === 0) {
