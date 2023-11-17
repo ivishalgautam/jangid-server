@@ -127,6 +127,7 @@ async function updateWorkerById(req, res) {
     site_assigned,
     daily_wage_salary,
     username,
+    password,
   } = req.body;
 
   if (!worker_id) {
@@ -138,13 +139,14 @@ async function updateWorkerById(req, res) {
 
   try {
     const { rowCount } = await pool.query(
-      `UPDATE workers SET fullname = $1, phone = $2, site_assigned = $3, daily_wage_salary = $4, username = $5 WHERE id = $6;`,
+      `UPDATE workers SET fullname = $1, phone = $2, site_assigned = $3, daily_wage_salary = $4, username = $5, password = $6 WHERE id = $7;`,
       [
         fullname,
         phone,
         site_assigned,
         daily_wage_salary,
         username,
+        password,
         parseInt(worker_id),
       ]
     );
