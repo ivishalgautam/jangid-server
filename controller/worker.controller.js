@@ -91,6 +91,7 @@ async function updateProfileImage(req, res) {
 async function uploadDocs(req, res) {
   const workerId = parseInt(req.params.workerId);
   const docs = req.files.map((file) => `/assets/images/${file.filename}`);
+  console.log({ file: req.files, docs });
 
   try {
     const { rowCount } = await pool.query(
