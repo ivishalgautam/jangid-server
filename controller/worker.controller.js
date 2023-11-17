@@ -201,6 +201,26 @@ async function deleteWorkerById(req, res) {
 
     if (rowCount === 0) {
       return res.status(404).json({ message: "NOT FOUND!" });
+    } else {
+      await pool.query(
+        `DELETE FROM check_in_out WHERE worker_id = $1;`,
+        [worker_id],
+        (err, result) => {
+          if (err) {
+            console.error("error deleting sessions");
+          }
+        }
+      );
+
+      await pool.query(
+        `DELETE FROM attendances WHERE worker_id = $1;`,
+        [worker_id],
+        (err, result) => {
+          if (err) {
+            console.error("error deleting attendances");
+          }
+        }
+      );
     }
 
     res.json({ message: "DELETED" });
