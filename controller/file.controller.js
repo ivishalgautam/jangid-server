@@ -30,6 +30,8 @@ async function deleteFile(req, res) {
         return res.json({ message: `query type not found!` });
     }
 
+    console.log(data.rows);
+
     const file = path.join(__dirname, "../assets/images", filename);
 
     if (fs.existsSync(file)) {
