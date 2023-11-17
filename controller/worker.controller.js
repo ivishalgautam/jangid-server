@@ -78,11 +78,7 @@ async function updateProfileImage(req, res) {
       return res.status(404).json({ message: "worker not exist!" });
     }
 
-    const file = path.join(
-      __dirname,
-      "../",
-      path.basename(rows[0]?.profile_img)
-    );
+    const file = path.join(__dirname, "../", rows[0]?.profile_img);
 
     if (fs.existsSync(file)) {
       fs.unlink(file, (err) => {
