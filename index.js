@@ -20,6 +20,7 @@ app.use("/api/expenses", require("./router/expense"));
 app.use("/api/payouts", require("./router/payout"));
 app.use("/api/dashboard", require("./router/dashboard"));
 app.use("/api/attendances", require("./router/attendance"));
+app.use("/api/files", require("./router/file"));
 
 app.use("/api/admin", require("./router/admin"));
 
