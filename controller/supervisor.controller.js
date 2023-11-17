@@ -168,9 +168,9 @@ async function deleteSupervisorById(req, res) {
     filesToDelete?.forEach((file) => {
       if (fs.existsSync(file)) {
         fs.unlinkSync(file);
-        console.log(`file:${file} deleted`);
+        console.log(`file:${path.basename(file)} deleted`);
       } else {
-        console.error(`file:${file} not found!`);
+        console.error(`file:${path.basename(file)} not found!`);
       }
     });
 
