@@ -145,7 +145,7 @@ async function uploadDocs(req, res) {
 
 async function deleteSupervisorById(req, res) {
   const supervisorId = parseInt(req.body.supervisor_id);
-  const basePath = process.env.images_path;
+  // const basePath = process.env.images_path;
   try {
     // return console.log(req.get("host"));
 
@@ -155,7 +155,7 @@ async function deleteSupervisorById(req, res) {
     );
 
     const filesToDelete = rows?.[0]?.docs?.map((file) =>
-      path.join(basePath, file)
+      path.join(__dirname, file)
     );
 
     filesToDelete?.forEach((file) => {

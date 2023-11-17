@@ -91,17 +91,21 @@ async function updateProfileImage(req, res) {
 async function uploadDocs(req, res) {
   const workerId = parseInt(req.params.workerId);
   const docs = req.files.map((file) => `/assets/images/${file.filename}`);
-  console.log({ file: req.files, docs });
+  // console.log({ file: req.files, docs });
 
   try {
-    const { rowCount } = await pool.query(
-      `UPDATE workers SET docs = $1 WHERE id = $2`,
-      [docs, workerId]
-    );
+    const record = await pool.query(`SELECT * FROM workers where id = $1;`, [
+      workerId,
+    ]);
 
-    if (rowCount === 0) {
+    if (record.rowCount === 0) {
       return res.status(404).json({ message: "worker not found!" });
     }
+
+    const { rowCount } = await pool.query(
+      `UPDATE workers SET docs = $1 WHERE id = $2`,
+      [[...record.rows?.[0]?.docs, ...docs], workerId]
+    );
 
     res.json({ message: "UPDATED" });
   } catch (error) {
