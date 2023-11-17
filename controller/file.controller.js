@@ -4,7 +4,7 @@ const path = require("path");
 async function deleteFile(req, res) {
   try {
     const { filename } = req.params;
-    const file = path.join(__dirname, filename);
+    const file = path.join(__dirname, "../assets/images", filename);
     fs.unlink(file, (err) => {
       if (err) {
         console.log(
