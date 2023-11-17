@@ -45,27 +45,21 @@ async function deleteFile(req, res) {
         } else {
           switch (type) {
             case "worker":
-              await pool.query(
-                `UPDATE workers SET docs = $1 WHERE id = $2 returning *;`,
-                [
-                  data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
-                  worker_id,
-                ]
-              );
+              return console.log("worker");
+              await pool.query(`UPDATE workers SET docs = $1 WHERE id = $2;`, [
+                data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
+                worker_id,
+              ]);
               break;
 
             case "supervisor":
+              return console.log("supervisor");
               await pool.query(
-                `UPDATE supervisors SET docs = $1 WHERE id = $2 returning *;`,
+                `UPDATE supervisors SET docs = $1 WHERE id = $2;`,
                 [
                   data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
                   supervisor_id,
-                ],
-                (err, result) => {
-                  if (result) {
-                    console.log(result.rows);
-                  }
-                }
+                ]
               );
               break;
 
