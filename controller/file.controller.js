@@ -30,7 +30,7 @@ async function deleteFile(req, res) {
         return res.json({ message: `query type not found!` });
     }
 
-    console.log(data.rows);
+    console.log({ rows: data.rows });
 
     const file = path.join(__dirname, "../assets/images", filename);
 
@@ -41,6 +41,7 @@ async function deleteFile(req, res) {
             `error deleting file: ${file} message:${JSON.stringify(err)}`
           );
         } else {
+          console.log({ file });
           switch (type) {
             case "worker":
               await pool.query(`UPDATE workers SET docs = $1 WHERE id = $2;`, [
