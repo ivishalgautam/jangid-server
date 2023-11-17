@@ -92,6 +92,7 @@ async function updateProfileImage(req, res) {
 
 async function uploadDocs(req, res) {
   const workerId = parseInt(req.params.workerId);
+  return console.log(req.files);
   const docs = req.files.map((file) => `/assets/images/${file.filename}`);
   // console.log({ file: req.files, docs });
 
