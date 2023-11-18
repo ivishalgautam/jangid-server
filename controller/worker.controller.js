@@ -350,6 +350,12 @@ async function deletePunchedIn(req, res) {
       [req.params.sessionId]
     );
 
+    if (record.rowCount === 0) {
+      return res.status(404).json({ message: "not found!" });
+    }
+
+    console.log({ worker_id: record.rows[0].worker_id });
+
     await pool.query(`UPDATE workers SET is_present = false WHERE id = $1;`, [
       record.rows[0].worker_id,
     ]);
