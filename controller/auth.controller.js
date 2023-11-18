@@ -227,8 +227,17 @@ async function workerCheckOut(req, res) {
   let dailyWage;
 
   try {
+    const sessionRecord = await pool.query(
+      "SELECT * FROM check_in_out WHERE uid = $1;",
+      [session_id]
+    );
+
+    if (sessionRecord.rowCount === 0) {
+      return res.status(400).json({ message: "session expired!" });
+    }
+
     const worker = await pool.query(`SELECT * FROM workers WHERE id = $1;`, [
-      rows[0].worker_id,
+      sessionRecord.rows[0].worker_id,
     ]);
 
     if (worker.rowCount === 0) {
