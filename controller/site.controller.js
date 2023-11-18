@@ -168,15 +168,15 @@ async function getSiteById(req, res) {
 
 async function getAllSites(req, res) {
   let data;
-  console.log(req.user);
+  // console.log(req.user);
   try {
     if (req.user.role === "admin") {
       data = await pool.query(`SELECT * FROM sites;`);
     }
 
     if (req.user.role === "supervisor") {
-      console.log(typeof parseInt(req.user.site_assigned) === "number");
-      if (typeof parseInt(req.user.site_assigned) === "number") {
+      // console.log(typeof parseInt(req.user.site_assigned) === "number");
+      if (!isNaN(parseInt(req.user.site_assigned))) {
         data = await pool.query(`SELECT * FROM sites WHERE id = $1;`, [
           parseInt(req.user.site_assigned),
         ]);
