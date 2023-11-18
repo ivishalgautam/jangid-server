@@ -73,7 +73,7 @@ router.get(
 router.delete(
   "/punched-in/:sessionId",
   verifyTokenAdminAndSupervisor,
-  Controller.punchedInWorkers
+  Controller.deletePunchedIn
 );
 
 module.exports = router;

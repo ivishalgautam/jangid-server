@@ -349,7 +349,7 @@ async function deletePunchedIn(req, res) {
         ;`,
       [req.params.sessionId]
     );
-    console.log(record.rows);
+    console.log({ deleted: record.rows });
 
     res.json({ message: "success", status: 200, data: "deleted" });
   } catch (error) {
