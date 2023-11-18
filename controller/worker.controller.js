@@ -349,7 +349,12 @@ async function deletePunchedIn(req, res) {
         ;`,
       [req.params.sessionId]
     );
-    console.log({ deleted: record.rows });
+
+    await pool.query(`UPDATE workers SET is_present = false WHERE id = $1;`, [
+      record.rows[0].worker_id,
+    ]);
+
+    // console.log({ deleted: record.rows });
 
     res.json({ message: "success", status: 200, data: "deleted" });
   } catch (error) {
