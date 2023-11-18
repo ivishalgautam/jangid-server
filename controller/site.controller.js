@@ -175,9 +175,13 @@ async function getAllSites(req, res) {
     }
 
     if (req.user.role === "supervisor") {
-      data = await pool.query(`SELECT * FROM sites WHERE id = $1;`, [
-        parseInt(req.user.site_assigned),
-      ]);
+      if (typeof parseInt(req.user.site_assigned) === "number") {
+        data = await pool.query(`SELECT * FROM sites WHERE id = $1;`, [
+          parseInt(req.user.site_assigned),
+        ]);
+      } else {
+        data = { rows: [] };
+      }
     }
 
     res.json({
