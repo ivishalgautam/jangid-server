@@ -156,8 +156,10 @@ async function updateWorkerById(req, res) {
   const profile_img = req.file ? `/assets/${req.file.filename}` : null;
 
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const { rowCount } = await pool.query(
-      `UPDATE workers SET fullname = $1, phone = $2, site_assigned = $3, daily_wage_salary = $4, username = $5, password = $6 WHERE id = $7;`,
+      `UPDATE workers SET fullname = $1, phone = $2, site_assigned = $3, daily_wage_salary = $4, username = $5, password = $6, hpassword = $7 WHERE id = $8;`,
       [
         fullname,
         phone,
@@ -165,6 +167,7 @@ async function updateWorkerById(req, res) {
         daily_wage_salary,
         username,
         password,
+        hashedPassword,
         parseInt(worker_id),
       ]
     );

@@ -80,9 +80,19 @@ async function updateSupervisorById(req, res) {
   const supervisorId = parseInt(req.params.supervisorId);
   const { fullname, email, phone, site_assigned, password } = req.body;
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const { rowCount } = await pool.query(
-      `UPDATE supervisors SET fullname = $1, email = $2, phone = $3, site_assigned = $4, password = $5 WHERE id = $6`,
-      [fullname, email, phone, site_assigned, password, supervisorId]
+      `UPDATE supervisors SET fullname = $1, email = $2, phone = $3, site_assigned = $4, password = $5, hpassword = $6 WHERE id = $7`,
+      [
+        fullname,
+        email,
+        phone,
+        site_assigned,
+        password,
+        hashedPassword,
+        supervisorId,
+      ]
     );
 
     if (rowCount === 0) {
