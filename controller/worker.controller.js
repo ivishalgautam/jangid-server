@@ -17,7 +17,7 @@ async function createWorker(req, res) {
   } = req.body;
 
   const usernameRegex = new RegExp("^[a-zA-Z0-9_]{3,20}$");
-
+  console.log(usernameRegex.test(username.trim().toLowerCase()));
   if (usernameRegex.test(username.trim().toLowerCase())) {
     return res.status(400).json({ message: "username not valid" });
   }
