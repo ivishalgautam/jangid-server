@@ -334,7 +334,8 @@ async function punchedInWorkers(req, res) {
         SELECT 
             cio.*,
             w.username as worker_username,
-            w.fullname as worker_fullname
+            w.fullname as worker_fullname,
+            w.profile_img
         FROM check_in_out cio
         LEFT JOIN workers w on w.id = cio.worker_id 
         ;`
