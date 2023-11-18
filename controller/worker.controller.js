@@ -341,6 +341,23 @@ async function punchedInWorkers(req, res) {
   }
 }
 
+async function deletePunchedIn(req, res) {
+  try {
+    const record = await pool.query(
+      `
+        DELETE FROM check_in_out WHERE uid = $1 returning *;
+        ;`,
+      [req.params.sessionId]
+    );
+    console.log(record.rows);
+
+    res.json({ message: "success", status: 200, data: "deleted" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createWorker,
   updateWorkerById,
@@ -351,4 +368,5 @@ module.exports = {
   updateProfileImage,
   uploadDocs,
   punchedInWorkers,
+  deletePunchedIn,
 };
