@@ -65,5 +65,10 @@ router.put(
 router.delete("/", verifyTokenAndAdmin, Controller.deleteWorkerById);
 router.get("/all", verifyTokenAdminAndSupervisor, Controller.getAllWorkers);
 router.get("/", verifyTokenAdminAndSupervisor, Controller.getWorkerById);
+router.get(
+  "/punched-in",
+  verifyTokenAdminAndSupervisor,
+  Controller.punchedInWorkers
+);
 
 module.exports = router;

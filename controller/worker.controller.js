@@ -321,6 +321,26 @@ async function getAllWorkers(req, res) {
   }
 }
 
+async function punchedInWorkers(req, res) {
+  try {
+    const { rows } = await pool.query(
+      `
+        SELECT 
+            cio.*,
+            w.username as worker_username,
+            w.fullname as worker_fullname
+        FROM check_in_out cio 
+        LEFT JOIN worker w on w.id = cio.worker_id 
+        ;`
+    );
+
+    res.json({ message: "success", status: 200, data: rows });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createWorker,
   updateWorkerById,
@@ -330,4 +350,5 @@ module.exports = {
   siteAssign,
   updateProfileImage,
   uploadDocs,
+  punchedInWorkers,
 };

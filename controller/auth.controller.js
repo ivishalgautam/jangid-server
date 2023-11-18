@@ -222,11 +222,41 @@ async function workerCheckIn(req, res) {
 
 async function workerCheckOut(req, res) {
   const { session_id, lat, long } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   let extraHours;
   let dailyWage;
 
   try {
+    const worker = await pool.query(`SELECT * FROM workers WHERE id = $1;`, [
+      rows[0].worker_id,
+    ]);
+
+    if (worker.rowCount === 0) {
+      return res.status(400).json({ message: "worker not found!" });
+    }
+
+    const siteAssigned = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
+      worker.rows[0].site_assigned,
+    ]);
+
+    if (siteAssigned.rowCount === 0) {
+      return res.status(400).json({ message: "site not found!" });
+    }
+    // Coordinates of the center point (latitude and longitude)
+    const centerLat = siteAssigned.rows[0].lat;
+    const centerLon = siteAssigned.rows[0].long;
+
+    // Coordinates of the point to check (latitude and longitude)
+    const checkLat = req.user.role === "admin" ? centerLat : lat;
+    const checkLon = req.user.role === "admin" ? centerLon : long;
+
+    const radius = siteAssigned.rows[0].radius;
+    const distance = haversine(centerLat, centerLon, checkLat, checkLon);
+
+    if (distance > radius) {
+      return res.status(400).json({ message: "You are out of radius!" });
+    }
+
     const { rows, rowCount } = await pool.query(
       `UPDATE check_in_out set check_out = CURRENT_TIMESTAMP WHERE uid = $1 returning *`,
       [session_id]
@@ -234,35 +264,6 @@ async function workerCheckOut(req, res) {
     // console.log(rows);
     if (rowCount === 0) {
       return res.status(400).json({ message: "Session expired!" });
-    }
-
-    const worker = await pool.query(`SELECT * FROM workers WHERE id = $1;`, [
-      rows[0].worker_id,
-    ]);
-
-    const siteAssigned = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
-      worker.rows[0].site_assigned,
-    ]);
-
-    if (siteAssigned.rowCount === 0) {
-      return res
-        .status(500)
-        .json({ message: "You are not assigned to any site!" });
-    }
-
-    // Coordinates of the center point (latitude and longitude)
-    const centerLat = siteAssigned.rows[0].lat;
-    const centerLon = siteAssigned.rows[0].long;
-
-    // Coordinates of the point to check (latitude and longitude)
-    const checkLat = lat;
-    const checkLon = long;
-
-    const radius = siteAssigned.rows[0].radius;
-    const distance = haversine(centerLat, centerLon, checkLat, checkLon);
-
-    if (distance > radius) {
-      return res.status(400).json({ message: "You are out of radius!" });
     }
 
     dailyWage = worker.rows[0].daily_wage_salary;
