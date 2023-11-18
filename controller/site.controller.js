@@ -168,6 +168,7 @@ async function getSiteById(req, res) {
 
 async function getAllSites(req, res) {
   let data;
+  console.log(req.user);
   try {
     if (req.user.role === "admin") {
       data = await pool.query(`SELECT * FROM sites;`);
