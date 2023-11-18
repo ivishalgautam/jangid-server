@@ -175,7 +175,7 @@ async function getAllSites(req, res) {
     }
 
     if (req.user.role === "supervisor") {
-      // console.log(typeof parseInt(req.user.site_assigned) === "number");
+      console.log(!isNaN(parseInt(req.user.site_assigned)));
       if (!isNaN(parseInt(req.user.site_assigned))) {
         data = await pool.query(`SELECT * FROM sites WHERE id = $1;`, [
           parseInt(req.user.site_assigned),
