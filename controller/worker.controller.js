@@ -330,7 +330,7 @@ async function punchedInWorkers(req, res) {
             w.username as worker_username,
             w.fullname as worker_fullname
         FROM check_in_out cio 
-        LEFT JOIN worker w on w.id = cio.worker_id 
+        LEFT JOIN workers w on w.id = cio.worker_id 
         ;`
     );
 
