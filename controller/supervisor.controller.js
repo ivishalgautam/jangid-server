@@ -8,6 +8,12 @@ async function createSupervisor(req, res) {
     req.body;
   const docs = req.files.map((file) => `/assets/images/${file.filename}`);
 
+  const usernameRegex = new RegExp("^[a-zA-Z0-9_]{3,20}$");
+
+  if (usernameRegex.test(username.trim().toLowerCase())) {
+    return res.status(400).json({ message: "username not valid" });
+  }
+
   try {
     const emailExist = await pool.query(
       `SELECT email FROM supervisors WHERE email = $1;`,
@@ -50,7 +56,7 @@ async function createSupervisor(req, res) {
         fullname,
         email,
         phone,
-        username.trim(),
+        username.trim().toLowerCase(),
         password,
         hashedPassword,
         docs,

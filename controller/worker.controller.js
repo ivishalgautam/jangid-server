@@ -16,6 +16,12 @@ async function createWorker(req, res) {
     address,
   } = req.body;
 
+  const usernameRegex = new RegExp("^[a-zA-Z0-9_]{3,20}$");
+
+  if (usernameRegex.test(username.trim().toLowerCase())) {
+    return res.status(400).json({ message: "username not valid" });
+  }
+
   let record;
   try {
     record = await pool.query(`SELECT * FROM workers WHERE phone = $1;`, [
@@ -50,7 +56,7 @@ async function createWorker(req, res) {
         site_assigned,
         password,
         daily_wage_salary,
-        username.trim(),
+        username.trim().toLowerCase(),
         hashedPassword,
         lat,
         long,
@@ -329,7 +335,7 @@ async function punchedInWorkers(req, res) {
             cio.*,
             w.username as worker_username,
             w.fullname as worker_fullname
-        FROM check_in_out cio 
+        FROM check_in_out cio
         LEFT JOIN workers w on w.id = cio.worker_id 
         ;`
     );
@@ -359,8 +365,6 @@ async function deletePunchedIn(req, res) {
     await pool.query(`UPDATE workers SET is_present = false WHERE id = $1;`, [
       record.rows[0].worker_id,
     ]);
-
-    // console.log({ deleted: record.rows });
 
     res.json({ message: "success", status: 200, data: "deleted" });
   } catch (error) {
