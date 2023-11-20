@@ -8,7 +8,7 @@ function convertMillisecondsToTime(milliseconds, custom = false) {
         2,
         "0"
       )}:${String(seconds).padStart(2, "0")}`
-    : `${hours} hours ${minutes} minutes ${seconds} seconds`;
+    : `${hours} h ${minutes} m ${seconds} s`;
 }
 
 module.exports = { convertMillisecondsToTime };
