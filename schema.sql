@@ -130,7 +130,6 @@ CREATE TABLE expenses(
 
 CREATE TABLE attendances(
     id SERIAL PRIMARY KEY,
-    date DATE DEFAULT CURRENT_DATE,
     hours VARCHAR NOT NULL,
     check_in TIMESTAMP NOT NULL,
     check_out TIMESTAMP NOT NULL,
