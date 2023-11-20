@@ -275,8 +275,8 @@ async function workerCheckOut(req, res) {
       // const d = punch_out_time.split(" ")[0].split("/").join("-");
       const t = punch_out_time.split(" ")[1];
 
-      // console.log(`${yyyy}-${mm}-${dd}`);
-      // console.log(new Date(`${yyyy}-${mm}-${dd}`));
+      console.log(`${yyyy}-${mm}-${dd}`);
+      console.log(new Date(`${yyyy}-${mm}-${dd}`));
       data = await pool.query(
         `UPDATE check_in_out set check_out = $1 WHERE uid = $2 returning *`,
         [
