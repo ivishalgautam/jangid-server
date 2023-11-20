@@ -314,8 +314,8 @@ async function workerCheckOut(req, res) {
 
     dailyWage = worker.rows[0].daily_wage_salary;
 
-    const check_in_time = moment(rows[0].check_in).tz("Asia/Kolkata");
-    const check_out_time = moment(rows[0].check_out).tz("Asia/Kolkata");
+    const check_in_time = rows[0].check_in;
+    const check_out_time = rows[0].check_out;
 
     console.log({ check_in_time, check_out_time });
     // Calculate the time difference in hours
