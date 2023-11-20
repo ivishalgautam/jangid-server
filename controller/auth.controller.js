@@ -325,7 +325,7 @@ async function workerCheckOut(req, res) {
     console.log({ check_in_time, check_out_time });
     // Calculate the time difference in hours
     const timeDifferenceInMilliseconds =
-      new Date(check_in_time) - new Date(check_out_time);
+      new Date(check_out_time) - new Date(check_in_time);
 
     const timeDifferenceInHours =
       timeDifferenceInMilliseconds / (1000 * 60 * 60); // Convert milliseconds to hours
