@@ -277,6 +277,18 @@ async function workerCheckOut(req, res) {
 
       console.log(`${yyyy}-${mm}-${dd}`);
       console.log(new Date(`${yyyy}-${mm}-${dd}`));
+      console.log({
+        db: new Date(
+          `${yyyy}-${mm}-${
+            new Date().getDate().length === 1
+              ? "0" + new Date().getDate()
+              : new Date().getDate()
+          }T${t}`
+        )
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " "),
+      });
       data = await pool.query(
         `UPDATE check_in_out set check_out = $1 WHERE uid = $2 returning *`,
         [
