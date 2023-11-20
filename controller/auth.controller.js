@@ -221,10 +221,11 @@ async function workerCheckIn(req, res) {
 }
 
 async function workerCheckOut(req, res) {
-  const { session_id, lat, long } = req.body;
+  const { session_id, lat, long, punch_out_time } = req.body;
   // console.log(req.body);
   let extraHours;
   let dailyWage;
+  let data;
 
   try {
     const sessionRecord = await pool.query(
@@ -266,10 +267,19 @@ async function workerCheckOut(req, res) {
       return res.status(400).json({ message: "You are out of radius!" });
     }
 
-    const { rows, rowCount } = await pool.query(
-      `UPDATE check_in_out set check_out = CURRENT_TIMESTAMP WHERE uid = $1 returning *`,
-      [session_id]
-    );
+    if (req.user.role === "admin") {
+      data = await pool.query(
+        `UPDATE check_in_out set check_out = $1 WHERE uid = $2 returning *`,
+        [punch_out_time, session_id]
+      );
+    } else {
+      data = await pool.query(
+        `UPDATE check_in_out set check_out = CURRENT_TIMESTAMP WHERE uid = $1 returning *`,
+        [session_id]
+      );
+    }
+
+    const { rows, rowCount } = data;
     // console.log(rows);
     if (rowCount === 0) {
       return res.status(400).json({ message: "Session expired!" });
