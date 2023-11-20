@@ -303,7 +303,7 @@ async function workerCheckOut(req, res) {
 
     const { rows, rowCount } = data;
     console.log({
-      db: rows[0].check_out,
+      db: new Date(rows[0].check_out),
     });
     // console.log(rows);
     if (rowCount === 0) {
