@@ -270,7 +270,10 @@ async function workerCheckOut(req, res) {
     if (req.user.role === "admin") {
       data = await pool.query(
         `UPDATE check_in_out set check_out = $1 WHERE uid = $2 returning *`,
-        [punch_out_time, session_id]
+        [
+          new Date(punch_out_time).toISOString().slice(0, 19).replace("T", " "),
+          session_id,
+        ]
       );
     } else {
       data = await pool.query(
