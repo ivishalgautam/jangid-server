@@ -305,7 +305,7 @@ async function workerCheckOut(req, res) {
 
     const { rows, rowCount } = data;
     console.log({
-      db: moment(rows[0].check_out).tz("Asia/Kolkata"),
+      db: rows[0].check_out,
     });
     // console.log(rows);
     if (rowCount === 0) {
