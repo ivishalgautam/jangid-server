@@ -295,8 +295,8 @@ async function workerCheckOut(req, res) {
           new Date(
             `${yyyy}-${mm}-${
               new Date().getDate().length === 1
-                ? "0" + new Date().getDate()
-                : new Date().getDate()
+                ? "0" + new Date().getDate() - 1
+                : new Date().getDate() - 1
             }T${t}`
           )
             .toISOString()
