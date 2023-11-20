@@ -227,6 +227,13 @@ async function workerCheckOut(req, res) {
   let dailyWage;
   let data;
 
+  const d = punch_out_time?.split(" ")[0];
+  const yyyy = d.split("/")[2];
+  const mm = d.split("/")[1];
+  const dd = d.split("/")[0];
+  // const d = punch_out_time.split(" ")[0].split("/").join("-");
+  const t = punch_out_time?.split(" ")[1];
+
   try {
     const sessionRecord = await pool.query(
       "SELECT * FROM check_in_out WHERE uid = $1;",
@@ -268,13 +275,6 @@ async function workerCheckOut(req, res) {
     }
 
     if (req.user.role === "admin") {
-      const d = punch_out_time.split(" ")[0];
-      const yyyy = d.split("/")[2];
-      const mm = d.split("/")[1];
-      const dd = d.split("/")[0];
-      // const d = punch_out_time.split(" ")[0].split("/").join("-");
-      const t = punch_out_time.split(" ")[1];
-
       console.log(`${yyyy}-${mm}-${dd}`);
       console.log(
         moment(new Date(`${yyyy}-${mm}-${dd}T${t}`)).tz("Asia/Kolkata")
