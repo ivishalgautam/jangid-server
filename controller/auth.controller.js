@@ -277,7 +277,7 @@ async function workerCheckOut(req, res) {
 
       console.log(`${yyyy}-${mm}-${dd}`);
       console.log(
-        moment(new Date(`${yyyy}-${mm}-${dd}T${t}`).tz("Asia/Kolkata"))
+        moment(new Date(`${yyyy}-${mm}-${dd}T${t}`)).tz("Asia/Kolkata")
       );
 
       data = await pool.query(
