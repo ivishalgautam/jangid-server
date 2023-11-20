@@ -346,10 +346,9 @@ async function workerCheckOut(req, res) {
 
     if (rowCount > 0) {
       await pool.query(
-        `INSERT INTO attendances (worker_id, date, hours, check_in, check_out, earned, site_id, time_diff) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        `INSERT INTO attendances (worker_id, hours, check_in, check_out, earned, site_id, time_diff) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
           rows[0].worker_id,
-          new Date().toLocaleDateString(),
           timeDifferenceInHours,
           check_in.format(),
           check_out.format(),
