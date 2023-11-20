@@ -275,8 +275,8 @@ async function workerCheckOut(req, res) {
       // const d = punch_out_time.split(" ")[0].split("/").join("-");
       const t = punch_out_time.split(" ")[1];
 
-      console.log(`${yyyy}-${mm}-${dd}`);
-      console.log(new Date(`${d + "T" + t}`));
+      // console.log(`${yyyy}-${mm}-${dd}`);
+      // console.log(new Date(`${yyyy}-${mm}-${dd}`));
       data = await pool.query(
         `UPDATE check_in_out set check_out = $1 WHERE uid = $2 returning *`,
         [
@@ -304,7 +304,7 @@ async function workerCheckOut(req, res) {
 
     const check_in_time = rows[0].check_in;
     const check_out_time = rows[0].check_out;
-
+    console.log({ check_in_time, check_out_time });
     // Calculate the time difference in hours
     const timeDifferenceInMilliseconds =
       new Date(check_out_time) - new Date(check_in_time);
