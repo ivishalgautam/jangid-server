@@ -289,16 +289,7 @@ async function workerCheckOut(req, res) {
       data = await pool.query(
         `UPDATE check_in_out set check_out = $1 WHERE uid = $2 returning *`,
         [
-          new Date(
-            `${yyyy}-${mm}-${
-              new Date().getDate().length === 1
-                ? "0" + new Date().getDate()
-                : new Date().getDate()
-            }T${t}`
-          )
-            .toISOString()
-            .slice(0, 19)
-            .replace("T", " "),
+          new Date(punch_out_time).toISOString().slice(0, 19).replace("T", " "),
           session_id,
         ]
       );
@@ -323,9 +314,7 @@ async function workerCheckOut(req, res) {
     const check_in_time = rows[0].check_in;
     const check_out_time =
       req.user.role === "admin"
-        ? moment(new Date(`${yyyy}-${mm}-${dd}T${t}`))
-            .tz("Asia/Kolkata")
-            .format()
+        ? moment(punch_out_time).tz("Asia/Kolkata").format()
         : rows[0].check_out;
 
     console.log({ check_in_time, check_out_time });
