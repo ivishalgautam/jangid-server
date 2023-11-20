@@ -227,12 +227,12 @@ async function workerCheckOut(req, res) {
   let dailyWage;
   let data;
 
-  const d = punch_out_time?.split(" ")[0];
-  const yyyy = d.split("/")[2];
-  const mm = d.split("/")[1];
-  const dd = d.split("/")[0];
-  // const d = punch_out_time.split(" ")[0].split("/").join("-");
-  const t = punch_out_time?.split(" ")[1];
+  let d;
+  let yyyy;
+  let mm;
+  let dd;
+  // let d = punch_out_time.split(" ")[0].split("/").join("-");
+  let t;
 
   try {
     const sessionRecord = await pool.query(
@@ -275,6 +275,12 @@ async function workerCheckOut(req, res) {
     }
 
     if (req.user.role === "admin") {
+      d = punch_out_time?.split(" ")[0];
+      yyyy = d.split("/")[2];
+      mm = d.split("/")[1];
+      dd = d.split("/")[0];
+      t = punch_out_time?.split(" ")[1];
+
       console.log(`${yyyy}-${mm}-${dd}`);
       console.log(
         moment(new Date(`${yyyy}-${mm}-${dd}T${t}`)).tz("Asia/Kolkata")
@@ -315,9 +321,12 @@ async function workerCheckOut(req, res) {
     dailyWage = worker.rows[0].daily_wage_salary;
 
     const check_in_time = rows[0].check_in;
-    const check_out_time = moment(new Date(`${yyyy}-${mm}-${dd}T${t}`))
-      .tz("Asia/Kolkata")
-      .format();
+    const check_out_time =
+      req.user.role === "admin"
+        ? moment(new Date(`${yyyy}-${mm}-${dd}T${t}`))
+            .tz("Asia/Kolkata")
+            .format()
+        : rows[0].check_out;
 
     console.log({ check_in_time, check_out_time });
     // Calculate the time difference in hours
