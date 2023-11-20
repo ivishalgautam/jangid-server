@@ -276,7 +276,7 @@ async function workerCheckOut(req, res) {
       const t = punch_out_time.split(" ")[1];
 
       console.log(`${yyyy}-${mm}-${dd}`);
-      console.log(new Date(`${yyyy}-${mm}-${dd}`));
+      console.log(new Date(`${yyyy}-${mm}-${dd}T${t}`));
       console.log({
         db: new Date(
           `${yyyy}-${mm}-${
