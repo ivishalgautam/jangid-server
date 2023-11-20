@@ -315,7 +315,9 @@ async function workerCheckOut(req, res) {
     dailyWage = worker.rows[0].daily_wage_salary;
 
     const check_in_time = rows[0].check_in;
-    const check_out_time = rows[0].check_out;
+    const check_out_time = moment(new Date(`${yyyy}-${mm}-${dd}T${t}`))
+      .tz("Asia/Kolkata")
+      .format();
 
     console.log({ check_in_time, check_out_time });
     // Calculate the time difference in hours
