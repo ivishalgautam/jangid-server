@@ -270,6 +270,8 @@ async function workerCheckOut(req, res) {
     if (req.user.role === "admin") {
       const d = punch_out_time.split(" ")[0].split("/").join("-");
       const t = punch_out_time.split(" ")[1];
+      console.log(`${d + "T" + t}`);
+      console.log(new Date(`${d + "T" + t}`));
       data = await pool.query(
         `UPDATE check_in_out set check_out = $1 WHERE uid = $2 returning *`,
         [
