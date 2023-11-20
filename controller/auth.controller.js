@@ -280,7 +280,7 @@ async function workerCheckOut(req, res) {
       data = await pool.query(
         `UPDATE check_in_out set check_out = $1 WHERE uid = $2 returning *`,
         [
-          new Date(`${yyyy}-${mm}-${dd}`)
+          new Date(`${yyyy}-${mm}-${dd}T${t}`)
             .toISOString()
             .slice(0, 19)
             .replace("T", " "),
