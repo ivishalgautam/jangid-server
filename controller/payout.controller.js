@@ -27,14 +27,14 @@ async function addWorkerPayout(req, res) {
 
     const { total_payout, total_paid } = worker?.rows[0];
 
-    await pool.query(
-      `UPDATE workers SET total_paid = $1, pending_payout = $2 WHERE id = $3;`,
-      [
-        parseInt(total_paid) + parseInt(amount),
-        parseInt(total_payout) - parseInt(total_paid) + parseInt(amount),
-        parseInt(worker_id),
-      ]
-    );
+    // await pool.query(
+    //   `UPDATE workers SET total_paid = $1, pending_payout = $2 WHERE id = $3;`,
+    //   [
+    //     parseInt(total_paid) + parseInt(amount),
+    //     parseInt(total_payout) - parseInt(total_paid) + parseInt(amount),
+    //     parseInt(worker_id),
+    //   ]
+    // );
 
     res.json({ message: "Payout added" });
   } catch (error) {

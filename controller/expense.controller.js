@@ -55,7 +55,7 @@ async function createExpense(req, res) {
     if (prevAmt <= 0) {
       return res.status(400).json({ message: "insufficient wallet balance!" });
     }
-
+    
     await pool.query(
       `UPDATE wallet SET amount = $1 WHERE supervisor_id = $2;`,
       [prevAmt - parseInt(amount), supervisor_id]
@@ -142,7 +142,7 @@ async function getAllExpenses(req, res) {
           `
           SELECT 
             exp.*, 
-            s.site_name
+            s.site_name,
             s.image as site_image
           FROM expenses exp 
           LEFT JOIN sites s ON exp.site_id = s.id
@@ -218,6 +218,28 @@ async function getWorkerExpenses(req, res) {
   }
 }
 
+async function getSupervisorExpenses(req, res) {
+  try {
+    const expenses = await pool.query(
+      `
+          SELECT 
+            exp.*, 
+            s.fullname as supervisor_name,
+            s.profile_img as profile_img
+          FROM expenses exp 
+          LEFT JOIN supervisors s ON exp.supervisor_id = s.id
+            WHERE exp.supervisor_id = $1
+          ;`,
+      [req.user.id]
+    );
+
+    res.json({ message: "success", status: 200, data: expenses.rows });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createExpense,
   updateExpenseById,
@@ -225,4 +247,5 @@ module.exports = {
   getExpenseById,
   getAllExpenses,
   getWorkerExpenses,
+  getSupervisorExpenses
 };

@@ -12,5 +12,6 @@ router.delete("/:expenseId", verifyTokenAndAdmin, Controller.deleteExpenseById);
 router.get("/all", verifyTokenAndAdmin, Controller.getAllExpenses);
 router.get("/", verifyTokenAndAdmin, Controller.getExpenseById);
 router.get("/worker", verifyToken, Controller.getWorkerExpenses);
+router.get("/supervisor", verifyToken, Controller.getSupervisorExpenses);
 
 module.exports = router;
