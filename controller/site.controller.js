@@ -22,7 +22,7 @@ async function createSite(req, res) {
   // console.log(req.file);
   try {
     const { rows } = await pool.query(
-      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius, start_time, end_time, owner_contact, total_budget) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id`,
+      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius, start_time, end_time, owner_contact, total_budget) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) returning id`,
       [
         site_name,
         owner_name,
