@@ -12,6 +12,7 @@ async function createSite(req, res) {
     start_time,
     end_time,
     owner_contact,
+    total_budget,
   } = req.body;
 
   const files = {
@@ -21,7 +22,7 @@ async function createSite(req, res) {
   // console.log(req.file);
   try {
     const { rows } = await pool.query(
-      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius, start_time, end_time, owner_contact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id`,
+      `INSERT INTO sites (site_name, owner_name, address, supervisor_id, image, lat, long, radius, start_time, end_time, owner_contact, total_budget) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id`,
       [
         site_name,
         owner_name,
@@ -34,6 +35,7 @@ async function createSite(req, res) {
         start_time,
         end_time,
         owner_contact,
+        total_budget
       ]
     );
     res.json({ message: "Site created", site_id: rows[0].id });
@@ -171,13 +173,13 @@ async function getAllSites(req, res) {
   // console.log(req.user);
   try {
     if (req.user.role === "admin") {
-      data = await pool.query(`SELECT * FROM sites;`);
+      data = await pool.query(`SELECT * FROM sites ORDER BY created_at DESC;`);
     }
 
     if (req.user.role === "supervisor") {
       // console.log(!isNaN(parseInt(req.user.site_assigned)));
       if (!isNaN(parseInt(req.user.site_assigned))) {
-        data = await pool.query(`SELECT * FROM sites st WHERE st.supervisor_id = $1;`, [
+        data = await pool.query(`SELECT * FROM sites st WHERE st.supervisor_id = $1  ORDER BY st.created_at DESC;`, [
           req.user.id,
         ]);
       } else {
