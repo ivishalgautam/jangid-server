@@ -191,7 +191,6 @@ async function workerCheckIn(req, res) {
 
     const radius = siteAssigned.rows[0].radius;
     const distance = haversine(centerLat, centerLon, checkLat, checkLon);
-
     if (distance <= radius) {
       const { rows, rowCount } = await pool.query(
         `INSERT INTO check_in_out (uid, check_in, worker_id, date, site_id) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE, $3) returning *`,

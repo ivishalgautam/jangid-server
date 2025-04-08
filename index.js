@@ -11,6 +11,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
+app.use((req, res, next) => {
+  if (req.method !== "GET") {
+    console.log(`\n[${req.method}] ${req.originalUrl}`);
+    console.log("Request Body:", req.body);
+  }
+  next();
+});
+
 app.use("/api/supervisors", require("./router/supervisor"));
 app.use("/api/workers", require("./router/worker"));
 app.use("/api/payouts", require("./router/payout"));
