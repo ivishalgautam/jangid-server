@@ -5,7 +5,6 @@ function verifyToken(req, res, next) {
   if (authHeader) {
     const token = authHeader.split(" ")[1];
     jwt.verify(token, process.env.JWT_SEC, (err, user) => {
-      console.log({ err, user });
       if (err) {
         return res.status(401).json({ message: err });
       } else {
