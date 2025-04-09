@@ -23,7 +23,7 @@ async function supervisorLogin(req, res) {
   try {
     const supervisor = await pool.query(
       `SELECT id, fullname, email, phone, role, hpassword, site_assigned FROM supervisors WHERE username = $1`,
-      [username]
+      [String(username).toLowerCase()]
     );
 
     if (supervisor.rowCount === 0) {
@@ -64,7 +64,7 @@ async function adminLogin(req, res) {
   try {
     const admin = await pool.query(
       `SELECT id, fullname, email, role, hpassword FROM admin WHERE username = $1`,
-      [username]
+      [String(username).toLowerCase()]
     );
 
     if (admin.rowCount === 0) {
@@ -99,7 +99,7 @@ async function workerLogin(req, res) {
   try {
     const record = await pool.query(
       `SELECT * FROM workers WHERE username = $1;`,
-      [username]
+      [String(username).toLowerCase()]
     );
 
     if (record.rowCount === 0) {

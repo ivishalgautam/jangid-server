@@ -56,7 +56,7 @@ async function createSupervisor(req, res) {
         fullname,
         email,
         phone,
-        username.trim().toLowerCase(),
+        String(username).trim().toLowerCase(),
         password,
         hashedPassword,
         docs,
