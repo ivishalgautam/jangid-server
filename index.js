@@ -12,10 +12,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use((req, res, next) => {
-  if (req.method !== "GET") {
-    console.log(`\n[${req.method}] ${req.originalUrl}`);
-    console.log("Request Body:", req.body);
-  }
+  // if (req.method !== "GET") {
+  console.log(`\n[${req.method}] ${req.originalUrl}`);
+  console.log("Request Body:", req.body);
+  // }
   next();
 });
 
