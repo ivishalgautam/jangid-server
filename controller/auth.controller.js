@@ -22,7 +22,7 @@ async function supervisorLogin(req, res) {
 
   try {
     const supervisor = await pool.query(
-      `SELECT id, fullname, email, phone, role, hpassword, site_assigned FROM supervisors WHERE username = $1`,
+      `SELECT id, fullname, email, phone, role, hpassword, site_assigned FROM supervisors WHERE LOWER(username) = $1`,
       [String(username).toLowerCase()]
     );
 
@@ -63,7 +63,7 @@ async function adminLogin(req, res) {
 
   try {
     const admin = await pool.query(
-      `SELECT id, fullname, email, role, hpassword FROM admin WHERE username = $1`,
+      `SELECT id, fullname, email, role, hpassword FROM admin WHERE LOWER(username) = $1`,
       [String(username).toLowerCase()]
     );
 
@@ -98,7 +98,7 @@ async function workerLogin(req, res) {
 
   try {
     const record = await pool.query(
-      `SELECT * FROM workers WHERE username = $1;`,
+      `SELECT * FROM workers WHERE LOWER(username) = $1;`,
       [String(username).toLowerCase()]
     );
 
