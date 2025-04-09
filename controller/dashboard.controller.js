@@ -23,7 +23,8 @@ async function supervisor(req, res) {
       [req.user.id]
     );
 
-    const { worker_count, present_worker_count, wallet_count ,site_count} = rows[0];
+    const { worker_count, present_worker_count, wallet_count, site_count } =
+      rows[0];
 
     res.json({
       worker_count: String(worker_count),
@@ -89,7 +90,7 @@ async function worker(req, res) {
         worker_id,
       ]
     );
-
+    console.log({ rows });
     const { total_paid, total_earned, ...data } = rows[0];
 
     res.json({

@@ -93,7 +93,9 @@ async function getWorkerPayouts(req, res) {
     }
 
     const { rows } = await pool.query(
-      `SELECT s.profile_img as supervisor_image, s.fullname as supervisor_name, wp.amount, wp.created_at FROM worker_payouts AS wp
+      `SELECT 
+        s.profile_img as supervisor_image, s.fullname as supervisor_name,
+        wp.amount, wp.created_at FROM worker_payouts AS wp
       JOIN supervisors AS s ON s.id = wp.supervisor_id
       WHERE worker_id = $1;`,
       [worker_id]

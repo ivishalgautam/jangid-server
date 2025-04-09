@@ -154,6 +154,8 @@ async function updateWorkerById(req, res) {
     password,
   } = req.body;
 
+  console.log(req.body);
+
   if (!worker_id) {
     return res.status(400).json({ message: "worker_id not found!" });
   }

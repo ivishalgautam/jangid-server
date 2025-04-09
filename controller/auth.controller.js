@@ -337,7 +337,7 @@ async function workerCheckOut(req, res) {
         break;
       }
     }
-
+    console.log({ earned });
     const time_diff = convertMillisecondsToTime(timeDifferenceInMilliseconds);
 
     const check_in = moment(check_in_time).tz("Asia/Kolkata");
