@@ -278,7 +278,17 @@ async function getWorkerById(req, res) {
   const { worker_id } = req.body;
   try {
     const { rows, rowCount } = await pool.query(
-      `SELECT * FROM workers WHERE id = $1`,
+      `SELECT 
+          wk.*,
+          ROUND(COALESCE(SUM(at.hours::numeric), 0), 2) as total_hours,
+          ROUND(COALESCE(SUM(at.earned::numeric), 0), 2) as total_payout,
+          ROUND(COALESCE(SUM(wp.amount::numeric), 0), 2) as total_paid
+        FROM workers wk 
+        LEFT JOIN attendances at ON at.worker_id = wk.id
+        LEFT JOIN worker_payouts wp ON wp.worker_id = wk.id
+        WHERE wk.id = $1
+        GROUP BY wk.id
+        `,
       [worker_id]
     );
 
