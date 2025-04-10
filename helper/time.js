@@ -7,4 +7,15 @@ function getCurrentTimeFormatted() {
   return `${hours}:${minutes}:${seconds}`;
 }
 
-module.exports = { getCurrentTimeFormatted };
+function getFormattedTimeInTimezone(timeZone) {
+  const now = new Date();
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+    timeZone,
+  }).format(now);
+}
+
+module.exports = { getCurrentTimeFormatted, getFormattedTimeInTimezone };

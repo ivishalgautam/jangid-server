@@ -4,7 +4,10 @@ const bcrypt = require("bcryptjs");
 const jwtGenerator = require("../utils/jwtGenerator");
 const { v4: uuidv4 } = require("uuid");
 const { haversine } = require("../helper/haversine");
-const { getCurrentTimeFormatted } = require("../helper/time");
+const {
+  getCurrentTimeFormatted,
+  getFormattedTimeInTimezone,
+} = require("../helper/time");
 const jwt = require("jsonwebtoken");
 const {
   convertMillisecondsToTime,
@@ -167,7 +170,9 @@ async function workerCheckIn(req, res) {
         .json({ message: "You are not assigned to any site!" });
     }
 
-    const currentTime = new Date(`1970-01-01T${getCurrentTimeFormatted()}`);
+    const currentTime = new Date(
+      `1970-01-01T${getFormattedTimeInTimezone("Asia/Kolkata")}`
+    );
 
     const siteStartTime = new Date(
       `1970-01-01T${siteAssigned.rows[0].start_time}`
