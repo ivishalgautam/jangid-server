@@ -10,16 +10,14 @@ async function supervisor(req, res) {
     if (supervisor.rowCount === 0) {
       return res.status(404).json({ message: "NOT FOUND!" });
     }
-
     const { rows } = await pool.query(
-      // (SELECT COUNT(*) FROM sites AS s WHERE s.supervisor_id::integer = sv.id) AS site_count,
       `SELECT 
-            (SELECT COUNT(*) FROM workers AS w WHERE w.supervisor_id::integer = sv.id) AS worker_count,
-            (SELECT COUNT(*) FROM sites AS st WHERE st.supervisor_id::integer = sv.id) AS site_count,
-            (SELECT COUNT(*) FROM workers AS w WHERE w.supervisor_id::integer = sv.id AND w.is_present = true) AS present_worker_count,
-            (SELECT amount FROM wallet AS wlt WHERE wlt.supervisor_id::integer = sv.id) AS wallet_count
-        FROM supervisors AS sv
-        WHERE sv.id = $1;`,
+          (SELECT COUNT(*) FROM workers AS w WHERE w.supervisor_id::varchar = sv.id::varchar) AS worker_count,
+          (SELECT COUNT(*) FROM sites AS st WHERE st.supervisor_id::varchar = sv.id::varchar) AS site_count,
+          (SELECT COUNT(*) FROM workers AS w WHERE w.supervisor_id::varchar = sv.id::varchar AND w.is_present = true) AS present_worker_count,
+          (SELECT amount FROM wallet AS wlt WHERE wlt.supervisor_id::varchar = sv.id::varchar) AS wallet_count
+       FROM supervisors AS sv
+       WHERE sv.id = $1`,
       [req.user.id]
     );
 
