@@ -279,36 +279,52 @@ async function getWorkerById(req, res) {
   try {
     const { rows, rowCount } = await pool.query(
       `SELECT 
-            wk.*,
-            ROUND((
-              SELECT COALESCE(SUM(at.hours::numeric), 0)
-              FROM attendances at
-              WHERE at.worker_id = wk.id
-            ), 2) AS total_working_hours,
-            ROUND((
-              SELECT COALESCE(SUM(at.earned::numeric), 0)
-              FROM attendances at
-              WHERE at.worker_id = wk.id
-            ), 2) AS total_payout,
-            ROUND((
-              SELECT COALESCE(SUM(wp.amount::numeric), 0)
-              FROM worker_payouts wp
-              WHERE wp.worker_id = wk.id
-            ), 2) AS total_paid,
-            ROUND((
-              (SELECT COALESCE(SUM(at.earned::numeric), 0)
-              FROM attendances at
-              WHERE at.worker_id = wk.id)
-              -
-              (SELECT COALESCE(SUM(wp.amount::numeric), 0)
-              FROM worker_payouts wp
-              WHERE wp.worker_id = wk.id)
-            ), 2) AS pending_payout
-          FROM workers wk
-          WHERE wk.id = $1;
+          wk.*,
+          ROUND(COALESCE(SUM(at.hours::numeric), 0), 2) as total_working_hours,
+          ROUND(COALESCE(SUM(at.earned::numeric), 0), 2) as total_payout,
+          ROUND(COALESCE(SUM(wp.amount::numeric), 0), 2) as total_paid,
+          (COALESCE(SUM(at.earned::numeric), 0) - COALESCE(SUM(wp.amount::numeric), 0)) as pending_payout
+        FROM workers wk
+         JOIN attendances at ON at.worker_id = wk.id
+         JOIN worker_payouts wp ON wp.worker_id = wk.id
+        WHERE wk.id = $1
+        GROUP BY wk.id
         `,
       [worker_id]
     );
+
+    // const { rows, rowCount } = await pool.query(
+    //   `SELECT
+    //         wk.*,
+    //         ROUND((
+    //           SELECT COALESCE(SUM(at.hours::numeric), 0)
+    //           FROM attendances at
+    //           WHERE at.worker_id = wk.id
+    //         ), 2) AS total_working_hours,
+    //         ROUND((
+    //           SELECT COALESCE(SUM(at.earned::numeric), 0)
+    //           FROM attendances at
+    //           WHERE at.worker_id = wk.id
+    //         ), 2) AS total_payout,
+    //         ROUND((
+    //           SELECT COALESCE(SUM(wp.amount::numeric), 0)
+    //           FROM worker_payouts wp
+    //           WHERE wp.worker_id = wk.id
+    //         ), 2) AS total_paid,
+    //         ROUND((
+    //           (SELECT COALESCE(SUM(at.earned::numeric), 0)
+    //           FROM attendances at
+    //           WHERE at.worker_id = wk.id)
+    //           -
+    //           (SELECT COALESCE(SUM(wp.amount::numeric), 0)
+    //           FROM worker_payouts wp
+    //           WHERE wp.worker_id = wk.id)
+    //         ), 2) AS pending_payout
+    //       FROM workers wk
+    //       WHERE wk.id = $1;
+    //     `,
+    //   [worker_id]
+    // );
 
     if (rowCount === 0) {
       return res.status(404).json({ message: "NOT FOUND!" });
