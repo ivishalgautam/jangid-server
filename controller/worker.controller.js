@@ -280,10 +280,10 @@ async function getWorkerById(req, res) {
     const { rows, rowCount } = await pool.query(
       `SELECT 
           wk.*,
-          ROUND(COALESCE(SUM(at.hours::numeric), 0), 2)::integer as total_working_hours,
-          ROUND(COALESCE(SUM(at.earned::numeric), 0), 2)::integer as total_payout,
-          ROUND(COALESCE(SUM(wp.amount::numeric), 0), 2)::integer as total_paid,
-          (COALESCE(SUM(at.earned::numeric), 0) - COALESCE(SUM(wp.amount::numeric), 0))::integer as pending_payout
+          ROUND(COALESCE(SUM(at.hours::numeric), 0), 2) as total_working_hours,
+          ROUND(COALESCE(SUM(at.earned::numeric), 0), 2) as total_payout,
+          ROUND(COALESCE(SUM(wp.amount::numeric), 0), 2) as total_paid,
+          (COALESCE(SUM(at.earned::numeric), 0) - COALESCE(SUM(wp.amount::numeric), 0)) as pending_payout
         FROM workers wk 
         LEFT JOIN attendances at ON at.worker_id = wk.id
         LEFT JOIN worker_payouts wp ON wp.worker_id = wk.id
