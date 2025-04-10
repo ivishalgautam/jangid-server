@@ -175,6 +175,8 @@ async function workerCheckIn(req, res) {
 
     const siteEndTime = new Date(`1970-01-01T${siteAssigned.rows[0].end_time}`);
 
+    console.log({ currentTime, siteStartTime });
+
     if (currentTime < siteStartTime) {
       return res.status(400).json({
         message: `Site will open on ${siteAssigned.rows[0].start_time}`,
