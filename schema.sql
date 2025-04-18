@@ -40,7 +40,6 @@ CREATE TABLE supervisors(
     is_present BOOLEAN DEFAULT false,
     profile_img TEXT,
     docs TEXT [],
-    site_assigned VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -65,10 +64,6 @@ CREATE TABLE workers(
     address TEXT,
     is_present BOOLEAN DEFAULT false,
     is_disabled BOOLEAN DEFAULT false,
-    -- total_working_hours INT DEFAULT 0,
-    -- total_payout INT DEFAULT 0,
-    -- total_paid INT DEFAULT 0,
-    -- pending_payout INT DEFAULT 0,
     lat text,
     long text,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -86,9 +81,6 @@ CREATE TABLE sites(
     owner_contact VARCHAR(100) NOT NULL,
     address TEXT NOT NULL,
     image TEXT NOT NULL,
-    total_budget INT DEFAULT 0,
-    budget_left INT DEFAULT 0,
-    supervisor_id INT REFERENCES supervisors(id),
     is_completed BOOLEAN DEFAULT false,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
@@ -98,6 +90,7 @@ CREATE TABLE sites(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 CREATE TRIGGER trigger_update_updated_at BEFORE
 UPDATE
@@ -115,12 +108,14 @@ CREATE TRIGGER trigger_update_updated_at BEFORE
 UPDATE
     ON wallet FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
-CREATE TYPE expense_type as ENUM('site', 'worker');
+CREATE TYPE expense_purpose as ENUM('site', 'worker');
+CREATE TYPE expense_type as ENUM('machine_tool', 'material', 'miscellaneous', 'food', 'fare', 'payout');
 
 CREATE TABLE expenses(
     id SERIAL PRIMARY KEY,
     amount INT NOT NULL,
-    purpose expense_type NOT NULL,
+    purpose expense_purpose NOT NULL,
+    type expense_type NOT NULL,
     comment text,
     site_id INT NOT NULL,
     worker_id INT,
@@ -140,10 +135,22 @@ CREATE TABLE attendances(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE supervisor_attendances(
+    id SERIAL PRIMARY KEY,
+    hours VARCHAR NOT NULL,
+    check_in TIMESTAMP NOT NULL,
+    check_out TIMESTAMP NOT NULL,
+    supervisor_id INT NOT NULL,
+    site_id INT,
+    time_diff VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE worker_payouts(
     id SERIAL PRIMARY KEY,
     amount INT NOT NULL,
     worker_id INT NOT NULL,
+    site_id INT NOT NULL,
     supervisor_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -165,4 +172,48 @@ CREATE TABLE check_in_out(
     worker_id INT NOT NULL,
     site_id INT NOT NULL,
     created_at DATE DEFAULT CURRENT_DATE
+);
+
+
+CREATE TABLE site_supervisor_map (
+    id SERIAL PRIMARY KEY,
+    site_id INT NOT NULL UNIQUE,
+    supervisor_id INT NOT NULL,
+    CONSTRAINT fk_site FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE,
+    CONSTRAINT fk_supervisor FOREIGN KEY (supervisor_id) REFERENCES supervisors(id) ON DELETE CASCADE
+);
+
+CREATE TABLE supervisor_check_in_out(
+    uid TEXT,
+    date DATE,
+    check_in TIMESTAMP,
+    check_out TIMESTAMP,
+    supervisor_id INT NOT NULL,
+    site_id INT NOT NULL,
+    created_at DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE bills(
+    id SERIAL PRIMARY KEY,
+    amount BIGINT NOT NULL,
+    site_id INT NOT NULL,
+    docs TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_site FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE
+);
+
+CREATE TABLE site_transactions(
+    id SERIAL PRIMARY KEY,
+    amount BIGINT NOT NULL,
+    site_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_site FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE
+);
+
+CREATE TABLE wallet_transactions(
+    id SERIAL PRIMARY KEY,
+    mode VARCHAR, 
+    amount BIGINT NOT NULL,
+    supervisor_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

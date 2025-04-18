@@ -25,7 +25,7 @@ async function supervisorLogin(req, res) {
 
   try {
     const supervisor = await pool.query(
-      `SELECT id, fullname, email, phone, role, hpassword, site_assigned FROM supervisors WHERE LOWER(username) = $1`,
+      `SELECT id, fullname, email, phone, role, hpassword FROM supervisors WHERE LOWER(username) = $1`,
       [String(username).toLowerCase()]
     );
 
@@ -134,6 +134,214 @@ async function workerLogin(req, res) {
   }
 }
 
+async function supervisorCheckIn(req, res) {
+  const { lat, long } = req.body;
+  const supervisor_id = req.user.id;
+
+  try {
+    const supervisor = await pool.query(
+      `SELECT * FROM supervisors WHERE id = $1;`,
+      [supervisor_id]
+    );
+
+    if (supervisor.rowCount === 0) {
+      return res.status(404).json({
+        message: `supervisor not found!`,
+      });
+    }
+
+    const assignedSites =
+      (
+        await pool.query(
+          `SELECT 
+            st.* 
+          from site_supervisor_map ssm 
+          LEFT JOIN sites st ON st.id = ssm.site_id
+          WHERE ssm.supervisor_id = $1  
+          ORDER BY st.created_at DESC;`,
+          [supervisor_id]
+        )
+      ).rows ?? [];
+    // console.log({ assignedSites });
+    const siteToLogin = assignedSites.find((site) => {
+      const centerLat = site.lat;
+      const centerLon = site.long;
+
+      const checkLat = lat;
+      const checkLon = long;
+
+      const radius = site.radius;
+      const distance = haversine(centerLat, centerLon, checkLat, checkLon);
+      console.log({ distance });
+      return distance <= radius;
+    });
+
+    if (!siteToLogin)
+      return res.status(400).json({
+        message: "You are not within the radius of any assigned site.",
+      });
+
+    const currentTime = new Date(
+      `1970-01-01T${getFormattedTimeInTimezone("Asia/Kolkata")}`
+    );
+
+    const siteStartTime = new Date(`1970-01-01T${siteToLogin.start_time}`);
+    const siteEndTime = new Date(`1970-01-01T${siteToLogin.end_time}`);
+    console.log({ siteToLogin });
+    if (currentTime < siteStartTime) {
+      return res.status(400).json({
+        message: `Site will open on ${siteToLogin.start_time}`,
+      });
+    }
+
+    const data = await pool.query(
+      `INSERT INTO supervisor_check_in_out (uid, check_in, supervisor_id, date, site_id) VALUES ($1, CURRENT_TIMESTAMP, $2, CURRENT_DATE, $3) returning *`,
+      [uuidv4(), supervisor_id, siteToLogin.id]
+    );
+
+    await pool.query(
+      `UPDATE supervisors SET is_present = true WHERE id = $1;`,
+      [supervisor_id]
+    );
+
+    return res.json({
+      message: "success",
+      status: 200,
+      session_id: data.rows[0].uid,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async function supervisorCheckOut(req, res) {
+  const { session_id, lat, long, punch_out_time } = req.body;
+  let extraHours;
+  let dailyWage;
+  let data;
+
+  try {
+    const sessionRecord = await pool.query(
+      "SELECT * FROM supervisor_check_in_out WHERE uid = $1;",
+      [session_id]
+    );
+    if (sessionRecord.rowCount === 0) {
+      return res.status(400).json({ message: "session expired!" });
+    }
+
+    const { supervisor_id, site_id } = sessionRecord.rows[0];
+
+    const supervisor = await pool.query(
+      `SELECT * FROM supervisors WHERE id = $1;`,
+      [supervisor_id]
+    );
+
+    if (supervisor.rowCount === 0) {
+      return res.status(400).json({ message: "supervisor not found!" });
+    }
+
+    const siteAssigned = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
+      site_id,
+    ]);
+
+    if (siteAssigned.rowCount === 0) {
+      return res.status(400).json({ message: "site not found!" });
+    }
+    // Coordinates of the center point (latitude and longitude)
+    const centerLat = siteAssigned.rows[0].lat;
+    const centerLon = siteAssigned.rows[0].long;
+
+    // Coordinates of the point to check (latitude and longitude)
+    const checkLat = req.user.role === "admin" ? centerLat : lat;
+    const checkLon = req.user.role === "admin" ? centerLon : long;
+
+    const radius = siteAssigned.rows[0].radius;
+    const distance = haversine(centerLat, centerLon, checkLat, checkLon);
+
+    if (distance > radius) {
+      return res.status(400).json({ message: "You are out of radius!" });
+    }
+
+    if (req.user.role === "admin") {
+      data = await pool.query(
+        `UPDATE supervisor_check_in_out set check_out = $1 WHERE uid = $2 returning *`,
+        [
+          new Date(punch_out_time).toISOString().slice(0, 19).replace("T", " "),
+          session_id,
+        ]
+      );
+    } else {
+      data = await pool.query(
+        `UPDATE supervisor_check_in_out set check_out = CURRENT_TIMESTAMP WHERE uid = $1 returning *`,
+        [session_id]
+      );
+    }
+
+    const { rows, rowCount } = data;
+    if (rowCount === 0) {
+      return res.status(400).json({ message: "Session expired!" });
+    }
+
+    const check_in_time = rows[0].check_in;
+    const check_out_time =
+      req.user.role === "admin"
+        ? moment(punch_out_time).tz("Asia/Kolkata").format()
+        : rows[0].check_out;
+
+    // Calculate the time difference in hours
+    const timeDifferenceInMilliseconds =
+      new Date(check_out_time) - new Date(check_in_time);
+
+    const timeDifferenceInHours =
+      timeDifferenceInMilliseconds / (1000 * 60 * 60); // Convert milliseconds to hours
+
+    const siteHours = await pool.query(
+      `SELECT 
+          EXTRACT(HOUR FROM end_time - start_time) AS hours
+          FROM sites where id = $1;
+          `,
+      [site_id]
+    );
+
+    const time_diff = convertMillisecondsToTime(timeDifferenceInMilliseconds);
+
+    const check_in = moment(check_in_time).tz("Asia/Kolkata");
+    const check_out = moment(check_out_time).tz("Asia/Kolkata");
+
+    await pool.query(
+      `INSERT INTO supervisor_attendances (supervisor_id, hours, check_in, check_out, site_id, time_diff) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [
+        supervisor_id,
+        timeDifferenceInHours,
+        check_in.format(),
+        check_out.format(),
+        site_id,
+        time_diff,
+      ],
+      async (err, result) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: err.message });
+        } else {
+          await pool.query(
+            `DELETE FROM supervisor_check_in_out WHERE uid = $1`,
+            [rows[0].uid]
+          );
+          await pool.query(
+            `UPDATE supervisors SET is_present = false WHERE id = $1;`,
+            [rows[0].supervisor_id]
+          );
+          res.json({ message: "Logged out" });
+        }
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function workerCheckIn(req, res) {
   const { lat, long } = req.body;
   const worker_id = req.user.id;
@@ -170,6 +378,17 @@ async function workerCheckIn(req, res) {
         .json({ message: "You are not assigned to any site!" });
     }
 
+    const supervisor = await pool.query(
+      `select supervisor_id from site_supervisor_map where site_id = $1`,
+      [siteAssigned.rows[0].id]
+    );
+
+    if (!supervisor.rowCount)
+      return res
+        .status(409)
+        .json({ message: "Supervisor not assigned to site!" });
+
+    console.log(siteAssigned.rows[0]);
     const currentTime = new Date(
       `1970-01-01T${getFormattedTimeInTimezone("Asia/Kolkata")}`
     );
@@ -183,9 +402,11 @@ async function workerCheckIn(req, res) {
     console.log({ currentTime, siteStartTime });
 
     if (currentTime < siteStartTime) {
-      return res.status(400).json({
-        message: `Site will open on ${siteAssigned.rows[0].start_time}`,
-      });
+      return res
+        .status(400)
+        .json({
+          message: `Site will open on ${siteAssigned.rows[0].start_time}`,
+        });
     }
 
     // Coordinates of the center point (latitude and longitude)
@@ -209,6 +430,29 @@ async function workerCheckIn(req, res) {
           `UPDATE workers SET is_present = true WHERE id = $1;`,
           [worker.rows[0].id]
         );
+
+        await pool.query(
+          `INSERT INTO expenses (amount, purpose, site_id, worker_id, supervisor_id, type) VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            60,
+            "worker",
+            worker.rows[0].site_assigned,
+            worker_id,
+            supervisor.rows[0].supervisor_id,
+            "food",
+          ]
+        );
+        const supervisorWallet = await pool.query(
+          `SELECT * FROM wallet WHERE supervisor_id = $1`,
+          [supervisor.rows[0].supervisor_id]
+        );
+        await pool.query(
+          `UPDATE wallet SET amount = $1 WHERE supervisor_id = $2`,
+          [
+            supervisorWallet.rows[0].amount - 60,
+            supervisor.rows[0].supervisor_id,
+          ]
+        );
       }
 
       return res.json({
@@ -229,6 +473,7 @@ async function workerCheckIn(req, res) {
 async function workerCheckOut(req, res) {
   const { session_id, lat, long, punch_out_time } = req.body;
   console.log(req.body);
+
   let extraHours;
   let dailyWage;
   let data;
@@ -392,4 +637,6 @@ module.exports = {
   workerCheckIn,
   workerCheckOut,
   workerLogin,
+  supervisorCheckIn,
+  supervisorCheckOut,
 };

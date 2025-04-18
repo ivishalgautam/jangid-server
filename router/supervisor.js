@@ -10,7 +10,7 @@ const {
 
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
-    const folderPath = path.join(__dirname, "../assets/images");
+    const folderPath = path.join(__dirname, "../assets");
 
     // Create the folder if it doesn't exist
     if (!fs.existsSync(folderPath)) {
@@ -37,6 +37,7 @@ router.post(
 router.put(
   "/:supervisorId",
   verifyTokenAndAdmin,
+  uploads.array("file", 5),
   Controller.updateSupervisorById
 ); //admin
 
@@ -52,6 +53,11 @@ router.put(
   verifyTokenAndAdmin,
   uploads.array("file", 5),
   Controller.uploadDocs
+); //admin
+router.put(
+  "/update-password/:id",
+  verifyTokenAdminAndSupervisor,
+  Controller.updatePassword
 ); //admin
 
 router.put("/site-assign/:siteId", verifyTokenAndAdmin, Controller.siteAssign);

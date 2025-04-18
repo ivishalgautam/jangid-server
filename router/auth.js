@@ -15,6 +15,12 @@ router.post(
 
 // worker
 router.post("/login/worker", Controller.workerLogin);
+router.post("/supervisor/check-in", verifyToken, Controller.supervisorCheckIn);
+router.post(
+  "/supervisor/check-out",
+  verifyToken,
+  Controller.supervisorCheckOut
+);
 router.post("/worker/check-in", verifyToken, Controller.workerCheckIn);
 router.post("/worker/check-out", verifyToken, Controller.workerCheckOut);
 

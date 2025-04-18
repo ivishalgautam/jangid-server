@@ -2,12 +2,10 @@ const router = require("express").Router();
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const Controller = require("../controller/site.controller");
+const Controller = require("../controller/bill.controller");
 const {
   verifyTokenAndAdmin,
   verifyToken,
-  verifyAdminAndSupervisor,
-  verifyTokenAdminAndSupervisor,
 } = require("../middlewares/verifyToken");
 
 const storage = multer.diskStorage({
@@ -29,26 +27,13 @@ const uploads = multer({ storage });
 
 router.post(
   "/",
-  verifyTokenAdminAndSupervisor,
+  verifyTokenAndAdmin,
   uploads.single("file"),
-  Controller.createSite
-); // admin
-
-router.delete("/", verifyTokenAndAdmin, Controller.deleteSiteById); // admin
-router.get("/all", verifyAdminAndSupervisor, Controller.getAllSites); // admin
-router.get("/all", verifyAdminAndSupervisor, Controller.getAllSites); // admin
-router.get(
-  "/supervisor-sites/:id",
-  verifyAdminAndSupervisor,
-  Controller.getSupervisorSites
-); // admin
-router.delete(
-  "/supervisor-sites/:id",
-  verifyAdminAndSupervisor,
-  Controller.unAssignSite
-); // admin
-
-router.get("/", verifyToken, Controller.getSiteById);
-router.put("/", verifyToken, Controller.updateSiteById);
+  Controller.createBill
+); //admin
+router.delete("/", verifyTokenAndAdmin, Controller.deleteBillById); // admin
+router.get("/all", verifyTokenAndAdmin, Controller.getAllBills); // admin
+router.get("/", verifyToken, Controller.getBillById);
+router.put("/", verifyToken, uploads.single("file"), Controller.updateBillById);
 
 module.exports = router;

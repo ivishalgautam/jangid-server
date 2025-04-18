@@ -1,7 +1,7 @@
 const { pool } = require("../config/db");
 
 async function createWallet(req, res) {
-  const { amount, supervisor_id } = req.body;
+  const { amount, supervisor_id, mode } = req.body;
 
   try {
     const record = await pool.query(
@@ -14,8 +14,8 @@ async function createWallet(req, res) {
     }
 
     await pool.query(
-      `INSERT INTO wallet (amount, supervisor_id) VALUES ($1, $2)`,
-      [amount, supervisor_id]
+      `INSERT INTO wallet (amount, supervisor_id, mode) VALUES ($1, $2, $3)`,
+      [amount, supervisor_id, mode]
     );
     res.json({ message: "Wallet created" });
   } catch (error) {
@@ -25,8 +25,7 @@ async function createWallet(req, res) {
 }
 
 async function updateWalletBySupervisorId(req, res) {
-  const { amount, supervisor_id } = req.body;
-  console.log(req.body);
+  const { amount, supervisor_id, mode } = req.body;
 
   try {
     const walletRecord = await pool.query(
@@ -46,6 +45,10 @@ async function updateWalletBySupervisorId(req, res) {
           parseInt(walletRecord.rows[0].amount) + parseInt(amount),
           supervisor_id,
         ]
+      );
+      await pool.query(
+        `INSERT INTO wallet_transactions (amount, supervisor_id, mode) VALUES ($1, $2, $3);`,
+        [parseInt(amount), supervisor_id, mode]
       );
     }
 
@@ -96,6 +99,22 @@ async function getWalletBySupervisorId(req, res) {
   }
 }
 
+async function getWalletHistoryBySupervisorId(req, res) {
+  const supervisorId = req.params.id;
+
+  try {
+    const { rows, rowCount } = await pool.query(
+      `SELECT * FROM wallet_transactions WHERE supervisor_id = $1`,
+      [supervisorId]
+    );
+
+    res.json(rows);
+  } catch (error) {
+    console.log(error);
+    res.json({ message: error.message });
+  }
+}
+
 async function getAllWallet(req, res) {
   try {
     const { rows } = await pool.query(
@@ -115,4 +134,5 @@ module.exports = {
   deleteWalletById,
   getWalletBySupervisorId,
   getAllWallet,
+  getWalletHistoryBySupervisorId,
 };

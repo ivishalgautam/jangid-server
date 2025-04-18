@@ -52,6 +52,32 @@ async function getWorkerAttendanceById(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+async function getSupervisorAttendanceById(req, res) {
+  const { id } = req.params;
+  try {
+    const record = await pool.query(
+      `SELECT * FROM supervisors WHERE id = $1;`,
+      [id]
+    );
+
+    if (record.rowCount === 0) {
+      return res.status(404).json({ message: `supervisor not found!` });
+    }
+
+    const { rows } = await pool.query(
+      `SELECT a.*, s.site_name FROM supervisor_attendances a 
+       LEFT JOIN sites s ON s.id = a.site_id
+       WHERE a.supervisor_id = $1 
+       ORDER BY a.created_at DESC`,
+      [id]
+    );
+
+    res.json(rows);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
 
 async function getAllAttendances(req, res) {
   try {
@@ -143,4 +169,5 @@ module.exports = {
   createAttendance,
   getWorkerAttendanceById,
   getAllAttendances,
+  getSupervisorAttendanceById,
 };

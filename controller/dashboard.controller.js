@@ -11,24 +11,35 @@ async function supervisor(req, res) {
       return res.status(404).json({ message: "NOT FOUND!" });
     }
     const { rows } = await pool.query(
-      `SELECT 
-          (SELECT COUNT(*) FROM workers AS w WHERE w.supervisor_id::varchar = sv.id::varchar) AS worker_count,
-          (SELECT COUNT(*) FROM sites AS st WHERE st.supervisor_id::varchar = sv.id::varchar) AS site_count,
-          (SELECT COUNT(*) FROM workers AS w WHERE w.supervisor_id::varchar = sv.id::varchar AND w.is_present = true) AS present_worker_count,
-          (SELECT amount FROM wallet AS wlt WHERE wlt.supervisor_id::varchar = sv.id::varchar) AS wallet_count
+      `SELECT
+        (SELECT COUNT(*) FROM workers AS w WHERE w.site_assigned::varchar = ssm.site_id::varchar) AS worker_count,
+        (SELECT COUNT(*) FROM site_supervisor_map AS ssm WHERE ssm.supervisor_id::varchar = sv.id::varchar) AS site_count,
+        (SELECT COUNT(*) FROM workers AS w WHERE w.site_assigned::varchar = ssm.site_id::varchar AND w.is_present = true) AS present_worker_count,
+        (SELECT amount FROM wallet AS wlt WHERE wlt.supervisor_id::varchar = sv.id::varchar) AS wallet_count,
+        (SELECT uid FROM supervisor_check_in_out AS sco WHERE sco.supervisor_id::varchar = sv.id::varchar) AS session_id,
+        sv.is_present as is_present
        FROM supervisors AS sv
+       LEFT JOIN site_supervisor_map ssm ON ssm.supervisor_id = sv.id
        WHERE sv.id = $1`,
       [req.user.id]
     );
 
-    const { worker_count, present_worker_count, wallet_count, site_count } =
-      rows[0];
+    const {
+      worker_count,
+      present_worker_count,
+      wallet_count,
+      site_count,
+      is_present,
+      session_id,
+    } = rows[0];
 
     res.json({
       worker_count: String(worker_count),
       present_worker_count: String(present_worker_count),
       wallet_count: parseInt(wallet_count),
       site_count: parseInt(site_count),
+      is_present,
+      session_id,
     });
   } catch (error) {
     console.log(error);
@@ -49,7 +60,9 @@ async function admin(req, res) {
             (SELECT COUNT(*) FROM supervisors) AS total_supervisors,
             (SELECT COUNT(*) FROM workers AS s WHERE s.is_present = true) AS present_supervisors,
             (SELECT SUM(amount) FROM expenses WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW())) AS expense_this_month,
-            (SELECT SUM(total_budget) FROM sites WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW()) AND is_completed = true) AS income_this_month;
+            (SELECT SUM(amount) FROM site_transactions WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM NOW())) AS income_this_month,
+            (SELECT SUM(amount) FROM bills) as total_bill,
+            (SELECT SUM(amount) FROM site_transactions) as total_amount_received;
             `
     );
 
@@ -71,22 +84,15 @@ async function worker(req, res) {
     const { rows } = await pool.query(
       `SELECT 
         (SELECT daily_wage_salary FROM workers WHERE id = $1) AS daily_wage,
-        COALESCE((SELECT SUM(earned) FROM attendances WHERE worker_id = $2 AND date_trunc('month', created_at) = date_trunc('month', CURRENT_DATE)), 0) AS total_payout_this_month,
-        COALESCE((SELECT SUM(amount) FROM expenses WHERE worker_id = $3 AND date_trunc('month', created_at) = date_trunc('month', CURRENT_DATE)), 0) AS paid_this_month,
-        (SELECT SUM(earned) FROM attendances WHERE worker_id = $4) AS total_earned,
-        COALESCE((SELECT SUM(amount) FROM expenses WHERE worker_id = $5), 0) AS total_paid,
-        (SELECT is_present FROM workers WHERE id = $6),
-        (SELECT fullname FROM workers WHERE id = $7) as worker_name
+        COALESCE((SELECT SUM(earned) FROM attendances WHERE worker_id = $1 AND date_trunc('month', created_at) = date_trunc('month', CURRENT_DATE)), 0) AS total_payout_this_month,
+        COALESCE((SELECT SUM(amount) FROM worker_payouts WHERE worker_id = $1 AND date_trunc('month', created_at) = date_trunc('month', CURRENT_DATE)), 0) AS paid_this_month,
+        (SELECT SUM(earned) FROM attendances WHERE worker_id = $1) AS total_earned,
+        COALESCE((SELECT SUM(amount) FROM worker_payouts WHERE worker_id = $1), 0) AS total_paid,
+        (SELECT uid FROM check_in_out AS wco WHERE wco.worker_id::varchar = $1::VARCHAR) AS session_id,
+        (SELECT is_present FROM workers WHERE id = $1),
+        (SELECT fullname FROM workers WHERE id = $1) as worker_name
         ;`,
-      [
-        worker_id,
-        worker_id,
-        worker_id,
-        worker_id,
-        worker_id,
-        worker_id,
-        worker_id,
-      ]
+      [worker_id]
     );
     console.log({ rows });
     const { total_paid, total_earned, ...data } = rows[0];

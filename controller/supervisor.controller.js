@@ -4,9 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 async function createSupervisor(req, res) {
-  const { fullname, email, phone, username, password, site_assigned } =
-    req.body;
-  const docs = req.files.map((file) => `/assets/images/${file.filename}`);
+  const { fullname, email, phone, username, password } = req.body;
+  const docs = req.files.map((file) => `/assets/${file.filename}`);
 
   const usernameRegex = new RegExp("^[a-zA-Z0-9_]{3,20}$");
 
@@ -51,7 +50,7 @@ async function createSupervisor(req, res) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const supervisor = await pool.query(
-      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, docs, site_assigned) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) returning *;`,
+      `INSERT INTO supervisors (fullname, email, phone, username, password, hpassword, docs) VALUES ($1, $2, $3, $4, $5, $6, $7) returning *;`,
       [
         fullname,
         email,
@@ -60,7 +59,6 @@ async function createSupervisor(req, res) {
         password,
         hashedPassword,
         docs,
-        site_assigned,
       ]
     );
 
@@ -84,21 +82,42 @@ async function createSupervisor(req, res) {
 
 async function updateSupervisorById(req, res) {
   const supervisorId = parseInt(req.params.supervisorId);
-  const { fullname, email, phone, site_assigned, password } = req.body;
+  const { fullname, email, phone, docs } = req.body;
+  const newDocs = !req.files
+    ? []
+    : req.files.map((file) => `/assets/${file.filename}`);
+
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const record = await pool.query(`SELECT * FROM supervisors WHERE id = $1`, [
+      supervisorId,
+    ]);
+
+    if (record.rowCount === 0) {
+      return res.status(404).json({ message: "WORKER NOT FOUND!" });
+    }
+
+    const storedDocs = record.rows[0].docs ?? [];
+    const docsToDelete = docs
+      ? storedDocs.filter((doc) => !JSON.parse(docs).includes(doc))
+      : [];
+    docsToDelete.forEach((doc) => {
+      const filepath = path.join(__dirname, "../", doc);
+      if (fs.existsSync(filepath)) {
+        fs.unlink(filepath, (err) => {
+          if (err) {
+            console.log(`error deleting filepath:${filepath}`);
+          } else {
+            console.log(`filepath:'${filepath}' removed`);
+          }
+        });
+      }
+    });
+    const updatedDocs = [...newDocs, ...JSON.parse(docs ?? [])];
+    console.log({ storedDocs, docsToDelete, updatedDocs });
 
     const { rowCount } = await pool.query(
-      `UPDATE supervisors SET fullname = $1, email = $2, phone = $3, site_assigned = $4, password = $5, hpassword = $6 WHERE id = $7`,
-      [
-        fullname,
-        email,
-        phone,
-        site_assigned,
-        password,
-        hashedPassword,
-        supervisorId,
-      ]
+      `UPDATE supervisors SET fullname = $1, email = $2, phone = $3, docs = $4 WHERE id = $5`,
+      [fullname, email, phone, updatedDocs, supervisorId]
     );
 
     if (rowCount === 0) {
@@ -114,7 +133,6 @@ async function updateSupervisorById(req, res) {
 
 async function updateProfileImage(req, res) {
   const { supervisorId } = req.params;
-
   try {
     const { rows, rowCount } = await pool.query(
       "SELECT * FROM supervisors WHERE id = $1",
@@ -141,7 +159,7 @@ async function updateProfileImage(req, res) {
     }
 
     await pool.query("UPDATE supervisors SET profile_img = $1 WHERE id = $2", [
-      `/assets/images/${req.file.filename}`,
+      `/assets/${req.file.filename}`,
       supervisorId,
     ]);
 
@@ -151,10 +169,36 @@ async function updateProfileImage(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+async function updatePassword(req, res) {
+  const { id } = req.params;
+  const { password } = req.body;
+
+  try {
+    const { rows, rowCount } = await pool.query(
+      "SELECT * FROM supervisors WHERE id = $1",
+      [id]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ message: "supervisor not found!" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await pool.query(
+      "UPDATE supervisors SET hpassword = $1, password = $2 WHERE id = $3",
+      [hashedPassword, password, id]
+    );
+
+    res.json({ message: "Password updated" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
 
 async function uploadDocs(req, res) {
   const supervisorId = parseInt(req.params.supervisorId);
-  const docs = req.files.map((file) => `/assets/images/${file.filename}`);
+  const docs = req.files.map((file) => `/assets/${file.filename}`);
 
   try {
     const record = await pool.query(
@@ -259,7 +303,7 @@ async function getAllSupervisors(req, res) {
 async function siteAssign(req, res) {
   const { supervisor_id } = req.body;
   const site_id = req.params.siteId;
-  // console.log(req.body, req.params);
+
   try {
     const site = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
       parseInt(site_id),
@@ -278,14 +322,20 @@ async function siteAssign(req, res) {
       return res.status(404).json({ message: "Supervisor not exist!" });
     }
 
-    await pool.query(
-      `UPDATE supervisors SET site_assigned = null WHERE site_assigned = $1;`,
-      [site_id]
+    const siteId = site.rows[0].id;
+    const supervisorId = supervisor.rows[0].id;
+
+    const siteRecord = await pool.query(
+      `SELECT * FROM site_supervisor_map WHERE site_id = $1`,
+      [siteId]
     );
 
+    if (siteRecord.rowCount)
+      return res.status(409).json({ message: "Site Already assigned!" });
+
     await pool.query(
-      `UPDATE supervisors SET site_assigned = $1 WHERE id = $2;`,
-      [site_id, supervisor_id]
+      `INSERT INTO site_supervisor_map (site_id, supervisor_id) VALUES ($1, $2)`,
+      [siteId, supervisorId]
     );
 
     res.json({ message: "Site assigned." });
@@ -304,4 +354,5 @@ module.exports = {
   siteAssign,
   uploadDocs,
   updateProfileImage,
+  updatePassword,
 };

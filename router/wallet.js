@@ -8,6 +8,11 @@ const {
 // router.post("/", verifyTokenAndAdmin, Controller.createWallet);
 router.put("/", verifyTokenAndAdmin, Controller.updateWalletBySupervisorId);
 router.delete("/:walletId", verifyTokenAndAdmin, Controller.deleteWalletById);
+router.get(
+  "/transactions/:id",
+  verifyTokenAndAdmin,
+  Controller.getWalletHistoryBySupervisorId
+);
 router.get("/all", verifyTokenAndAdmin, Controller.getAllWallet);
 router.get(
   "/",

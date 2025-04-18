@@ -34,9 +34,9 @@ async function deleteFile(req, res) {
     //   images: data.rows[0]?.docs?.filter((doc) => !doc.includes(filename)),
     // });
 
-    const file = path.join(__dirname, "../assets/images", filename);
+    const file = path.join(__dirname, "../assets", filename);
 
-    if (!data?.rows?.[0]?.docs?.includes(`/assets/images/${filename}`)) {
+    if (!data?.rows?.[0]?.docs?.includes(`/assets/${filename}`)) {
       return res.status(404).json({ message: "image not exist!" });
     }
 

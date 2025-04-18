@@ -4,6 +4,7 @@ const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
 // check in - check out
 router.get("/", Controller.getWorkerAttendanceById);
+router.get("/supervisor/:id", Controller.getSupervisorAttendanceById);
 router.get("/all", verifyTokenAndAdmin, Controller.getAllAttendances);
 
 module.exports = router;

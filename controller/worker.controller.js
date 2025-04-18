@@ -45,7 +45,7 @@ async function createWorker(req, res) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const docs = req.files.map((file) => `/assets/images/${file.filename}`);
+    const docs = req.files.map((file) => `/assets/${file.filename}`);
 
     const { rows } = await pool.query(
       `INSERT INTO workers (fullname, phone, docs, site_assigned, password, daily_wage_salary, username, hpassword, lat, long, address) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning *`,
@@ -71,8 +71,74 @@ async function createWorker(req, res) {
   }
 }
 
+async function updateWorkerById(req, res) {
+  const {
+    worker_id,
+    fullname,
+    phone,
+    site_assigned,
+    daily_wage_salary,
+    username,
+    docs,
+  } = req.body;
+  console.log(req.body);
+  console.log({ docs });
+  if (!worker_id) {
+    return res.status(400).json({ message: "worker_id not found!" });
+  }
+  const newDocs = !req.files
+    ? []
+    : req.files.map((file) => `/assets/${file.filename}`);
+
+  try {
+    const record = await pool.query(`SELECT * FROM workers WHERE id = $1`, [
+      parseInt(worker_id),
+    ]);
+
+    if (record.rowCount === 0) {
+      return res.status(404).json({ message: "WORKER NOT FOUND!" });
+    }
+
+    const storedDocs = record.rows[0].docs ?? [];
+    const docsToDelete = docs
+      ? storedDocs.filter((doc) => !JSON.parse(docs).includes(doc))
+      : [];
+    docsToDelete.forEach((doc) => {
+      const filepath = path.join(__dirname, "../", doc);
+      if (fs.existsSync(filepath)) {
+        fs.unlink(filepath, (err) => {
+          if (err) {
+            console.log(`error deleting filepath:${filepath}`);
+          } else {
+            console.log(`filepath:'${filepath}' removed`);
+          }
+        });
+      }
+    });
+    const updatedDocs = [...newDocs, ...JSON.parse(docs ?? [])];
+    console.log({ storedDocs, docsToDelete, updatedDocs });
+
+    const { rowCount } = await pool.query(
+      `UPDATE workers SET fullname = $1, phone = $2,  daily_wage_salary = $3, username = $4, docs = $5 WHERE id = $6;`,
+      [
+        fullname,
+        phone,
+        daily_wage_salary,
+        username,
+        updatedDocs,
+        parseInt(worker_id),
+      ]
+    );
+
+    res.json({ message: "UPDATED" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function updateProfileImage(req, res) {
-  const { worker_id } = req.body;
+  const { worker_id } = req.params;
 
   try {
     const { rows, rowCount } = await pool.query(
@@ -101,7 +167,7 @@ async function updateProfileImage(req, res) {
 
     await pool.query(
       "UPDATE workers SET profile_img = $1 WHERE id = $2 returning *;",
-      [`/assets/images/${req.file.filename}`, worker_id]
+      [`/assets/${req.file.filename}`, worker_id]
     );
 
     res.json({ message: "Profile updated" });
@@ -111,10 +177,36 @@ async function updateProfileImage(req, res) {
   }
 }
 
+async function updatePassword(req, res) {
+  const { id } = req.params;
+
+  try {
+    const { rows, rowCount } = await pool.query(
+      "SELECT * FROM workers WHERE id = $1;",
+      [id]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ message: "worker not exist!" });
+    }
+
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    await pool.query(
+      "UPDATE workers SET hpassword = $1, password = $2 WHERE id = $3 returning *;",
+      [hashedPassword, req.body.password, id]
+    );
+
+    res.json({ message: "Password updated" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 async function uploadDocs(req, res) {
   const workerId = parseInt(req.params.workerId);
   // return console.log(req.files);
-  const docs = req?.files?.map((file) => `/assets/images/${file.filename}`);
+  const docs = req?.files?.map((file) => `/assets/${file.filename}`);
   // console.log({ file: req.files, docs });
 
   try {
@@ -125,13 +217,12 @@ async function uploadDocs(req, res) {
     if (record.rowCount === 0) {
       return res.status(404).json({ message: "worker not found!" });
     }
+    const stroredDocs = record.rows[0]?.docs;
 
     const { rowCount } = await pool.query(
       `UPDATE workers SET docs = $1 WHERE id = $2`,
       [
-        record.rows[0]?.docs !== null
-          ? [...record.rows[0]?.docs, ...docs]
-          : [...docs],
+        stroredDocs !== null ? [...record.rows[0]?.docs, ...docs] : [...docs],
         workerId,
       ]
     );
@@ -139,54 +230,6 @@ async function uploadDocs(req, res) {
     res.json({ message: "UPDATED" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message });
-  }
-}
-
-async function updateWorkerById(req, res) {
-  const {
-    worker_id,
-    fullname,
-    phone,
-    site_assigned,
-    daily_wage_salary,
-    username,
-    password,
-  } = req.body;
-
-  console.log(req.body);
-
-  if (!worker_id) {
-    return res.status(400).json({ message: "worker_id not found!" });
-  }
-
-  const docs = req.files.map((file) => `/assets/${file.filename}`);
-  const profile_img = req.file ? `/assets/${req.file.filename}` : null;
-
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const { rowCount } = await pool.query(
-      `UPDATE workers SET fullname = $1, phone = $2, site_assigned = $3, daily_wage_salary = $4, username = $5, password = $6, hpassword = $7 WHERE id = $8;`,
-      [
-        fullname,
-        phone,
-        site_assigned,
-        daily_wage_salary,
-        username,
-        password,
-        hashedPassword,
-        parseInt(worker_id),
-      ]
-    );
-
-    if (rowCount === 0) {
-      return res.status(404).json({ message: "NOT FOUND!" });
-    }
-
-    res.json({ message: "UPDATED" });
-  } catch (error) {
-    console.log(error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -288,33 +331,33 @@ async function getWorkerById(req, res) {
 
     const { rows, rowCount } = await pool.query(
       `SELECT
-            wk.*,
-            ROUND((
-              SELECT COALESCE(SUM(at.hours::numeric), 0)
-              FROM attendances at
-              WHERE at.worker_id = wk.id
-            ), 2) AS total_working_hours,
-            ROUND((
-              SELECT COALESCE(SUM(at.earned::numeric), 0)
-              FROM attendances at
-              WHERE at.worker_id = wk.id
-            ), 2) AS total_payout,
-            ROUND((
-              SELECT COALESCE(SUM(wp.amount::numeric), 0)
-              FROM worker_payouts wp
-              WHERE wp.worker_id = wk.id
-            ), 2) AS total_paid,
-            ROUND((
-              (SELECT COALESCE(SUM(at.earned::numeric), 0)
-              FROM attendances at
-              WHERE at.worker_id = wk.id)
-              -
-              (SELECT COALESCE(SUM(wp.amount::numeric), 0)
-              FROM worker_payouts wp
-              WHERE wp.worker_id = wk.id)
-            ), 2) AS pending_payout
-          FROM workers wk
-          WHERE wk.id = $1;
+          wk.*,
+          ROUND((
+            SELECT COALESCE(SUM(at.hours::numeric), 0)
+            FROM attendances at
+            WHERE at.worker_id = wk.id
+          ), 2) AS total_working_hours,
+          ROUND((
+            SELECT COALESCE(SUM(at.earned::numeric), 0)
+            FROM attendances at
+            WHERE at.worker_id = wk.id
+          ), 2) AS total_payout,
+          ROUND((
+            SELECT COALESCE(SUM(wp.amount::numeric), 0)
+            FROM worker_payouts wp
+            WHERE wp.worker_id = wk.id
+          ), 2) AS total_paid,
+          ROUND((
+            (SELECT COALESCE(SUM(at.earned::numeric), 0)
+            FROM attendances at
+            WHERE at.worker_id = wk.id)
+            -
+            (SELECT COALESCE(SUM(wp.amount::numeric), 0)
+            FROM worker_payouts wp
+            WHERE wp.worker_id = wk.id)
+          ), 2) AS pending_payout
+        FROM workers wk
+        WHERE wk.id = $1;
         `,
       [worker_id]
     );
@@ -424,4 +467,5 @@ module.exports = {
   uploadDocs,
   punchedInWorkers,
   deletePunchedIn,
+  updatePassword,
 };

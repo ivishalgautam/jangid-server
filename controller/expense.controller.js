@@ -1,7 +1,7 @@
 const { pool } = require("../config/db");
 
 async function createExpense(req, res) {
-  const { amount, purpose, site_id, comment, worker_id, supervisor_id } =
+  const { amount, purpose, site_id, comment, worker_id, supervisor_id, type } =
     req.body;
 
   try {
@@ -36,8 +36,8 @@ async function createExpense(req, res) {
     }
 
     await pool.query(
-      `INSERT INTO expenses (amount, purpose, site_id, comment, worker_id, supervisor_id) VALUES ($1, $2, $3, $4, $5, $6)`,
-      [amount, purpose, site_id, comment, worker_id, supervisor_id]
+      `INSERT INTO expenses (amount, purpose, site_id, comment, worker_id, supervisor_id, type) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [amount, purpose, site_id, comment, worker_id, supervisor_id, type]
     );
 
     const walletRecord = await pool.query(
@@ -55,7 +55,7 @@ async function createExpense(req, res) {
     if (prevAmt <= 0) {
       return res.status(400).json({ message: "insufficient wallet balance!" });
     }
-    
+
     await pool.query(
       `UPDATE wallet SET amount = $1 WHERE supervisor_id = $2;`,
       [prevAmt - parseInt(amount), supervisor_id]
@@ -247,5 +247,5 @@ module.exports = {
   getExpenseById,
   getAllExpenses,
   getWorkerExpenses,
-  getSupervisorExpenses
+  getSupervisorExpenses,
 };

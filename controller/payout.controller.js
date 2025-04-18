@@ -6,10 +6,22 @@ async function addWorkerPayout(req, res) {
     const worker = await pool.query(`SELECT * FROM workers WHERE id = $1`, [
       worker_id,
     ]);
-
+    console.log(
+      amount,
+      "payout",
+      worker.rows[0].site_assigned,
+      worker_id,
+      supervisor_id
+    );
     if (worker.rowCount === 0) {
       return res.status(404).json({ message: "Worker not found!" });
     }
+    const siteAssignedToWorker = worker.rows[0].site_assigned;
+
+    if (!siteAssignedToWorker)
+      return res
+        .status(409)
+        .json({ message: "Worker not assigned to any site." });
 
     const supervisor = await pool.query(
       `SELECT * FROM supervisors WHERE id = $1`,
@@ -21,20 +33,21 @@ async function addWorkerPayout(req, res) {
     }
 
     await pool.query(
-      `INSERT INTO worker_payouts (amount, worker_id, supervisor_id) VALUES ($1, $2, $3)`,
-      [amount, worker_id, supervisor_id]
+      `INSERT INTO worker_payouts (amount, worker_id, supervisor_id, site_id) VALUES ($1, $2, $3, $4)`,
+      [amount, worker_id, supervisor_id, siteAssignedToWorker]
     );
 
-    const { total_payout, total_paid } = worker?.rows[0];
-
-    // await pool.query(
-    //   `UPDATE workers SET total_paid = $1, pending_payout = $2 WHERE id = $3;`,
-    //   [
-    //     parseInt(total_paid) + parseInt(amount),
-    //     parseInt(total_payout) - parseInt(total_paid) + parseInt(amount),
-    //     parseInt(worker_id),
-    //   ]
-    // );
+    await pool.query(
+      `INSERT INTO expenses (amount, type, purpose, site_id, worker_id, supervisor_id) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [
+        amount,
+        "payout",
+        "worker",
+        worker.rows[0].site_assigned,
+        worker_id,
+        supervisor_id,
+      ]
+    );
 
     res.json({ message: "Payout added" });
   } catch (error) {
@@ -93,7 +106,7 @@ async function getWorkerPayouts(req, res) {
     }
 
     const { rows } = await pool.query(
-      `SELECT 
+      `SELECT
         s.profile_img as supervisor_image, s.fullname as supervisor_name,
         wp.amount, wp.created_at FROM worker_payouts AS wp
       JOIN supervisors AS s ON s.id = wp.supervisor_id
