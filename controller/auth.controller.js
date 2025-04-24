@@ -432,6 +432,7 @@ async function workerCheckIn(req, res) {
         );
 
         if (!checkInRecord) {
+          console.log("First time check in today");
           await pool.query(
             `INSERT INTO expenses (amount, purpose, site_id, worker_id, type) VALUES ($1, $2, $3, $4, $5)`,
             [60, "worker", worker.rows[0].site_assigned, worker_id, "food"]
