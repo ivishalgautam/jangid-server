@@ -430,7 +430,7 @@ async function workerCheckIn(req, res) {
           `SELECT * FROM expenses WHERE worker_id = $1 AND created_at::date = CURRENT_DATE`,
           [worker_id]
         );
-
+        console.log({ checkInRecord });
         if (!checkInRecord) {
           console.log("First time check in today");
           await pool.query(
