@@ -119,8 +119,10 @@ async function updateWorkerById(req, res) {
     const updatedDocs = [...newDocs, ...JSON.parse(docs ?? [])];
     console.log({ storedDocs, docsToDelete, updatedDocs });
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const { rowCount } = await pool.query(
-      `UPDATE workers SET fullname = $1, phone = $2,  daily_wage_salary = $3, username = $4, docs = $5, password = $6 WHERE id = $7;`,
+      `UPDATE workers SET fullname = $1, phone = $2,  daily_wage_salary = $3, username = $4, docs = $5, password = $6, hpassword = $7 WHERE id = $8;`,
       [
         fullname,
         phone,
@@ -128,6 +130,7 @@ async function updateWorkerById(req, res) {
         username,
         updatedDocs,
         password,
+        hashedPassword,
         parseInt(worker_id),
       ]
     );
