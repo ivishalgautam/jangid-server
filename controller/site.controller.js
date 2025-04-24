@@ -189,10 +189,8 @@ async function getSiteById(req, res) {
 }
 
 async function getAllSites(req, res) {
-  let data;
   try {
-    if (req.user.role === "admin") {
-      data = await pool.query(`
+    const data = await pool.query(`
         SELECT 
           st.*,
           (SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE site_id = st.id) AS total_expense,
@@ -203,22 +201,6 @@ async function getAllSites(req, res) {
           ) as profit_and_loss
         FROM sites st 
         ORDER BY st.created_at DESC;`);
-    }
-
-    if (req.user.role === "supervisor") {
-      // console.log(!isNaN(parseInt(req.user.site_assigned)));
-      data = await pool.query(
-        `SELECT 
-              st.*,
-              (SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE site_id = st.id) AS total_expense,
-              ((SELECT COALESCE(SUM(amount::integer), 0) FROM site_transactions WHERE site_id = st.id) - (SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE site_id = st.id)) as profit_and_loss
-            from site_supervisor_map ssm 
-            LEFT JOIN sites st ON st.id = ssm.site_id
-            WHERE ssm.supervisor_id = $1 
-            ORDER BY st.id DESC;`,
-        [req.user.id]
-      );
-    }
 
     res.json({
       message: "success",
