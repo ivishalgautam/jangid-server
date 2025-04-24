@@ -82,7 +82,7 @@ async function createSupervisor(req, res) {
 
 async function updateSupervisorById(req, res) {
   const supervisorId = parseInt(req.params.supervisorId);
-  const { fullname, email, phone, docs } = req.body;
+  const { fullname, email, phone, docs, password } = req.body;
   const newDocs = !req.files
     ? []
     : req.files.map((file) => `/assets/${file.filename}`);
@@ -115,9 +115,18 @@ async function updateSupervisorById(req, res) {
     const updatedDocs = [...newDocs, ...JSON.parse(docs ?? [])];
     console.log({ storedDocs, docsToDelete, updatedDocs });
 
+    const hashedPassword = await bcrypt.hash(password, 10);
     const { rowCount } = await pool.query(
-      `UPDATE supervisors SET fullname = $1, email = $2, phone = $3, docs = $4 WHERE id = $5`,
-      [fullname, email, phone, updatedDocs, supervisorId]
+      `UPDATE supervisors SET fullname = $1, email = $2, phone = $3, docs = $4, password = $5, hpassword = $6 WHERE id = $7`,
+      [
+        fullname,
+        email,
+        phone,
+        updatedDocs,
+        password,
+        hashedPassword,
+        supervisorId,
+      ]
     );
 
     if (rowCount === 0) {
