@@ -442,7 +442,7 @@ async function workerCheckIn(req, res) {
           //   [supervisor.rows[0].supervisor_id]
           // );
         } else {
-          console.log("Checked is before once");
+          console.log("Checked in before once");
         }
       }
 
