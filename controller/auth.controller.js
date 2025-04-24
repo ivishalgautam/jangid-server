@@ -426,21 +426,23 @@ async function workerCheckIn(req, res) {
           `UPDATE workers SET is_present = true WHERE id = $1;`,
           [worker.rows[0].id]
         );
+        const checkInRecord = await pool.query(
+          `SELECT * FROM expenses WHERE worker_id = $1 AND created_at::date = CURRENT_DATE`,
+          [worker_id]
+        );
 
-        // await pool.query(
-        //   `INSERT INTO expenses (amount, purpose, site_id, worker_id, type) VALUES ($1, $2, $3, $4, $5)`,
-        //   [
-        //     60,
-        //     "worker",
-        //     worker.rows[0].site_assigned,
-        //     worker_id,
-        //     "food",
-        //   ]
-        // );
-        // const supervisorWallet = await pool.query(
-        //   `SELECT * FROM wallet WHERE supervisor_id = $1`,
-        //   [supervisor.rows[0].supervisor_id]
-        // );
+        if (!checkInRecord) {
+          await pool.query(
+            `INSERT INTO expenses (amount, purpose, site_id, worker_id, type) VALUES ($1, $2, $3, $4, $5)`,
+            [60, "worker", worker.rows[0].site_assigned, worker_id, "food"]
+          );
+          // const supervisorWallet = await pool.query(
+          //   `SELECT * FROM wallet WHERE supervisor_id = $1`,
+          //   [supervisor.rows[0].supervisor_id]
+          // );
+        } else {
+          console.log("Checked is before once");
+        }
       }
 
       return res.json({
