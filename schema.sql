@@ -23,6 +23,8 @@ CREATE TABLE admin(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+insert into admin (id, fullname, email, role, username, password, hpassword) values(1, 'admin', 'admin@gmail.com', 'admin', 'admin' , '1234', '1234');
+
 CREATE TRIGGER trigger_update_updated_at BEFORE
 UPDATE
     ON admin FOR EACH ROW EXECUTE FUNCTION update_updated_at();

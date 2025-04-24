@@ -150,20 +150,18 @@ async function supervisorCheckIn(req, res) {
       });
     }
 
-    const assignedSites =
+    const sites =
       (
         await pool.query(
           `SELECT 
             st.* 
-          from site_supervisor_map ssm 
-          LEFT JOIN sites st ON st.id = ssm.site_id
-          WHERE ssm.supervisor_id = $1  
+          from sites st 
           ORDER BY st.created_at DESC;`,
-          [supervisor_id]
+          []
         )
-      ).rows ?? [];
-    // console.log({ assignedSites });
-    const siteToLogin = assignedSites.find((site) => {
+      )?.rows ?? [];
+    // console.log({ sites });
+    const siteToLogin = sites.find((site) => {
       const centerLat = site.lat;
       const centerLon = site.long;
 
@@ -402,11 +400,9 @@ async function workerCheckIn(req, res) {
     console.log({ currentTime, siteStartTime });
 
     if (currentTime < siteStartTime) {
-      return res
-        .status(400)
-        .json({
-          message: `Site will open on ${siteAssigned.rows[0].start_time}`,
-        });
+      return res.status(400).json({
+        message: `Site will open on ${siteAssigned.rows[0].start_time}`,
+      });
     }
 
     // Coordinates of the center point (latitude and longitude)
@@ -431,28 +427,20 @@ async function workerCheckIn(req, res) {
           [worker.rows[0].id]
         );
 
-        await pool.query(
-          `INSERT INTO expenses (amount, purpose, site_id, worker_id, supervisor_id, type) VALUES ($1, $2, $3, $4, $5, $6)`,
-          [
-            60,
-            "worker",
-            worker.rows[0].site_assigned,
-            worker_id,
-            supervisor.rows[0].supervisor_id,
-            "food",
-          ]
-        );
-        const supervisorWallet = await pool.query(
-          `SELECT * FROM wallet WHERE supervisor_id = $1`,
-          [supervisor.rows[0].supervisor_id]
-        );
-        await pool.query(
-          `UPDATE wallet SET amount = $1 WHERE supervisor_id = $2`,
-          [
-            supervisorWallet.rows[0].amount - 60,
-            supervisor.rows[0].supervisor_id,
-          ]
-        );
+        // await pool.query(
+        //   `INSERT INTO expenses (amount, purpose, site_id, worker_id, type) VALUES ($1, $2, $3, $4, $5)`,
+        //   [
+        //     60,
+        //     "worker",
+        //     worker.rows[0].site_assigned,
+        //     worker_id,
+        //     "food",
+        //   ]
+        // );
+        // const supervisorWallet = await pool.query(
+        //   `SELECT * FROM wallet WHERE supervisor_id = $1`,
+        //   [supervisor.rows[0].supervisor_id]
+        // );
       }
 
       return res.json({

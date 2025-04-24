@@ -79,6 +79,7 @@ async function updateWorkerById(req, res) {
     site_assigned,
     daily_wage_salary,
     username,
+    password,
     docs,
   } = req.body;
   console.log(req.body);
@@ -119,13 +120,14 @@ async function updateWorkerById(req, res) {
     console.log({ storedDocs, docsToDelete, updatedDocs });
 
     const { rowCount } = await pool.query(
-      `UPDATE workers SET fullname = $1, phone = $2,  daily_wage_salary = $3, username = $4, docs = $5 WHERE id = $6;`,
+      `UPDATE workers SET fullname = $1, phone = $2,  daily_wage_salary = $3, username = $4, docs = $5, password = $6 WHERE id = $7;`,
       [
         fullname,
         phone,
         daily_wage_salary,
         username,
         updatedDocs,
+        password,
         parseInt(worker_id),
       ]
     );

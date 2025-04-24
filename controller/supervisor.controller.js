@@ -300,50 +300,50 @@ async function getAllSupervisors(req, res) {
   }
 }
 
-async function siteAssign(req, res) {
-  const { supervisor_id } = req.body;
-  const site_id = req.params.siteId;
+// async function siteAssign(req, res) {
+//   const { supervisor_id } = req.body;
+//   const site_id = req.params.siteId;
 
-  try {
-    const site = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
-      parseInt(site_id),
-    ]);
+//   try {
+//     const site = await pool.query(`SELECT * FROM sites WHERE id = $1`, [
+//       parseInt(site_id),
+//     ]);
 
-    if (site.rowCount === 0) {
-      return res.status(404).json({ message: "Site not exist!" });
-    }
+//     if (site.rowCount === 0) {
+//       return res.status(404).json({ message: "Site not exist!" });
+//     }
 
-    const supervisor = await pool.query(
-      `SELECT * FROM supervisors WHERE id = $1`,
-      [parseInt(supervisor_id)]
-    );
+//     const supervisor = await pool.query(
+//       `SELECT * FROM supervisors WHERE id = $1`,
+//       [parseInt(supervisor_id)]
+//     );
 
-    if (supervisor.rowCount === 0) {
-      return res.status(404).json({ message: "Supervisor not exist!" });
-    }
+//     if (supervisor.rowCount === 0) {
+//       return res.status(404).json({ message: "Supervisor not exist!" });
+//     }
 
-    const siteId = site.rows[0].id;
-    const supervisorId = supervisor.rows[0].id;
+//     const siteId = site.rows[0].id;
+//     const supervisorId = supervisor.rows[0].id;
 
-    const siteRecord = await pool.query(
-      `SELECT * FROM site_supervisor_map WHERE site_id = $1`,
-      [siteId]
-    );
+//     const siteRecord = await pool.query(
+//       `SELECT * FROM site_supervisor_map WHERE site_id = $1`,
+//       [siteId]
+//     );
 
-    if (siteRecord.rowCount)
-      return res.status(409).json({ message: "Site Already assigned!" });
+//     if (siteRecord.rowCount)
+//       return res.status(409).json({ message: "Site Already assigned!" });
 
-    await pool.query(
-      `INSERT INTO site_supervisor_map (site_id, supervisor_id) VALUES ($1, $2)`,
-      [siteId, supervisorId]
-    );
+//     await pool.query(
+//       `INSERT INTO site_supervisor_map (site_id, supervisor_id) VALUES ($1, $2)`,
+//       [siteId, supervisorId]
+//     );
 
-    res.json({ message: "Site assigned." });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
-  }
-}
+//     res.json({ message: "Site assigned." });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: error.message });
+//   }
+// }
 
 module.exports = {
   createSupervisor,
@@ -351,7 +351,7 @@ module.exports = {
   deleteSupervisorById,
   getSupervisorbyId,
   getAllSupervisors,
-  siteAssign,
+  // siteAssign,
   uploadDocs,
   updateProfileImage,
   updatePassword,

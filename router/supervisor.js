@@ -60,7 +60,7 @@ router.put(
   Controller.updatePassword
 ); //admin
 
-router.put("/site-assign/:siteId", verifyTokenAndAdmin, Controller.siteAssign);
+// router.put("/site-assign/:siteId", verifyTokenAndAdmin, Controller.siteAssign);
 
 router.delete("/", verifyTokenAndAdmin, Controller.deleteSupervisorById); //admin
 

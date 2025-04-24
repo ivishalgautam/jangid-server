@@ -34,12 +34,12 @@ async function createSite(req, res) {
       ]
     );
 
-    if (req.user.role === "supervisor") {
-      await pool.query(
-        `INSERT INTO site_supervisor_map (site_id, supervisor_id) VALUES ($1, $2)`,
-        [rows[0].id, req.user.id]
-      );
-    }
+    // if (req.user.role === "supervisor") {
+    //   await pool.query(
+    //     `INSERT INTO site_supervisor_map (site_id, supervisor_id) VALUES ($1, $2)`,
+    //     [rows[0].id, req.user.id]
+    //   );
+    // }
 
     res.json({ message: "Site created", site_id: rows[0].id });
   } catch (error) {
