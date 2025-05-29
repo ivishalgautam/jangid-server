@@ -376,15 +376,15 @@ async function workerCheckIn(req, res) {
         .json({ message: "You are not assigned to any site!" });
     }
 
-    const supervisor = await pool.query(
-      `select supervisor_id from site_supervisor_map where site_id = $1`,
-      [siteAssigned.rows[0].id]
-    );
+    // const supervisor = await pool.query(
+    //   `select supervisor_id from site_supervisor_map where site_id = $1`,
+    //   [siteAssigned.rows[0].id]
+    // );
 
-    if (!supervisor.rowCount)
-      return res
-        .status(409)
-        .json({ message: "Supervisor not assigned to site!" });
+    // if (!supervisor.rowCount)
+    //   return res
+    //     .status(409)
+    //     .json({ message: "Supervisor not assigned to site!" });
 
     console.log(siteAssigned.rows[0]);
     const currentTime = new Date(
